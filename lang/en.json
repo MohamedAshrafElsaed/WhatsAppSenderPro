@@ -209,28 +209,6 @@
             "jordan": "Jordan"
         }
     },
-    "dashboard": {
-        "title": "Dashboard",
-        "welcome": "Welcome back! Here's an overview of your account.",
-        "whatsapp_not_connected": "WhatsApp Not Connected",
-        "whatsapp_not_connected_desc": "Connect your WhatsApp to start sending messages.",
-        "connect_now": "Connect Now",
-        "total_imports": "Total Imports",
-        "valid_contacts": "Valid Contacts",
-        "total_campaigns": "Total Campaigns",
-        "messages_sent": "Messages Sent",
-        "recent_imports": "Recent Imports",
-        "recent_campaigns": "Recent Campaigns",
-        "no_imports": "No imports yet",
-        "no_campaigns": "No campaigns yet",
-        "view": "View",
-        "valid_contacts_suffix": "valid contacts",
-        "status": "Status",
-        "from_csv_excel": "From CSV/Excel",
-        "ready_to_message": "Ready to message",
-        "active_and_completed": "Active & completed",
-        "successfully_delivered": "Successfully delivered"
-    },
     "sidebar": {
         "contacts": "Contacts",
         "campaigns": "Campaigns",
@@ -388,57 +366,6 @@
         "message_content": "Message Content",
         "message_type": "Message Type"
     },
-    "segments": {
-        "title": "Segments",
-        "description": "Organize contacts into segments for targeted campaigns",
-        "create": "Create Segment",
-        "edit": "Edit Segment",
-        "create_description": "Group contacts together for easier campaign management",
-        "edit_description": "Update segment details and contacts",
-        "segment_details": "Segment Details",
-        "segment_name": "Segment Name",
-        "segment_name_placeholder": "e.g., Premium Customers, VIP List",
-        "description": "Description",
-        "description_placeholder": "Brief description of this segment...",
-        "select_contacts": "Select Contacts",
-        "selected": "selected",
-        "search_contacts": "Search contacts...",
-        "all_contacts": "All Contacts",
-        "no_contacts_found": "No contacts found",
-        "select_at_least_one": "Please select at least one contact to create a segment",
-        "create_segment": "Create Segment",
-        "update_segment": "Update Segment",
-        "creating": "Creating...",
-        "updating": "Updating...",
-        "no_segments": "No Segments Yet",
-        "get_started": "Create your first segment to organize contacts effectively",
-        "create_first": "Create First Segment",
-        "actions": "Actions",
-        "total_contacts": "Total Contacts",
-        "valid_contacts": "Valid Contacts",
-        "health": "Health",
-        "valid": "Valid",
-        "invalid": "Invalid",
-        "campaigns_using": "Campaigns",
-        "created": "Created",
-        "delete_confirm": "Are you sure you want to delete this segment? This cannot be undone.",
-        "contacts_list": "Contacts in Segment",
-        "showing_first_100": "Showing first 100 contacts",
-        "no_contacts": "No contacts in this segment",
-        "recent_campaigns": "Recent Campaigns",
-        "campaigns_using_segment": "Campaigns that used this segment",
-        "campaigns": "Campaigns",
-        "active": "Active",
-        "sent": "Sent",
-        "failed": "Failed",
-        "success_rate": "Success Rate",
-        "no_campaigns": "No campaigns have used this segment yet",
-        "create_campaign": "Create Campaign",
-        "statistics": "Statistics",
-        "last_campaign": "Last Campaign",
-        "total_messages": "Total Messages",
-        "campaign_performance": "Campaign Performance"
-    },
     "imports": {
         "title": "Contact Imports",
         "description": "Upload and manage your contact lists",
@@ -567,5 +494,163 @@
         "error": "something went wrong",
         "back_to_dashboard": "Back to Dashboard"
 
+    },
+
+
+
+    "landing": {
+        "brand_name": "WA Pro",
+        "meta": {
+            "title": "WA Pro - Professional WhatsApp Bulk Messaging",
+            "description": "Send personalized bulk WhatsApp messages safely. Supports 1000 devices, CSV/Excel import, and ban protection."
+        },
+        "nav": {
+            "features": "Features",
+            "pricing": "Pricing",
+            "how_it_works": "How It Works",
+            "login": "Login",
+            "get_started": "Get Started"
+        },
+        "hero": {
+            "badge": "🚀 Trusted by 10,000+ businesses",
+            "title": "Send Bulk WhatsApp Messages That Convert",
+            "subtitle": "Professional bulk messaging system for businesses and marketers. Connect WhatsApp, import contacts, and send personalized messages to 1000 devices simultaneously with ban protection.",
+            "cta_primary": "Start Free Trial",
+            "cta_secondary": "View Pricing",
+            "demo": {
+                "title": "Active Campaign",
+                "subtitle": "Sending messages...",
+                "devices": "Devices",
+                "success": "Success Rate"
+            }
+        },
+        "features": {
+            "badge": "Features",
+            "title": "Everything You Need to Scale Your Outreach",
+            "subtitle": "Powerful features designed to help you reach more customers while keeping your account safe",
+            "multi_device": "Multi-Device Support",
+            "multi_device_desc": "Connect up to 1000 WhatsApp devices simultaneously and manage them from a single dashboard",
+            "import_contacts": "Smart Contact Import",
+            "import_contacts_desc": "Import contacts from CSV, Excel, or Google Sheets with automatic validation and duplicate detection",
+            "personalized": "Message Personalization",
+            "personalized_desc": "Use custom fields to personalize each message with recipient's name, company, or any custom data",
+            "rate_limiting": "Ban Protection",
+            "rate_limiting_desc": "Smart rate limiting and random time gaps protect your WhatsApp account from being banned",
+            "analytics": "Real-Time Analytics",
+            "analytics_desc": "Track message delivery, read rates, and campaign performance with detailed reports and insights",
+            "campaign": "Campaign Management",
+            "campaign_desc": "Create, schedule, and manage multiple campaigns with templates, automation, and A/B testing"
+        },
+        "how_it_works": {
+            "badge": "Simple Process",
+            "title": "Get Started in 4 Easy Steps",
+            "subtitle": "From setup to sending your first campaign in minutes",
+            "step1_title": "Connect WhatsApp",
+            "step1_desc": "Scan QR code to connect your WhatsApp devices securely",
+            "step2_title": "Import Contacts",
+            "step2_desc": "Upload your contact list via CSV, Excel, or Google Sheets",
+            "step3_title": "Create Campaign",
+            "step3_desc": "Design personalized messages with templates and custom fields",
+            "step4_title": "Send & Track",
+            "step4_desc": "Launch your campaign and monitor results in real-time"
+        },
+        "pricing": {
+            "badge": "Pricing",
+            "title": "Choose Your Perfect Plan",
+            "subtitle": "Start with a free trial, then select the plan that fits your needs",
+            "popular": "Most Popular",
+            "best_value": "Best Value",
+            "free_trial": "Free Trial",
+            "free_trial_desc": "7 days or 1,000 messages - No credit card required",
+            "start_trial": "Start Free Trial",
+            "core_features": "Core Features",
+            "coming_soon": "Coming Soon",
+            "choose_plan": "Choose Plan",
+            "silver": {
+                "name": "WA Pro Silver",
+                "price": "49 LE/month",
+                "messages": "Send up to 5,000 messages/month",
+                "contacts": "Verify 5,000 contacts/month",
+                "templates": "Save 3 message templates",
+                "team": "Manage 1 team member"
+            },
+            "platinum": {
+                "name": "WA Pro Platinum",
+                "price": "59 LE/month",
+                "messages": "Send up to 10,000 messages/month",
+                "contacts": "Verify 10,000 contacts/month",
+                "templates": "Save 10 message templates",
+                "team": "Manage up to 3 team members",
+                "advanced_unsubscribe": "Advanced unsubscribe list (up to 20)",
+                "attachments": "Multiple attachments (up to 3 files)",
+                "no_watermark": "Remove SheetWA watermark"
+            },
+            "gold": {
+                "name": "WA Pro Gold",
+                "price": "99 LE/month",
+                "messages": "Unlimited messages",
+                "contacts": "Unlimited contact verification",
+                "templates": "Save up to 20 message templates",
+                "team": "Manage unlimited team members",
+                "large_unsubscribe": "Large unsubscribe list (up to 40)",
+                "max_attachments": "Send up to 6 attachments per message",
+                "full_integration": "Full Google Sheets + Excel + CSV Integration"
+            },
+            "features": {
+                "unsubscribe": "Unsubscribe list",
+                "auto_ignore": "Auto-ignore invalid numbers",
+                "media": "Send images, videos & documents",
+                "personalization": "Message personalization (names/data)",
+                "reports": "Detailed sent/not sent reports",
+                "google_sheets": "Google Sheets Integration",
+                "attachments": "Multiple attachments",
+                "preview": "Message preview",
+                "batch": "Batch sending",
+                "excel_csv": "Excel & CSV Integration",
+                "quick_reply": "Quick Reply",
+                "privacy": "Privacy Protect",
+                "time_gap": "Random Time Gap",
+                "timestamp": "Add Timestamp",
+                "ai_reply": "AI Reply Suggestions"
+            }
+        },
+        "trust": {
+            "title": "Trusted by Businesses Worldwide",
+            "users": "Active Users",
+            "messages": "Messages Sent",
+            "rating": "User Rating",
+            "countries": "Countries",
+            "secure": "Secure & Encrypted",
+            "ban_protection": "Ban Protection",
+            "rated": "Highly Rated",
+            "support": "24/7 Support"
+        },
+        "cta": {
+            "title": "Ready to Transform Your WhatsApp Marketing?",
+            "subtitle": "Join thousands of businesses already using WA Pro to grow their customer base",
+            "start_free": "Start Free Trial",
+            "contact_sales": "Contact Sales"
+        },
+        "footer": {
+            "tagline": "Professional WhatsApp bulk messaging for modern businesses",
+            "product": "Product",
+            "company": "Company",
+            "about": "About Us",
+            "contact": "Contact",
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service",
+            "follow_us": "Follow Us",
+            "copyright": "© 2025 WA Pro. All rights reserved."
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome back",
+        "stats": {
+            "sessions": "Active Sessions",
+            "contacts": "Total Contacts",
+            "messages": "Messages Sent",
+            "campaigns": "Active Campaigns"
+        }
     }
 }
