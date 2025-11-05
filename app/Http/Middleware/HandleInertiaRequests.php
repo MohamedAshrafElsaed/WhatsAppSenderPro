@@ -46,7 +46,30 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'first_name' => $request->user()->first_name,
+                    'last_name' => $request->user()->last_name,
+                    'full_name' => $request->user()->full_name,
+                    'email' => $request->user()->email,
+                    'mobile_number' => $request->user()->mobile_number,
+                    'formatted_mobile' => $request->user()->formatted_mobile,
+                    'country' => $request->user()->country ? [
+                        'id' => $request->user()->country->id,
+                        'name' => $request->user()->country->name,
+                        'phone_code' => $request->user()->country->phone_code,
+                        'iso_code' => $request->user()->country->iso_code,
+                    ] : null,
+                    'industry' => $request->user()->industry ? [
+                        'id' => $request->user()->industry->id,
+                        'name' => $request->user()->industry->name,
+                        'slug' => $request->user()->industry->slug,
+                    ] : null,
+                    'locale' => $request->user()->locale,
+                    'email_verified_at' => $request->user()->email_verified_at,
+                    'mobile_verified_at' => $request->user()->mobile_verified_at,
+                ] : null,
+                'jwt_token' => session('jwt_token'),
             ],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [

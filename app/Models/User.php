@@ -3,6 +3,7 @@
 namespace App\Models;
 
 
+use App\Services\JWTService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -35,13 +36,12 @@ class User extends Authenticatable
         'mobile_verified_at' => 'datetime',
     ];
 
-    // Relationships
-    public function country()
+    public function country(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Country::class);
     }
 
-    public function industry()
+    public function industry(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Industry::class);
     }
@@ -51,8 +51,7 @@ class User extends Authenticatable
         return $this->hasMany(UserDevice::class);
     }
 
-    // Accessors
-    public function getFullNameAttribute()
+    public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
     }
@@ -65,7 +64,6 @@ class User extends Authenticatable
         return $this->mobile_number;
     }
 
-    // Scopes
     public function scopeVerified($query)
     {
         return $query->whereNotNull('email_verified_at');
@@ -76,5 +74,21 @@ class User extends Authenticatable
         return $query->whereHas('country', function ($q) use ($countryCode) {
             $q->where('iso_code', $countryCode);
         });
+    }
+
+    /**
+     * Generate JWT token for WhatsApp API
+     */
+    public function generateJWT(): string
+    {
+        return app(JWTService::class)->generateToken($this);
+    }
+
+    /**
+     * Get JWT token expiration time
+     */
+    public function getJWTExpiration(): \Carbon\Carbon
+    {
+        return app(JWTService::class)->getTokenExpiration();
     }
 }

@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\Country;
+use App\Models\Industry;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -66,7 +68,24 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn () => Inertia::render('auth/Register'));
+        Fortify::registerView(fn () => Inertia::render('auth/Register', [
+            'countries' => Country::active()
+                ->get()
+                ->map(fn($country) => [
+                    'id' => $country->id,
+                    'name' => $country->name, // Uses locale accessor
+                    'phone_code' => $country->phone_code,
+                    'iso_code' => $country->iso_code,
+                ]),
+            'industries' => Industry::active()
+                ->sorted()
+                ->get()
+                ->map(fn($industry) => [
+                    'id' => $industry->id,
+                    'name' => $industry->name, // Uses locale accessor
+                    'slug' => $industry->slug,
+                ]),
+        ]));
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/TwoFactorChallenge'));
 

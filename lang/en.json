@@ -160,53 +160,82 @@
         "copyright": "© 2025 BulkWhatsApp. All rights reserved."
     },
     "auth": {
-        "login_title": "Log in to your account",
-        "login_description": "Enter your phone number and password to log in",
-        "register_title": "Create an account",
-        "register_description": "Enter your details below to create your account",
-        "forgot_password_title": "Forgot password",
-        "forgot_password_description": "Enter your email to receive a password reset link",
-        "first_name": "First Name",
-        "last_name": "Last Name",
-        "email": "Email (Optional)",
-        "email_required": "Email address",
-        "email_placeholder": "email@example.com",
-        "industry": "Industry (Optional)",
-        "phone": "Phone Number",
-        "country_code": "Country Code",
-        "password": "Password",
-        "confirm_password": "Confirm Password",
-        "phone_note": "⚠️ Enter phone number without country code. You must have WhatsApp on this number.",
-        "phone_error": "Don't include country code {code} in the phone number",
-        "already_have_account": "Already have an account?",
-        "dont_have_account": "Don't have an account?",
-        "sign_up": "Sign up",
-        "log_in": "Log in",
-        "create_account": "Create account",
-        "logging_in": "Logging in...",
-        "creating": "Creating...",
-        "send_reset_link": "Email password reset link",
-        "sending": "Sending...",
-        "return_to_login": "Or, return to",
-        "placeholder": {
+        "register": {
+            "title": "Create an account",
+            "mobile_hint": "Enter number without country code",
+            "description": "Enter your details to get started",
+            "first_name": "First Name",
+            "last_name": "Last Name",
+            "email": "Email Address",
+            "mobile": "Mobile Number",
+            "country": "Country",
+            "industry": "Industry",
+            "password": "Password",
+            "password_confirmation": "Confirm Password",
+            "submit": "Create Account",
+            "have_account": "Already have an account?",
+            "login": "Log in"
+        },
+        "login": {
+            "title": "Log in to your account",
+            "description": "Enter your email and password below to log in",
+            "email": "Email address",
+            "password": "Password",
+            "remember_me": "Remember me",
+            "forgot_password": "Forgot password?",
+            "submit": "Log in",
+            "no_account": "Don't have an account?",
+            "sign_up": "Sign up"
+        },
+        "forgot_password": {
+            "title": "Forgot password",
+            "description": "Enter your email to receive a password reset link",
+            "email": "Email address",
+            "submit": "Email password reset link",
+            "back_text": "Or, return to",
+            "back_link": "log in"
+        },
+        "reset_password": {
+            "title": "Reset password",
+            "description": "Please enter your new password below",
+            "email": "Email",
+            "password": "Password",
+            "password_confirmation": "Confirm Password",
+            "submit": "Reset password"
+        },
+        "confirm_password": {
+            "title": "Confirm your password",
+            "description": "This is a secure area of the application. Please confirm your password before continuing.",
+            "password": "Password",
+            "submit": "Confirm Password"
+        },
+        "two_factor": {
+            "page_title": "Two-Factor Authentication",
+            "title": "Authentication Code",
+            "description": "Enter the authentication code provided by your authenticator application.",
+            "recovery_title": "Recovery Code",
+            "recovery_description": "Please confirm access to your account by entering one of your emergency recovery codes.",
+            "recovery_placeholder": "Enter recovery code",
+            "use_code": "login using an authentication code",
+            "use_recovery": "login using a recovery code",
+            "submit": "Continue",
+            "or": "or you can"
+        },
+        "verify_email": {
+            "title": "Verify email",
+            "description": "Please verify your email address by clicking on the link we just emailed to you.",
+            "link_sent": "A new verification link has been sent to the email address you provided during registration.",
+            "resend": "Resend verification email",
+            "logout": "Log out"
+        },
+        "placeholders": {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john@example.com",
-            "phone": "1099999999",
-            "password": "Password",
-            "confirm_password": "Confirm password",
-            "industry": "Select your industry",
-            "search_industry": "Search industries...",
-            "country_code": "Code"
-        },
-        "countries": {
-            "us_canada": "US/Canada",
-            "egypt": "Egypt",
-            "uk": "UK",
-            "india": "India",
-            "uae": "UAE",
-            "saudi_arabia": "Saudi Arabia",
-            "jordan": "Jordan"
+            "email": "email@example.com",
+            "mobile": "1234567890",
+            "select_country": "Select country",
+            "select_industry": "Select industry",
+            "password": "Min 8 characters"
         }
     },
     "sidebar": {
@@ -640,7 +669,8 @@
             "privacy": "Privacy Policy",
             "terms": "Terms of Service",
             "follow_us": "Follow Us",
-            "copyright": "© 2025 WA Pro. All rights reserved."
+            "copyright": "© 2025 WA Pro. All rights reserved.",
+            "rights": "All rights reserved."
         }
     },
     "dashboard": {

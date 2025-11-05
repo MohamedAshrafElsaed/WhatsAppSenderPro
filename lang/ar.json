@@ -160,53 +160,82 @@
         "copyright": "© 2025 وأتساب جماعي. جميع الحقوق محفوظة."
     },
     "auth": {
-        "login_title": "تسجيل الدخول إلى حسابك",
-        "login_description": "أدخل رقم هاتفك وكلمة المرور لتسجيل الدخول",
-        "register_title": "إنشاء حساب",
-        "register_description": "أدخل تفاصيلك أدناه لإنشاء حسابك",
-        "forgot_password_title": "نسيت كلمة المرور",
-        "forgot_password_description": "أدخل بريدك الإلكتروني لتلقي رابط إعادة تعيين كلمة المرور",
-        "first_name": "الاسم الأول",
-        "last_name": "اسم العائلة",
-        "email": "البريد الإلكتروني (اختياري)",
-        "email_required": "عنوان البريد الإلكتروني",
-        "email_placeholder": "email@example.com",
-        "industry": "المجال (اختياري)",
-        "phone": "رقم الهاتف",
-        "country_code": "رمز الدولة",
-        "password": "كلمة المرور",
-        "confirm_password": "تأكيد كلمة المرور",
-        "phone_note": "⚠️ أدخل رقم الهاتف بدون رمز الدولة. يجب أن يكون لديك وأتساب على هذا الرقم.",
-        "phone_error": "لا تضمن رمز الدولة {code} في رقم الهاتف",
-        "already_have_account": "هل لديك حساب بالفعل؟",
-        "dont_have_account": "ليس لديك حساب؟",
-        "sign_up": "سجل",
-        "log_in": "تسجيل الدخول",
-        "create_account": "إنشاء حساب",
-        "logging_in": "جارٍ تسجيل الدخول...",
-        "creating": "جارٍ الإنشاء...",
-        "send_reset_link": "إرسال رابط إعادة تعيين كلمة المرور",
-        "sending": "جارٍ الإرسال...",
-        "return_to_login": "أو، العودة إلى",
-        "placeholder": {
-            "first_name": "أحمد",
-            "last_name": "محمد",
-            "email": "example@email.com",
-            "phone": "1099999999",
+        "register": {
+            "title": "إنشاء حساب",
+            "mobile_hint": "أدخل الرقم بدون رمز الدولة",
+            "description": "أدخل بياناتك للبدء",
+            "first_name": "الاسم الأول",
+            "last_name": "اسم العائلة",
+            "email": "البريد الإلكتروني",
+            "mobile": "رقم الجوال",
+            "country": "الدولة",
+            "industry": "المجال",
             "password": "كلمة المرور",
-            "confirm_password": "تأكيد كلمة المرور",
-            "industry": "اختر مجالك",
-            "search_industry": "ابحث عن المجالات...",
-            "country_code": "الرمز"
+            "password_confirmation": "تأكيد كلمة المرور",
+            "submit": "إنشاء حساب",
+            "have_account": "لديك حساب بالفعل؟",
+            "login": "تسجيل الدخول"
         },
-        "countries": {
-            "us_canada": "أمريكا/كندا",
-            "egypt": "مصر",
-            "uk": "المملكة المتحدة",
-            "india": "الهند",
-            "uae": "الإمارات",
-            "saudi_arabia": "السعودية",
-            "jordan": "الأردن"
+        "login": {
+            "title": "تسجيل الدخول إلى حسابك",
+            "description": "أدخل بريدك الإلكتروني وكلمة المرور أدناه لتسجيل الدخول",
+            "email": "البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "remember_me": "تذكرني",
+            "forgot_password": "نسيت كلمة المرور؟",
+            "submit": "تسجيل الدخول",
+            "no_account": "ليس لديك حساب؟",
+            "sign_up": "سجل الآن"
+        },
+        "forgot_password": {
+            "title": "نسيت كلمة المرور",
+            "description": "أدخل بريدك الإلكتروني لتلقي رابط إعادة تعيين كلمة المرور",
+            "email": "البريد الإلكتروني",
+            "submit": "إرسال رابط إعادة التعيين",
+            "back_text": "أو، العودة إلى",
+            "back_link": "تسجيل الدخول"
+        },
+        "reset_password": {
+            "title": "إعادة تعيين كلمة المرور",
+            "description": "الرجاء إدخال كلمة المرور الجديدة أدناه",
+            "email": "البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "password_confirmation": "تأكيد كلمة المرور",
+            "submit": "إعادة تعيين كلمة المرور"
+        },
+        "confirm_password": {
+            "title": "تأكيد كلمة المرور",
+            "description": "هذه منطقة آمنة من التطبيق. يرجى تأكيد كلمة المرور الخاصة بك قبل المتابعة.",
+            "password": "كلمة المرور",
+            "submit": "تأكيد كلمة المرور"
+        },
+        "two_factor": {
+            "page_title": "المصادقة الثنائية",
+            "title": "رمز المصادقة",
+            "description": "أدخل رمز المصادقة المقدم من تطبيق المصادقة الخاص بك.",
+            "recovery_title": "رمز الاسترداد",
+            "recovery_description": "يرجى تأكيد الوصول إلى حسابك عن طريق إدخال أحد رموز الاسترداد الطارئة.",
+            "recovery_placeholder": "أدخل رمز الاسترداد",
+            "use_code": "تسجيل الدخول باستخدام رمز المصادقة",
+            "use_recovery": "تسجيل الدخول باستخدام رمز الاسترداد",
+            "submit": "متابعة",
+            "or": "أو يمكنك"
+        },
+        "verify_email": {
+            "title": "تحقق من البريد الإلكتروني",
+            "description": "يرجى التحقق من عنوان بريدك الإلكتروني بالنقر على الرابط الذي أرسلناه إليك للتو.",
+            "link_sent": "تم إرسال رابط تحقق جديد إلى عنوان البريد الإلكتروني الذي قدمته أثناء التسجيل.",
+            "resend": "إعادة إرسال بريد التحقق",
+            "logout": "تسجيل الخروج"
+        },
+        "placeholders": {
+            "first_name": "محمد",
+            "last_name": "أحمد",
+            "email": "email@example.com",
+            "mobile": "1234567890",
+            "select_country": "اختر الدولة",
+            "select_industry": "اختر المجال",
+            "password": "8 أحرف على الأقل"
         }
     },
     "sidebar": {
@@ -221,7 +250,6 @@
     "feature_requests": {
         "title": "طلبات الميزات",
         "suggest_feature": "اقترح ميزة"
-
     },
     "campaigns": {
         "delay_between_messages": "الفاصل الزمني بين الرسائل",
@@ -339,8 +367,6 @@
         "status_sent": "تم الإرسال",
         "status_queued": "قيد التشغيل",
         "start": "بدأ"
-
-
     },
     "coming_soon": {
         "planned_features": "الميزات المخطط لها",
@@ -498,7 +524,6 @@
         "optional": "اختياري",
         "error": "خطأ"
     },
-
     "landing": {
         "brand_name": "واتساب برو",
         "meta": {
@@ -641,7 +666,8 @@
             "privacy": "سياسة الخصوصية",
             "terms": "شروط الخدمة",
             "follow_us": "تابعنا",
-            "copyright": "© 2025 واتساب برو. جميع الحقوق محفوظة."
+            "copyright": "© 2025 واتساب برو. جميع الحقوق محفوظة.",
+            "rights": "جميع الحقوق محفوظة."
         }
     },
     "dashboard": {

@@ -1,110 +1,183 @@
 <script setup lang="ts">
+import { Head, Link, Form } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
-import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import AuthBase from '@/layouts/AuthLayout.vue';
+import LandingLayout from '@/layouts/LandingLayout.vue';
+import { useTranslation } from '@/composables/useTranslation';
+import { Loader2 } from 'lucide-vue-next';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
 
 defineProps<{
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
 }>();
+
+const { t } = useTranslation();
 </script>
 
 <template>
-    <AuthBase
-        title="Log in to your account"
-        description="Enter your email and password below to log in"
-    >
-        <Head title="Log in" />
+    <LandingLayout>
+        <Head :title="t('auth.login.title', 'Log in')" />
 
-        <div
-            v-if="status"
-            class="mb-4 text-center text-sm font-medium text-green-600"
-        >
-            {{ status }}
-        </div>
+        <div class="mx-auto max-w-md px-4 py-16">
+            <!-- Header -->
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold tracking-tight">
+                    {{ t('auth.login.title', 'Log in to your account') }}
+                </h1>
+                <p class="mt-2 text-muted-foreground">
+                    {{
+                        t(
+                            'auth.login.description',
+                            'Enter your email and password below to log in'
+                        )
+                    }}
+                </p>
+            </div>
 
-        <Form
-            v-bind="store.form()"
-            :reset-on-success="['password']"
-            v-slot="{ errors, processing }"
-            class="flex flex-col gap-6"
-        >
-            <div class="grid gap-6">
-                <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="email"
-                        placeholder="email@example.com"
-                    />
-                    <InputError :message="errors.email" />
-                </div>
-
-                <div class="grid gap-2">
-                    <div class="flex items-center justify-between">
-                        <Label for="password">Password</Label>
-                        <TextLink
-                            v-if="canResetPassword"
-                            :href="request()"
-                            class="text-sm"
-                            :tabindex="5"
-                        >
-                            Forgot password?
-                        </TextLink>
-                    </div>
-                    <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        required
-                        :tabindex="2"
-                        autocomplete="current-password"
-                        placeholder="Password"
-                    />
-                    <InputError :message="errors.password" />
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" :tabindex="3" />
-                        <span>Remember me</span>
-                    </Label>
-                </div>
-
-                <Button
-                    type="submit"
-                    class="mt-4 w-full"
-                    :tabindex="4"
-                    :disabled="processing"
-                    data-test="login-button"
+            <!-- Login Form -->
+            <div class="rounded-lg border bg-card p-8 shadow-sm">
+                <div
+                    v-if="status"
+                    class="mb-4 text-center text-sm font-medium text-green-600"
                 >
-                    <Spinner v-if="processing" />
-                    Log in
-                </Button>
-            </div>
+                    {{ status }}
+                </div>
 
-            <div
-                class="text-center text-sm text-muted-foreground"
-                v-if="canRegister"
-            >
-                Don't have an account?
-                <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
+                <Form
+                    v-bind="store.form()"
+                    :reset-on-success="['password']"
+                    v-slot="{ errors, processing }"
+                    class="flex flex-col gap-6"
+                >
+                    <div class="grid gap-6">
+                        <!-- Email -->
+                        <div class="grid gap-2">
+                            <Label for="email">
+                                {{ t('auth.login.email', 'Email address') }}
+                                <span class="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                name="email"
+                                required
+                                autofocus
+                                :tabindex="1"
+                                autocomplete="email"
+                                :placeholder="
+                                    t(
+                                        'auth.placeholders.email',
+                                        'email@example.com'
+                                    )
+                                "
+                                :class="{ 'border-destructive': errors.email }"
+                            />
+                            <InputError :message="errors.email" />
+                        </div>
+
+                        <!-- Password -->
+                        <div class="grid gap-2">
+                            <div
+                                class="flex items-center justify-between"
+                            >
+                                <Label for="password">
+                                    {{
+                                        t('auth.login.password', 'Password')
+                                    }}
+                                    <span class="text-destructive">*</span>
+                                </Label>
+                                <Link
+                                    v-if="canResetPassword"
+                                    :href="request()"
+                                    class="text-sm font-medium text-[#25D366] hover:text-[#128C7E] hover:underline"
+                                    :tabindex="5"
+                                >
+                                    {{
+                                        t(
+                                            'auth.login.forgot_password',
+                                            'Forgot password?'
+                                        )
+                                    }}
+                                </Link>
+                            </div>
+                            <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                required
+                                :tabindex="2"
+                                autocomplete="current-password"
+                                :placeholder="
+                                    t('auth.placeholders.password', 'Password')
+                                "
+                                :class="{
+                                    'border-destructive': errors.password,
+                                }"
+                            />
+                            <InputError :message="errors.password" />
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="flex items-center justify-between">
+                            <Label
+                                for="remember"
+                                class="flex cursor-pointer items-center space-x-3"
+                            >
+                                <Checkbox
+                                    id="remember"
+                                    name="remember"
+                                    :tabindex="3"
+                                />
+                                <span>{{
+                                        t('auth.login.remember_me', 'Remember me')
+                                    }}</span>
+                            </Label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <Button
+                            type="submit"
+                            class="mt-2 w-full bg-[#25D366] hover:bg-[#128C7E]"
+                            :tabindex="4"
+                            :disabled="processing"
+                            data-test="login-button"
+                        >
+                            <Loader2
+                                v-if="processing"
+                                class="mr-2 h-4 w-4 animate-spin"
+                            />
+                            {{ t('auth.login.submit', 'Log in') }}
+                        </Button>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div
+                        class="text-center text-sm text-muted-foreground"
+                        v-if="canRegister"
+                    >
+                        {{
+                            t(
+                                'auth.login.no_account',
+                                "Don't have an account?"
+                            )
+                        }}
+                        <Link
+                            :href="register()"
+                            :tabindex="5"
+                            class="font-medium text-[#25D366] hover:text-[#128C7E] hover:underline"
+                        >
+                            {{ t('auth.login.sign_up', 'Sign up') }}
+                        </Link>
+                    </div>
+                </Form>
             </div>
-        </Form>
-    </AuthBase>
+        </div>
+    </LandingLayout>
 </template>

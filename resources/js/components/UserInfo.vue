@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useInitials } from '@/composables/useInitials';
-import type { User } from '@/types';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-interface Props {
-    user: User;
-    showEmail?: boolean;
-}
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 
-const props = withDefaults(defineProps<Props>(), {
-    showEmail: false,
+// Get user initials from first_name and last_name
+const userInitials = computed(() => {
+    if (!user.value) return '??';
+
+    const firstName = user.value.first_name || '';
+    const lastName = user.value.last_name || '';
+
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 });
 
-const { getInitials } = useInitials();
-
-// Compute whether we should show the avatar image
-const showAvatar = computed(
-    () => props.user.avatar && props.user.avatar !== '',
-);
+// Get full name
+const fullName = computed(() => {
+    if (!user.value) return 'Guest';
+    return user.value.full_name || `${user.value.first_name} ${user.value.last_name}`;
+});
 </script>
 
 <template>
-    <Avatar class="h-8 w-8 overflow-hidden rounded-lg">
-        <AvatarImage v-if="showAvatar" :src="user.avatar!" :alt="user.name" />
-        <AvatarFallback class="rounded-lg text-black dark:text-white">
-            {{ getInitials(user.name) }}
-        </AvatarFallback>
-    </Avatar>
-
-    <div class="grid flex-1 text-left text-sm leading-tight">
-        <span class="truncate font-medium">{{ user.name }}</span>
-        <span v-if="showEmail" class="truncate text-xs text-muted-foreground">{{
-            user.email
-        }}</span>
+    <div v-if="user" class="flex items-center gap-3">
+        <Avatar class="size-8">
+            <AvatarFallback class="text-xs">
+                {{ userInitials }}
+            </AvatarFallback>
+        </Avatar>
+        <div class="flex flex-col">
+            <span class="text-sm font-medium leading-none">{{ fullName }}</span>
+            <span class="text-xs text-muted-foreground">{{ user.email }}</span>
+        </div>
     </div>
 </template>
