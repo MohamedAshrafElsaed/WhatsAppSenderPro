@@ -50,8 +50,8 @@ const getStoredAppearance = () => {
 
 const handleSystemThemeChange = () => {
     const currentAppearance = getStoredAppearance();
-
-    updateTheme(currentAppearance || 'system');
+    // CHANGED: Default from 'system' to 'light'
+    updateTheme(currentAppearance || 'light');
 };
 
 export function initializeTheme() {
@@ -59,15 +59,17 @@ export function initializeTheme() {
         return;
     }
 
-    // Initialize theme from saved preference or default to system...
+    // Initialize theme from saved preference or default to light
     const savedAppearance = getStoredAppearance();
-    updateTheme(savedAppearance || 'system');
+    // CHANGED: Default from 'system' to 'light'
+    updateTheme(savedAppearance || 'light');
 
-    // Set up system theme change listener...
+    // Set up system theme change listener
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
-const appearance = ref<Appearance>('system');
+// CHANGED: Initial ref value from 'system' to 'light'
+const appearance = ref<Appearance>('light');
 
 export function useAppearance() {
     onMounted(() => {
@@ -77,16 +79,19 @@ export function useAppearance() {
 
         if (savedAppearance) {
             appearance.value = savedAppearance;
+        } else {
+            // CHANGED: Added explicit else clause to set default to 'light'
+            appearance.value = 'light';
         }
     });
 
     function updateAppearance(value: Appearance) {
         appearance.value = value;
 
-        // Store in localStorage for client-side persistence...
+        // Store in localStorage for client-side persistence
         localStorage.setItem('appearance', value);
 
-        // Store in cookie for SSR...
+        // Store in cookie for SSR
         setCookie('appearance', value);
 
         updateTheme(value);
