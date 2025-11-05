@@ -31,6 +31,7 @@ import {
     Zap,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
+import LanguageToggle from '@/components/LanguageToggle.vue';
 
 const props = defineProps<{
     canRegister: boolean;
@@ -222,8 +223,8 @@ const trustIndicators = computed(() => [
                         <MessageCircle class="size-6 text-white" />
                     </div>
                     <span class="text-xl font-bold">{{
-                        t('landing.brand_name')
-                    }}</span>
+                            t('landing.brand_name')
+                        }}</span>
                 </div>
                 <nav class="hidden items-center gap-6 md:flex">
                     <a
@@ -246,6 +247,9 @@ const trustIndicators = computed(() => [
                     </a>
                 </nav>
                 <div class="flex items-center gap-3">
+                    <!-- Language Toggle - NEW! -->
+                    <LanguageToggle />
+
                     <Link
                         :href="'/login'"
                         class="hidden text-sm font-medium md:inline-flex"

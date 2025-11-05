@@ -15,7 +15,7 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check for locale in query parameter
+        // Priority 1: Check for locale in query parameter
         if ($request->has('lang')) {
             $locale = $request->get('lang');
             if (in_array($locale, ['en', 'ar'])) {
@@ -25,7 +25,7 @@ class SetLocale
             }
         }
 
-        // Check for locale in session
+        // Priority 2: Check for locale in session
         if (Session::has('locale')) {
             $locale = Session::get('locale');
             if (in_array($locale, ['en', 'ar'])) {
@@ -34,7 +34,7 @@ class SetLocale
             }
         }
 
-        // Check for locale in user preferences (if authenticated)
+        // Priority 3: Check for locale in user preferences (if authenticated)
         if (auth()->check() && auth()->user()->locale) {
             $locale = auth()->user()->locale;
             if (in_array($locale, ['en', 'ar'])) {
@@ -44,9 +44,10 @@ class SetLocale
             }
         }
 
-        // Default to Arabic
-        App::setLocale('ar');
-        Session::put('locale', 'ar');
+        // Priority 4: Default to Arabic (only if no locale found)
+        $defaultLocale = 'ar';
+        App::setLocale($defaultLocale);
+        Session::put('locale', $defaultLocale);
 
         return $next($request);
     }
