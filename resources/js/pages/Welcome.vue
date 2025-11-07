@@ -33,11 +33,28 @@ import {
 import { computed } from 'vue';
 import LanguageToggle from '@/components/LanguageToggle.vue';
 
-const props = defineProps<{
-    canRegister: boolean;
-}>();
+interface Package {
+    id: number;
+    name: string;
+    name_en: string;
+    name_ar: string;
+    slug: string;
+    price: number;
+    formatted_price: string;
+    features: Record<string, any>;
+    limits: Record<string, any>;
+    is_popular: boolean;
+    is_best_value: boolean;
+    color: string;
+}
 
-// Use centralized translation
+interface Props {
+    packages: Package[];
+    canRegister: boolean;
+}
+
+const props = defineProps<Props>();
+
 const { t, isRTL } = useTranslation();
 
 const features = computed(() => [
@@ -100,85 +117,6 @@ const steps = computed(() => [
     },
 ]);
 
-const pricingPlans = computed(() => [
-    {
-        name: t('landing.pricing.silver.name'),
-        price: t('landing.pricing.silver.price'),
-        badge: '',
-        features: [
-            t('landing.pricing.silver.messages'),
-            t('landing.pricing.silver.contacts'),
-            t('landing.pricing.silver.templates'),
-            t('landing.pricing.silver.team'),
-            t('landing.pricing.features.unsubscribe'),
-            t('landing.pricing.features.auto_ignore'),
-            t('landing.pricing.features.media'),
-            t('landing.pricing.features.personalization'),
-            t('landing.pricing.features.reports'),
-            t('landing.pricing.features.google_sheets'),
-        ],
-        comingSoon: [
-            t('landing.pricing.features.quick_reply'),
-            t('landing.pricing.features.privacy'),
-            t('landing.pricing.features.time_gap'),
-            t('landing.pricing.features.timestamp'),
-            t('landing.pricing.features.excel_csv'),
-        ],
-        color: 'silver',
-    },
-    {
-        name: t('landing.pricing.platinum.name'),
-        price: t('landing.pricing.platinum.price'),
-        badge: t('landing.pricing.popular'),
-        features: [
-            t('landing.pricing.platinum.messages'),
-            t('landing.pricing.platinum.contacts'),
-            t('landing.pricing.platinum.templates'),
-            t('landing.pricing.platinum.team'),
-            t('landing.pricing.platinum.advanced_unsubscribe'),
-            t('landing.pricing.platinum.attachments'),
-            t('landing.pricing.features.personalization'),
-            t('landing.pricing.features.preview'),
-            t('landing.pricing.features.reports'),
-            t('landing.pricing.platinum.no_watermark'),
-            t('landing.pricing.features.google_sheets'),
-        ],
-        comingSoon: [
-            t('landing.pricing.features.quick_reply'),
-            t('landing.pricing.features.time_gap'),
-            t('landing.pricing.features.privacy'),
-            t('landing.pricing.features.timestamp'),
-            t('landing.pricing.features.excel_csv'),
-        ],
-        color: 'platinum',
-    },
-    {
-        name: t('landing.pricing.gold.name'),
-        price: t('landing.pricing.gold.price'),
-        badge: t('landing.pricing.best_value'),
-        features: [
-            t('landing.pricing.gold.messages'),
-            t('landing.pricing.gold.contacts'),
-            t('landing.pricing.gold.templates'),
-            t('landing.pricing.gold.team'),
-            t('landing.pricing.gold.large_unsubscribe'),
-            t('landing.pricing.gold.max_attachments'),
-            t('landing.pricing.features.personalization'),
-            t('landing.pricing.features.preview'),
-            t('landing.pricing.features.reports'),
-            t('landing.pricing.features.batch'),
-            t('landing.pricing.gold.full_integration'),
-        ],
-        comingSoon: [
-            t('landing.pricing.features.privacy'),
-            t('landing.pricing.features.time_gap'),
-            t('landing.pricing.features.timestamp'),
-            t('landing.pricing.features.ai_reply'),
-        ],
-        color: 'gold',
-    },
-]);
-
 const trustIndicators = computed(() => [
     {
         icon: Users,
@@ -201,6 +139,67 @@ const trustIndicators = computed(() => [
         label: t('landing.trust.countries'),
     },
 ]);
+
+const getFeatureTranslations = (packageSlug: string, features: Record<string, any>) => {
+    const featureList: Array<{ text: string; available: boolean; comingSoon: boolean }> = [];
+
+    if (packageSlug === 'basic') {
+        featureList.push(
+            { text: t('packages.basic.messages'), available: true, comingSoon: false },
+            { text: t('packages.basic.contacts'), available: true, comingSoon: false },
+            { text: t('packages.basic.numbers'), available: true, comingSoon: false },
+            { text: t('packages.basic.templates'), available: true, comingSoon: false },
+            { text: t('packages.basic.features.csv_import'), available: true, comingSoon: false },
+            { text: t('packages.basic.features.text_messages'), available: true, comingSoon: false },
+            { text: t('packages.basic.features.basic_reports'), available: true, comingSoon: false },
+            { text: t('packages.basic.features.manual_sending'), available: true, comingSoon: false },
+            { text: t('packages.basic.features.browser_only'), available: true, comingSoon: false },
+        );
+    } else if (packageSlug === 'pro') {
+        featureList.push(
+            { text: t('packages.pro.messages'), available: true, comingSoon: false },
+            { text: t('packages.pro.contacts'), available: true, comingSoon: false },
+            { text: t('packages.pro.numbers'), available: true, comingSoon: false },
+            { text: t('packages.pro.templates'), available: true, comingSoon: false },
+            { text: t('packages.pro.features.media'), available: true, comingSoon: false },
+            { text: t('packages.pro.features.groups'), available: true, comingSoon: false },
+            { text: t('packages.pro.features.tagging'), available: true, comingSoon: false },
+            { text: t('packages.pro.features.scheduling'), available: true, comingSoon: false },
+            { text: t('packages.pro.features.dashboard'), available: true, comingSoon: false },
+            { text: t('packages.pro.features.sheets'), available: true, comingSoon: false },
+            { text: t('packages.pro.features.priority_support'), available: true, comingSoon: false },
+        );
+    } else if (packageSlug === 'golden') {
+        featureList.push(
+            { text: t('packages.golden.messages'), available: true, comingSoon: false },
+            { text: t('packages.golden.contacts'), available: true, comingSoon: false },
+            { text: t('packages.golden.numbers'), available: true, comingSoon: false },
+            { text: t('packages.golden.templates'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.full_media'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.drip'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.advanced_segmentation'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.inbox'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.unsubscribe'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.teams'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.api'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.analytics'), available: true, comingSoon: false },
+            { text: t('packages.golden.features.premium_support'), available: true, comingSoon: false },
+        );
+    }
+
+    return featureList;
+};
+
+const getBadgeText = (pkg: Package) => {
+    if (pkg.is_popular) {
+        return t('subscription.popular');
+    }
+    if (pkg.is_best_value) {
+        return t('subscription.best_value');
+    }
+    return '';
+};
+
 </script>
 <template>
     <Head>
@@ -501,18 +500,14 @@ const trustIndicators = computed(() => [
                                     <Clock class="size-8 text-[#25D366]" />
                                     <div>
                                         <CardTitle class="text-2xl">{{
-                                            t('landing.pricing.free_trial')
-                                        }}</CardTitle>
-                                        <CardDescription class="text-base"
-                                            >{{
-                                                t(
-                                                    'landing.pricing.free_trial_desc',
-                                                )
-                                            }}
-                                        </CardDescription>
+                                                t('landing.pricing.free_trial')
+                                            }}</CardTitle>
+                                        <CardDescription class="text-base">{{
+                                                t('landing.pricing.free_trial_desc')
+                                            }}</CardDescription>
                                     </div>
                                 </div>
-                                <Link v-if="canRegister" :href="'/register'">
+                                <Link v-if="canRegister" href="/register">
                                     <Button
                                         class="bg-[#25D366] hover:bg-[#128C7E]"
                                     >
@@ -524,98 +519,89 @@ const trustIndicators = computed(() => [
                     </Card>
                 </div>
 
-                <!-- Pricing Plans -->
+                <!-- Pricing Plans - FIXED VERSION -->
                 <div class="mt-12 grid gap-8 lg:grid-cols-3">
                     <Card
-                        v-for="plan in pricingPlans"
-                        :key="plan.name"
+                        v-for="pkg in packages"
+                        :key="pkg.id"
                         :class="
-                            plan.badge === t('landing.pricing.popular')
-                                ? 'border-2 border-[#25D366] shadow-lg'
-                                : ''
-                        "
-                        class="relative transition-all hover:shadow-lg"
+            pkg.is_popular
+                ? 'border-2 border-[#25D366] shadow-lg'
+                : ''
+        "
+                        class="relative flex flex-col transition-all hover:shadow-lg"
                     >
+                        <!-- Badge - Fixed positioning to not overlap title -->
                         <Badge
-                            v-if="plan.badge"
-                            class="absolute top-4 right-4 bg-[#25D366]"
+                            v-if="pkg.is_popular || pkg.is_best_value"
+                            class="absolute bg-[#25D366]"
+                            :class="isRTL ? 'left-4 top-4' : 'right-4 top-4'"
                         >
-                            {{ plan.badge }}
+                            {{ getBadgeText(pkg) }}
                         </Badge>
-                        <CardHeader>
-                            <CardTitle class="text-2xl">{{
-                                plan.name
-                            }}</CardTitle>
+
+                        <!-- Header with extra padding if badge exists -->
+                        <CardHeader :class="(pkg.is_popular || pkg.is_best_value) ? (isRTL ? 'pl-24' : 'pr-24') : ''">
+                            <CardTitle class="text-2xl">{{ pkg.name }}</CardTitle>
                             <div class="mt-4">
-                                <span class="text-4xl font-bold">{{
-                                    plan.price
-                                }}</span>
+                <span class="text-4xl font-bold">{{
+                        pkg.formatted_price
+                    }}</span>
                             </div>
                         </CardHeader>
-                        <CardContent class="space-y-6">
-                            <div class="space-y-3">
+
+                        <!-- Content - Flex grow to push button to bottom -->
+                        <CardContent class="flex flex-1 flex-col space-y-6">
+                            <div class="flex-1 space-y-3">
                                 <div
                                     class="text-sm font-semibold text-muted-foreground"
                                 >
                                     {{ t('landing.pricing.core_features') }}
                                 </div>
-                                <div
-                                    v-for="feature in plan.features"
-                                    :key="feature"
-                                    class="flex items-start gap-2"
-                                >
-                                    <Check
-                                        class="mt-0.5 size-5 shrink-0 text-[#25D366]"
-                                    />
-                                    <span class="text-sm">{{ feature }}</span>
-                                </div>
-                            </div>
-                            <div
-                                v-if="plan.comingSoon.length > 0"
-                                class="space-y-3 border-t border-border pt-4"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <Badge class="text-xs" variant="outline"
-                                        >{{ t('landing.pricing.coming_soon') }}
-                                    </Badge>
-                                </div>
-                                <div
-                                    v-for="feature in plan.comingSoon"
-                                    :key="feature"
-                                    class="flex items-start gap-2"
-                                >
-                                    <Clock
-                                        class="mt-0.5 size-5 shrink-0 text-muted-foreground"
-                                    />
-                                    <span
-                                        class="text-sm text-muted-foreground"
-                                        >{{ feature }}</span
+                                <ul class="space-y-2">
+                                    <li
+                                        v-for="(feature, index) in getFeatureTranslations(pkg.slug, pkg.features)"
+                                        :key="index"
+                                        class="flex items-start gap-2"
                                     >
-                                </div>
+                                        <Check
+                                            v-if="feature.available && !feature.comingSoon"
+                                            class="mt-0.5 size-5 shrink-0 text-[#25D366]"
+                                        />
+                                        <X
+                                            v-else
+                                            class="mt-0.5 size-5 shrink-0 text-muted-foreground"
+                                        />
+                                        <span
+                                            class="text-sm"
+                                            :class="
+                                !feature.available || feature.comingSoon
+                                    ? 'text-muted-foreground'
+                                    : ''
+                            "
+                                        >
+                            {{ feature.text }}
+                        </span>
+                                    </li>
+                                </ul>
                             </div>
-                            <Link
-                                v-if="canRegister"
-                                :href="'/register'"
-                                class="block"
-                            >
-                                <Button
-                                    :class="
-                                        plan.badge ===
-                                        t('landing.pricing.popular')
-                                            ? 'bg-[#25D366] hover:bg-[#128C7E]'
-                                            : ''
-                                    "
-                                    :variant="
-                                        plan.badge ===
-                                        t('landing.pricing.popular')
-                                            ? 'default'
-                                            : 'outline'
-                                    "
-                                    class="w-full"
-                                >
-                                    {{ t('landing.pricing.choose_plan') }}
-                                </Button>
-                            </Link>
+
+                            <!-- Button - Fixed at bottom -->
+                            <div class="pt-4">
+                                <Link v-if="canRegister" href="/register" class="block">
+                                    <Button
+                                        class="w-full"
+                                        :class="
+                            pkg.is_popular
+                                ? 'bg-[#25D366] hover:bg-[#128C7E]'
+                                : ''
+                        "
+                                        :variant="pkg.is_popular ? 'default' : 'outline'"
+                                    >
+                                        {{ t('landing.pricing.choose_plan') }}
+                                    </Button>
+                                </Link>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -707,8 +693,8 @@ const trustIndicators = computed(() => [
                                 <MessageCircle class="size-5 text-white" />
                             </div>
                             <span class="font-bold">{{
-                                t('landing.brand_name')
-                            }}</span>
+                                    t('landing.brand_name')
+                                }}</span>
                         </div>
                         <p class="text-sm text-muted-foreground">
                             {{ t('landing.footer.tagline') }}
@@ -723,21 +709,21 @@ const trustIndicators = computed(() => [
                                 <a
                                     href="#features"
                                     class="hover:text-foreground"
-                                    >{{ t('landing.nav.features') }}</a
+                                >{{ t('landing.nav.features') }}</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="#pricing"
                                     class="hover:text-foreground"
-                                    >{{ t('landing.nav.pricing') }}</a
+                                >{{ t('landing.nav.pricing') }}</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="#how-it-works"
                                     class="hover:text-foreground"
-                                    >{{ t('landing.nav.how_it_works') }}</a
+                                >{{ t('landing.nav.how_it_works') }}</a
                                 >
                             </li>
                         </ul>
@@ -748,24 +734,24 @@ const trustIndicators = computed(() => [
                         </h3>
                         <ul class="space-y-2 text-sm text-muted-foreground">
                             <li>
-                                <a href="#" class="hover:text-foreground">{{
-                                    t('landing.footer.about')
-                                }}</a>
+                                <Link href="/about" class="hover:text-foreground">{{
+                                        t('static.about.link')
+                                    }}</Link>
                             </li>
                             <li>
-                                <a href="#" class="hover:text-foreground">{{
-                                    t('landing.footer.contact')
-                                }}</a>
+                                <Link href="/contact" class="hover:text-foreground">{{
+                                        t('static.contact.link')
+                                    }}</Link>
                             </li>
                             <li>
-                                <a href="#" class="hover:text-foreground">{{
-                                    t('landing.footer.privacy')
-                                }}</a>
+                                <Link href="/privacy" class="hover:text-foreground">{{
+                                        t('static.privacy.link')
+                                    }}</Link>
                             </li>
                             <li>
-                                <a href="#" class="hover:text-foreground">{{
-                                    t('landing.footer.terms')
-                                }}</a>
+                                <Link href="/terms" class="hover:text-foreground">{{
+                                        t('static.terms.link')
+                                    }}</Link>
                             </li>
                         </ul>
                     </div>

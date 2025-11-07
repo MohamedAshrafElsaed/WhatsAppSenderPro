@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Services\SubscriptionService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -16,7 +17,8 @@ class CreateNewUser implements CreatesNewUsers
     /**
      * Validate and create a newly registered user.
      *
-     * @param  array<string, string>  $input
+     * @param array<string, string> $input
+     * @throws \Throwable
      */
     public function create(array $input): User
     {
@@ -42,7 +44,7 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         // Device tracking and JWT generation handled by event listener
-        return User::create([
+        $user =  User::create([
             'first_name' => $input['first_name'],
             'last_name' => $input['last_name'],
             'email' => $input['email'],
@@ -52,5 +54,11 @@ class CreateNewUser implements CreatesNewUsers
             'password' => Hash::make($input['password']),
             'locale' => app()->getLocale(),
         ]);
+
+        // Create trial subscription automatically
+        $subscriptionService = new SubscriptionService();
+        $subscriptionService->createTrialSubscription($user);
+
+        return $user;
     }
 }

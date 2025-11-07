@@ -142,6 +142,7 @@
     </script>
 
     {{-- Meta Pixel (Facebook Pixel) - HARDCODED ID --}}
+    <!-- Meta Pixel Code -->
     <script>
         !function(f, b, e, v, n, t, s) {
             if (f.fbq) return;
@@ -164,10 +165,10 @@
         fbq('init', '1146830717394931');
         fbq('track', 'PageView');
     </script>
-    <noscript>
-        <img height="1" width="1" style="display:none"
-             src="https://www.facebook.com/tr?id=1146830717394931&ev=PageView&noscript=1" />
-    </noscript>
+    <noscript><img height="1" width="1" style="display:none"
+                   src="https://www.facebook.com/tr?id=1146830717394931&ev=PageView&noscript=1"
+        /></noscript>
+    <!-- End Meta Pixel Code -->
 
     {{-- Structured Data (JSON-LD) - Organization Schema --}}
     <script type="application/ld+json">
