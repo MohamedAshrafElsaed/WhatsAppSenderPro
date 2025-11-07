@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 interface Props {
     variant?: 'header' | 'sidebar';
@@ -8,14 +9,22 @@ interface Props {
 
 defineProps<Props>();
 
-const isOpen = usePage().props.sidebarOpen;
+const page = usePage();
+const isOpen = page.props.sidebarOpen ?? true;
+const locale = computed(() => page.props.locale || 'en');
+const isRTL = computed(() => locale.value === 'ar');
 </script>
 
 <template>
     <div v-if="variant === 'header'" class="flex min-h-screen w-full flex-col">
         <slot />
     </div>
-    <SidebarProvider v-else :default-open="isOpen">
+    <SidebarProvider
+        v-else
+        :default-open="isOpen"
+        :class="isRTL ? 'rtl' : 'ltr'"
+        :dir="isRTL ? 'rtl' : 'ltr'"
+    >
         <slot />
     </SidebarProvider>
 </template>

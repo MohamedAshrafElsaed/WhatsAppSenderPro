@@ -24,7 +24,7 @@ class DashboardController extends Controller
         $subscriptionSummary = $this->subscriptionService->getSubscriptionSummary($user);
 
         return Inertia::render('Dashboard', [
-            'subscription' => [],
+            'subscription' => $subscriptionSummary,
         ]);
     }
 }

@@ -2,6 +2,7 @@
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
+import LanguageToggle from '@/components/LanguageToggle.vue';
 import {
     Sidebar,
     SidebarContent,
@@ -25,6 +26,14 @@ import {
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
+
+interface Props {
+    side?: 'left' | 'right';
+}
+
+withDefaults(defineProps<Props>(), {
+    side: 'left',
+});
 
 const { t } = useTranslation();
 const page = usePage();
@@ -67,7 +76,7 @@ const footerNavItems: NavItem[] = [];
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset">
+    <Sidebar collapsible="icon" variant="inset" :side="side">
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
@@ -85,6 +94,11 @@ const footerNavItems: NavItem[] = [];
         </SidebarContent>
 
         <SidebarFooter>
+            <!-- Language Toggle -->
+            <div class="px-3 py-2">
+                <LanguageToggle />
+            </div>
+
             <NavFooter v-if="footerNavItems.length" :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>

@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/tooltip';
 import UserMenuContent from '@/components/UserMenuContent.vue';
 import { getInitials } from '@/composables/useInitials';
+import { useTranslation } from '@/composables/useTranslation';
 import { toUrl, urlIsActive } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
@@ -45,8 +46,11 @@ const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
 
+const { t } = useTranslation();
 const page = usePage();
 const auth = computed(() => page.props.auth);
+const locale = computed(() => page.props.locale || 'en');
+const isRTL = computed(() => locale.value === 'ar');
 
 const isCurrentRoute = computed(
     () => (url: NonNullable<InertiaLinkProps['href']>) =>
@@ -60,13 +64,13 @@ const activeItemStyles = computed(
             : '',
 );
 
-const mainNavItems: NavItem[] = [
+const mainNavItems = computed<NavItem[]>(() => [
     {
-        title: 'Dashboard',
+        title: t('nav.dashboard', 'Dashboard'),
         href: dashboard(),
         icon: LayoutGrid,
     },
-];
+]);
 
 const rightNavItems: NavItem[] = [
     {
@@ -85,24 +89,33 @@ const rightNavItems: NavItem[] = [
 <template>
     <div>
         <div class="border-b border-sidebar-border/80">
-            <div class="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
+            <div
+                class="mx-auto flex h-16 items-center px-4 md:max-w-7xl"
+                :class="isRTL ? 'flex-row-reverse' : ''"
+            >
                 <!-- Mobile Menu -->
-                <div class="lg:hidden">
+                <div class="lg:hidden" :class="isRTL ? 'ml-0 mr-auto' : 'mr-2'">
                     <Sheet>
                         <SheetTrigger :as-child="true">
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                class="mr-2 h-9 w-9"
+                                class="h-9 w-9"
                             >
                                 <Menu class="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="left" class="w-[300px] p-6">
-                            <SheetTitle class="sr-only"
-                                >Navigation Menu</SheetTitle
+                        <SheetContent
+                            :side="isRTL ? 'right' : 'left'"
+                            class="w-[300px] p-6"
+                        >
+                            <SheetTitle class="sr-only">
+                                {{ t('nav.navigation_menu', 'Navigation Menu') }}
+                            </SheetTitle>
+                            <SheetHeader
+                                class="flex justify-start"
+                                :class="isRTL ? 'text-right' : 'text-left'"
                             >
-                            <SheetHeader class="flex justify-start text-left">
                                 <AppLogoIcon
                                     class="size-6 fill-current text-black dark:text-white"
                                 />
@@ -116,7 +129,10 @@ const rightNavItems: NavItem[] = [
                                         :key="item.title"
                                         :href="item.href"
                                         class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
-                                        :class="activeItemStyles(item.href)"
+                                        :class="[
+                                            activeItemStyles(item.href),
+                                            isRTL ? 'flex-row-reverse' : ''
+                                        ]"
                                     >
                                         <component
                                             v-if="item.icon"
@@ -134,6 +150,7 @@ const rightNavItems: NavItem[] = [
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         class="flex items-center space-x-2 text-sm font-medium"
+                                        :class="isRTL ? 'flex-row-reverse space-x-reverse' : ''"
                                     >
                                         <component
                                             v-if="item.icon"
@@ -148,15 +165,23 @@ const rightNavItems: NavItem[] = [
                     </Sheet>
                 </div>
 
-                <Link :href="dashboard()" class="flex items-center gap-x-2">
+                <Link
+                    :href="dashboard()"
+                    class="flex items-center gap-x-2"
+                    :class="isRTL ? 'ml-2' : 'mr-2'"
+                >
                     <AppLogo />
                 </Link>
 
                 <!-- Desktop Menu -->
                 <div class="hidden h-full lg:flex lg:flex-1">
-                    <NavigationMenu class="ml-10 flex h-full items-stretch">
+                    <NavigationMenu
+                        class="flex h-full items-stretch"
+                        :class="isRTL ? 'mr-auto' : 'ml-auto'"
+                    >
                         <NavigationMenuList
-                            class="flex h-full items-stretch space-x-2"
+                            class="flex h-full items-stretch"
+                            :class="isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'"
                         >
                             <NavigationMenuItem
                                 v-for="(item, index) in mainNavItems"
@@ -168,13 +193,15 @@ const rightNavItems: NavItem[] = [
                                         navigationMenuTriggerStyle(),
                                         activeItemStyles(item.href),
                                         'h-9 cursor-pointer px-3',
+                                        isRTL ? 'flex-row-reverse' : ''
                                     ]"
                                     :href="item.href"
                                 >
                                     <component
                                         v-if="item.icon"
                                         :is="item.icon"
-                                        class="mr-2 h-4 w-4"
+                                        :class="isRTL ? 'ml-2' : 'mr-2'"
+                                        class="h-4 w-4"
                                     />
                                     {{ item.title }}
                                 </Link>
@@ -187,7 +214,12 @@ const rightNavItems: NavItem[] = [
                     </NavigationMenu>
                 </div>
 
-                <div class="ml-auto flex items-center space-x-2">
+                <div
+                    class="flex items-center"
+                    :class="[
+                        isRTL ? 'mr-auto space-x-reverse space-x-2' : 'ml-auto space-x-2'
+                    ]"
+                >
                     <div class="relative flex items-center space-x-1">
                         <Button
                             variant="ghost"
@@ -199,7 +231,10 @@ const rightNavItems: NavItem[] = [
                             />
                         </Button>
 
-                        <div class="hidden space-x-1 lg:flex">
+                        <div
+                            class="hidden lg:flex"
+                            :class="isRTL ? 'space-x-reverse space-x-1' : 'space-x-1'"
+                        >
                             <template
                                 v-for="item in rightNavItems"
                                 :key="item.title"
@@ -219,8 +254,8 @@ const rightNavItems: NavItem[] = [
                                                     rel="noopener noreferrer"
                                                 >
                                                     <span class="sr-only">{{
-                                                        item.title
-                                                    }}</span>
+                                                            item.title
+                                                        }}</span>
                                                     <component
                                                         :is="item.icon"
                                                         class="size-5 opacity-80 group-hover:opacity-100"
@@ -253,7 +288,7 @@ const rightNavItems: NavItem[] = [
                                         :alt="auth.user.name"
                                     />
                                     <AvatarFallback
-                                        class="rounded-lg bg-neutral-200 font-semibold text-black dark:bg-neutral-700 dark:text-white"
+                                        class="rounded-lg bg-[#25D366] font-semibold text-white"
                                     >
                                         {{ getInitials(auth.user?.name) }}
                                     </AvatarFallback>
@@ -273,7 +308,8 @@ const rightNavItems: NavItem[] = [
             class="flex w-full border-b border-sidebar-border/70"
         >
             <div
-                class="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl"
+                class="mx-auto flex h-12 w-full items-center px-4 text-neutral-500 md:max-w-7xl"
+                :class="isRTL ? 'justify-end' : 'justify-start'"
             >
                 <Breadcrumbs :breadcrumbs="breadcrumbs" />
             </div>

@@ -13,11 +13,17 @@ class HandleInertiaRequests extends Middleware
 {
     /**
      * The root template that's loaded on the first page visit.
+     *
+     * @see https://inertiajs.com/server-side-setup#root-template
+     *
+     * @var string
      */
     protected $rootView = 'app';
 
     /**
      * Determines the current asset version.
+     *
+     * @see https://inertiajs.com/asset-versioning
      */
     public function version(Request $request): ?string
     {
@@ -26,22 +32,17 @@ class HandleInertiaRequests extends Middleware
 
     /**
      * Define the props that are shared by default.
+     *
+     * @see https://inertiajs.com/shared-data
+     *
+     * @return array<string, mixed>
      */
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        // Get parent shared data but evaluate it immediately to avoid closures
-        $parentShared = parent::share($request);
-
-        // Evaluate any lazy props from parent immediately
-        $evaluatedParentShared = [];
-        foreach ($parentShared as $key => $value) {
-            // If it's a closure, call it now to get the value
-            $evaluatedParentShared[$key] = $value instanceof \Closure ? $value() : $value;
-        }
-
-        return array_merge($evaluatedParentShared, [
+        return [
+            ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
@@ -80,11 +81,13 @@ class HandleInertiaRequests extends Middleware
                 : (object)[],
             'locale' => app()->getLocale(),
             'translations' => $this->getTranslations(),
-        ]);
+        ];
     }
 
     /**
      * Get translations for current locale
+     *
+     * @return array
      */
     protected function getTranslations(): array
     {
@@ -108,6 +111,7 @@ class HandleInertiaRequests extends Middleware
             return [];
         }
     }
+
 
     public function handle(Request $request, $next): Response
     {

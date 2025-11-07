@@ -7,7 +7,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 interface BreadcrumbItemType {
     title: string;
@@ -17,11 +18,15 @@ interface BreadcrumbItemType {
 defineProps<{
     breadcrumbs: BreadcrumbItemType[];
 }>();
+
+const page = usePage();
+const locale = computed(() => page.props.locale || 'en');
+const isRTL = computed(() => locale.value === 'ar');
 </script>
 
 <template>
     <Breadcrumb>
-        <BreadcrumbList>
+        <BreadcrumbList :class="isRTL ? 'flex-row-reverse' : ''">
             <template v-for="(item, index) in breadcrumbs" :key="index">
                 <BreadcrumbItem>
                     <template v-if="index === breadcrumbs.length - 1">
@@ -30,12 +35,15 @@ defineProps<{
                     <template v-else>
                         <BreadcrumbLink as-child>
                             <Link :href="item.href ?? '#'">{{
-                                item.title
-                            }}</Link>
+                                    item.title
+                                }}</Link>
                         </BreadcrumbLink>
                     </template>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator v-if="index !== breadcrumbs.length - 1" />
+                <BreadcrumbSeparator
+                    v-if="index !== breadcrumbs.length - 1"
+                    :class="isRTL ? 'rotate-180' : ''"
+                />
             </template>
         </BreadcrumbList>
     </Breadcrumb>

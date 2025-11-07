@@ -8,17 +8,23 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { home } from '@/routes';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 defineProps<{
     title?: string;
     description?: string;
 }>();
+
+const page = usePage();
+const locale = computed(() => page.props.locale || 'en');
+const isRTL = computed(() => locale.value === 'ar');
 </script>
 
 <template>
     <div
         class="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10"
+        :class="isRTL ? 'rtl' : 'ltr'"
     >
         <div class="flex w-full max-w-md flex-col gap-6">
             <Link
@@ -27,7 +33,7 @@ defineProps<{
             >
                 <div class="flex h-9 w-9 items-center justify-center">
                     <AppLogoIcon
-                        class="size-9 fill-current text-black dark:text-white"
+                        class="size-9 fill-current text-[#25D366]"
                     />
                 </div>
             </Link>

@@ -16,8 +16,9 @@ import {
     PinInputSlot,
 } from '@/components/ui/pin-input';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { useTranslation } from '@/composables/useTranslation';
 import { confirm } from '@/routes/two-factor';
-import { Form } from '@inertiajs/vue3';
+import { Form, usePage } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
 import { Check, Copy, ScanLine } from 'lucide-vue-next';
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
@@ -29,6 +30,11 @@ interface Props {
 
 const props = defineProps<Props>();
 const isOpen = defineModel<boolean>('isOpen');
+
+const { t } = useTranslation();
+const page = usePage();
+const locale = computed(() => page.props.locale || 'en');
+const isRTL = computed(() => locale.value === 'ar');
 
 const { copy, copied } = useClipboard();
 const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, errors } =
@@ -47,26 +53,24 @@ const modalConfig = computed<{
 }>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: 'Two-Factor Authentication Enabled',
-            description:
-                'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-            buttonText: 'Close',
+            title: t('two_factor.enabled_title', 'Two-Factor Authentication Enabled'),
+            description: t('two_factor.enabled_desc', 'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.'),
+            buttonText: t('common.close', 'Close'),
         };
     }
 
     if (showVerificationStep.value) {
         return {
-            title: 'Verify Authentication Code',
-            description: 'Enter the 6-digit code from your authenticator app',
-            buttonText: 'Continue',
+            title: t('two_factor.verify_title', 'Verify Authentication Code'),
+            description: t('two_factor.verify_desc', 'Enter the 6-digit code from your authenticator app'),
+            buttonText: t('common.continue', 'Continue'),
         };
     }
 
     return {
-        title: 'Enable Two-Factor Authentication',
-        description:
-            'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-        buttonText: 'Continue',
+        title: t('two_factor.enable_title', 'Enable Two-Factor Authentication'),
+        description: t('two_factor.enable_desc', 'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app'),
+        buttonText: t('common.continue', 'Continue'),
     };
 });
 
@@ -112,7 +116,10 @@ watch(
 <template>
     <Dialog :open="isOpen" @update:open="isOpen = $event">
         <DialogContent class="sm:max-w-md">
-            <DialogHeader class="flex items-center justify-center">
+            <DialogHeader
+                class="flex items-center justify-center"
+                :class="isRTL ? 'text-right' : 'text-left'"
+            >
                 <div
                     class="mb-3 w-auto rounded-full border border-border bg-card p-0.5 shadow-sm"
                 >
@@ -126,174 +133,120 @@ watch(
                                 v-for="i in 5"
                                 :key="`col-${i}`"
                                 class="border-r border-border last:border-r-0"
-                            />
+                            ></div>
                         </div>
-                        <div
-                            class="absolute inset-0 grid grid-rows-5 opacity-50"
-                        >
-                            <div
-                                v-for="i in 5"
-                                :key="`row-${i}`"
-                                class="border-b border-border last:border-b-0"
-                            />
-                        </div>
-                        <ScanLine
-                            class="relative z-20 size-6 text-foreground"
-                        />
+                        <ScanLine class="relative size-8" />
                     </div>
                 </div>
-                <DialogTitle>{{ modalConfig.title }}</DialogTitle>
+
+                <DialogTitle class="text-xl">
+                    {{ modalConfig.title }}
+                </DialogTitle>
                 <DialogDescription class="text-center">
                     {{ modalConfig.description }}
                 </DialogDescription>
             </DialogHeader>
 
-            <div
-                class="relative flex w-auto flex-col items-center justify-center space-y-5"
-            >
-                <template v-if="!showVerificationStep">
-                    <AlertError v-if="errors?.length" :errors="errors" />
-                    <template v-else>
-                        <div
-                            class="relative mx-auto flex max-w-md items-center overflow-hidden"
-                        >
-                            <div
-                                class="relative mx-auto aspect-square w-64 overflow-hidden rounded-lg border border-border"
-                            >
-                                <div
-                                    v-if="!qrCodeSvg"
-                                    class="absolute inset-0 z-10 flex aspect-square h-auto w-full animate-pulse items-center justify-center bg-background"
-                                >
-                                    <Spinner class="size-6" />
-                                </div>
-                                <div
-                                    v-else
-                                    class="relative z-10 overflow-hidden border p-5"
-                                >
-                                    <div
-                                        v-html="qrCodeSvg"
-                                        class="flex aspect-square size-full items-center justify-center"
-                                    />
-                                </div>
-                            </div>
-                        </div>
+            <div class="space-y-6 py-4">
+                <AlertError v-if="errors?.length" :errors="errors" />
 
-                        <div class="flex w-full items-center space-x-5">
-                            <Button class="w-full" @click="handleModalNextStep">
-                                {{ modalConfig.buttonText }}
-                            </Button>
-                        </div>
-
-                        <div
-                            class="relative flex w-full items-center justify-center"
-                        >
-                            <div
-                                class="absolute inset-0 top-1/2 h-px w-full bg-border"
-                            />
-                            <span class="relative bg-card px-2 py-1"
-                                >or, enter the code manually</span
-                            >
-                        </div>
-
-                        <div
-                            class="flex w-full items-center justify-center space-x-2"
-                        >
-                            <div
-                                class="flex w-full items-stretch overflow-hidden rounded-xl border border-border"
-                            >
-                                <div
-                                    v-if="!manualSetupKey"
-                                    class="flex h-full w-full items-center justify-center bg-muted p-3"
-                                >
-                                    <Spinner />
-                                </div>
-                                <template v-else>
-                                    <input
-                                        type="text"
-                                        readonly
-                                        :value="manualSetupKey"
-                                        class="h-full w-full bg-background p-3 text-foreground"
-                                    />
-                                    <button
-                                        @click="copy(manualSetupKey || '')"
-                                        class="relative block h-auto border-l border-border px-3 hover:bg-muted"
-                                    >
-                                        <Check
-                                            v-if="copied"
-                                            class="w-4 text-green-500"
-                                        />
-                                        <Copy v-else class="w-4" />
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-                    </template>
-                </template>
-
-                <template v-else>
+                <div
+                    v-if="showVerificationStep"
+                    class="flex items-center justify-center"
+                >
                     <Form
                         v-bind="confirm.form()"
-                        reset-on-error
-                        @finish="code = []"
                         @success="isOpen = false"
-                        v-slot="{ errors, processing }"
+                        reset-on-error
+                        @error="code = []"
+                        class="w-full"
+                        #default="{ errors, processing }"
                     >
                         <input type="hidden" name="code" :value="codeValue" />
-                        <div
-                            ref="pinInputContainerRef"
-                            class="relative w-full space-y-3"
-                        >
+                        <div class="space-y-6">
                             <div
-                                class="flex w-full flex-col items-center justify-center space-y-3 py-2"
+                                ref="pinInputContainerRef"
+                                class="flex flex-col items-center justify-center space-y-3"
                             >
                                 <PinInput
-                                    id="otp"
+                                    id="code"
                                     placeholder="○"
                                     v-model="code"
+                                    :disabled="processing"
                                     type="number"
-                                    otp
+                                    :name="t('two_factor.code_label', 'Code')"
                                 >
                                     <PinInputGroup>
                                         <PinInputSlot
-                                            autofocus
                                             v-for="(id, index) in 6"
                                             :key="id"
                                             :index="index"
-                                            :disabled="processing"
                                         />
                                     </PinInputGroup>
                                 </PinInput>
-                                <InputError
-                                    :message="
-                                        errors?.confirmTwoFactorAuthentication
-                                            ?.code
-                                    "
-                                />
-                            </div>
 
-                            <div class="flex w-full items-center space-x-5">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    class="w-auto flex-1"
-                                    @click="showVerificationStep = false"
-                                    :disabled="processing"
-                                >
-                                    Back
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    class="w-auto flex-1"
-                                    :disabled="
-                                        processing || codeValue.length < 6
-                                    "
-                                >
-                                    Confirm
-                                </Button>
+                                <InputError :message="errors.code" />
                             </div>
+                            <Button
+                                :disabled="processing || code.length !== 6"
+                                type="submit"
+                                class="w-full bg-[#25D366] hover:bg-[#20BA5A]"
+                            >
+                                <Spinner
+                                    v-if="processing"
+                                    class="size-4 text-white"
+                                />
+                                <span v-else>{{ modalConfig.buttonText }}</span>
+                            </Button>
                         </div>
                     </Form>
-                </template>
+                </div>
+
+                <div v-else class="space-y-4">
+                    <div
+                        v-if="qrCodeSvg"
+                        class="flex items-center justify-center rounded-lg border bg-white p-4"
+                        v-html="qrCodeSvg"
+                    ></div>
+                    <div v-else class="flex items-center justify-center py-12">
+                        <Spinner class="size-8" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <p
+                            class="text-sm font-medium"
+                            :class="isRTL ? 'text-right' : 'text-left'"
+                        >
+                            {{ t('two_factor.manual_entry', 'Or enter this code manually:') }}
+                        </p>
+                        <div
+                            class="flex items-center justify-between gap-2 rounded-lg border bg-muted p-3"
+                        >
+                            <code
+                                class="flex-1 text-sm"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                            >
+                                {{ manualSetupKey }}
+                            </code>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                class="size-8 shrink-0"
+                                @click="() => copy(manualSetupKey)"
+                            >
+                                <Check v-if="copied" class="size-4" />
+                                <Copy v-else class="size-4" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    <Button
+                        @click="handleModalNextStep"
+                        class="w-full bg-[#25D366] hover:bg-[#20BA5A]"
+                    >
+                        {{ modalConfig.buttonText }}
+                    </Button>
+                </div>
             </div>
         </DialogContent>
     </Dialog>

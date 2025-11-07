@@ -9,6 +9,13 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -20,13 +27,12 @@ import {
     CheckCircle2,
     FileText,
     MessageSquare,
+    Play,
     Plus,
-    TrendingUp,
     Upload,
-    Users,
     Zap,
 } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 interface SubscriptionUsage {
     messages_sent: number;
@@ -45,16 +51,21 @@ interface SubscriptionSummary {
     usage?: SubscriptionUsage;
 }
 
+interface Tutorial {
+    videoId: string;
+    title: string;
+    description: string;
+    duration: string;
+}
+
 interface Props {
     subscription: SubscriptionSummary;
 }
 
 const props = defineProps<Props>();
-const { t } = useTranslation();
+const { t, isRTL } = useTranslation();
 const page = usePage();
 
-const locale = computed(() => page.props.locale || 'en');
-const isRTL = computed(() => locale.value === 'ar');
 const userName = computed(() => {
     const user = page.props.auth?.user;
     return user?.first_name || '';
@@ -157,203 +168,156 @@ const gettingStartedSteps = computed(() => [
         completed: false,
     },
 ]);
+
+// Video Tutorials Data
+const tutorials: Tutorial[] = [
+    {
+        videoId: 'dQw4w9WgXcQ', // Replace with actual YouTube video IDs
+        title: 'dashboard.learning.video1_title',
+        description: 'dashboard.learning.video1_desc',
+        duration: '5:30',
+    },
+    {
+        videoId: 'dQw4w9WgXcQ',
+        title: 'dashboard.learning.video2_title',
+        description: 'dashboard.learning.video2_desc',
+        duration: '8:15',
+    },
+    {
+        videoId: 'dQw4w9WgXcQ',
+        title: 'dashboard.learning.video3_title',
+        description: 'dashboard.learning.video3_desc',
+        duration: '6:45',
+    },
+    {
+        videoId: 'dQw4w9WgXcQ',
+        title: 'dashboard.learning.video4_title',
+        description: 'dashboard.learning.video4_desc',
+        duration: '10:20',
+    }
+];
+
+// Video Modal State
+const videoModalOpen = ref(false);
+const currentVideo = ref<Tutorial | null>(null);
+
+const openVideoModal = (video: Tutorial) => {
+    currentVideo.value = video;
+    videoModalOpen.value = true;
+};
 </script>
 
 <template>
     <Head :title="t('dashboard.title', 'Dashboard')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6"
+            :class="isRTL() ? 'text-right' : 'text-left'"
+        >
             <!-- Welcome Section -->
             <div class="space-y-2">
                 <h1 class="text-3xl font-bold tracking-tight">
                     {{ t('dashboard.welcome', 'Welcome Back') }}{{ userName ? `, ${userName}` : '' }}!
                 </h1>
                 <p class="text-muted-foreground">
-                    {{ t('dashboard.subtitle', "Here's an overview of your WhatsApp campaigns") }}
+                    {{ t('dashboard.subtitle', "Here's what's happening with your WhatsApp campaigns today") }}
                 </p>
             </div>
 
             <!-- Trial Warning Alert -->
-            <Alert
-                v-if="showTrialWarning"
-                class="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20"
-            >
-                <AlertCircle class="size-4 text-yellow-600 dark:text-yellow-500" />
-                <AlertDescription class="text-yellow-800 dark:text-yellow-200">
-                    {{ t('subscription.trial_ending_soon', `Your trial ends in ${subscription.days_remaining} days`) }}
-                    <Link
-                        class="font-medium underline"
-                        :class="isRTL ? 'mr-2' : 'ml-2'"
-                        href="/subscription/upgrade"
-                    >
-                        {{ t('subscription.upgrade_plan', 'Upgrade Now') }}
-                    </Link>
-                </AlertDescription>
-            </Alert>
-
-            <!-- No Subscription Alert -->
-            <Alert v-if="!subscription.has_subscription" variant="destructive">
-                <AlertCircle class="size-4" />
+            <Alert v-if="showTrialWarning" variant="default" class="border-[#25D366]">
+                <AlertCircle class="size-4 text-[#25D366]" />
                 <AlertDescription>
-                    {{ t('subscription.no_active_subscription', 'No active subscription') }}
-                    <Link
-                        class="font-medium underline"
-                        :class="isRTL ? 'mr-2' : 'ml-2'"
-                        href="/subscription/upgrade"
-                    >
-                        {{ t('subscription.view_plans', 'View Plans') }}
+                    {{ t('dashboard.trial_warning', 'Your trial expires in') }}
+                    <strong>{{ subscription.days_remaining }}</strong>
+                    {{ t('dashboard.trial_warning_days', 'days. Upgrade now to continue using all features!') }}
+                    <Link href="/subscription/upgrade" class="ml-2 font-semibold text-[#25D366] hover:underline">
+                        {{ t('dashboard.upgrade_now', 'Upgrade Now') }}
                     </Link>
                 </AlertDescription>
             </Alert>
 
-            <!-- Subscription Overview Card -->
+            <!-- Subscription Status Card -->
             <Card v-if="subscription.has_subscription">
                 <CardHeader>
                     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div class="space-y-1">
-                            <CardTitle class="flex flex-wrap items-center gap-2">
-                                {{ t('subscription.current_plan', 'Current Plan') }}
-                                <Badge :variant="getStatusColor">
-                                    {{ subscription.package }}
+                        <div>
+                            <CardTitle>{{ t('subscription.current_plan', 'Current Plan') }}</CardTitle>
+                            <CardDescription class="mt-1">
+                                {{ t('subscription.status', 'Status') }}:
+                                <Badge :variant="getStatusColor" class="ml-2">
+                                    {{ t(`subscription.${subscription.status}`, subscription.status) }}
                                 </Badge>
-                            </CardTitle>
-                            <CardDescription>
-                                <template v-if="subscription.is_trial">
-                                    {{ t('subscription.trial_ends', 'Trial ends in') }}
-                                    {{ subscription.days_remaining }}
-                                    {{ t('subscription.days_remaining', 'days') }}
-                                </template>
-                                <template v-else>
-                                    {{ subscription.days_remaining }}
-                                    {{ t('subscription.days_remaining', 'days remaining') }}
-                                </template>
                             </CardDescription>
                         </div>
-                        <Link href="/subscription/upgrade">
-                            <Button class="whitespace-nowrap">
-                                {{ t('subscription.upgrade_plan', 'Upgrade Plan') }}
+                        <Link href="/subscription">
+                            <Button variant="outline" size="sm">
+                                {{ t('subscription.manage', 'Manage Plan') }}
                             </Button>
                         </Link>
                     </div>
                 </CardHeader>
+                <CardContent>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <!-- Messages Usage -->
+                        <div v-if="subscription.usage" class="space-y-2">
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-muted-foreground">
+                                    {{ t('subscription.messages_sent', 'Messages Sent') }}
+                                </span>
+                                <span class="font-medium">
+                                    {{ subscription.usage.messages_sent }} /
+                                    {{ formatLimit(subscription.usage.messages_limit) }}
+                                </span>
+                            </div>
+                            <Progress
+                                :model-value="calculatePercentage(
+                                    subscription.usage.messages_sent,
+                                    subscription.usage.messages_limit
+                                )"
+                                :class="getProgressColor(
+                                    calculatePercentage(
+                                        subscription.usage.messages_sent,
+                                        subscription.usage.messages_limit
+                                    )
+                                )"
+                            />
+                        </div>
+
+                        <!-- Contacts Usage -->
+                        <div v-if="subscription.usage" class="space-y-2">
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-muted-foreground">
+                                    {{ t('subscription.contacts_validated', 'Contacts Validated') }}
+                                </span>
+                                <span class="font-medium">
+                                    {{ subscription.usage.contacts_validated }} /
+                                    {{ formatLimit(subscription.usage.contacts_limit) }}
+                                </span>
+                            </div>
+                            <Progress
+                                :model-value="calculatePercentage(
+                                    subscription.usage.contacts_validated,
+                                    subscription.usage.contacts_limit
+                                )"
+                                :class="getProgressColor(
+                                    calculatePercentage(
+                                        subscription.usage.contacts_validated,
+                                        subscription.usage.contacts_limit
+                                    )
+                                )"
+                            />
+                        </div>
+                    </div>
+                </CardContent>
             </Card>
-
-            <!-- Usage Statistics -->
-            <div
-                v-if="subscription.has_subscription && subscription.usage"
-                class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-            >
-                <!-- Messages Sent -->
-                <Card>
-                    <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardTitle class="text-sm font-medium">
-                                {{ t('dashboard.usage.messages', 'Messages Sent') }}
-                            </CardTitle>
-                            <MessageSquare class="size-4 text-muted-foreground" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div class="space-y-2">
-                            <div class="flex items-baseline justify-between">
-                                <div class="text-2xl font-bold">
-                                    {{ subscription.usage.messages_sent }}
-                                </div>
-                                <span class="text-sm text-muted-foreground">
-                                    / {{ formatLimit(subscription.usage.messages_limit) }}
-                                </span>
-                            </div>
-                            <Progress
-                                :class="getProgressColor(calculatePercentage(subscription.usage.messages_sent, subscription.usage.messages_limit))"
-                                :model-value="calculatePercentage(subscription.usage.messages_sent, subscription.usage.messages_limit)"
-                            />
-                            <p class="text-xs text-muted-foreground">
-                                {{ calculatePercentage(subscription.usage.messages_sent, subscription.usage.messages_limit) }}%
-                                {{ t('dashboard.usage.used', 'used') }}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <!-- Contacts Validated -->
-                <Card>
-                    <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardTitle class="text-sm font-medium">
-                                {{ t('dashboard.usage.contacts', 'Contacts Validated') }}
-                            </CardTitle>
-                            <Users class="size-4 text-muted-foreground" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div class="space-y-2">
-                            <div class="flex items-baseline justify-between">
-                                <div class="text-2xl font-bold">
-                                    {{ subscription.usage.contacts_validated }}
-                                </div>
-                                <span class="text-sm text-muted-foreground">
-                                    / {{ formatLimit(subscription.usage.contacts_limit) }}
-                                </span>
-                            </div>
-                            <Progress
-                                :class="getProgressColor(calculatePercentage(subscription.usage.contacts_validated, subscription.usage.contacts_limit))"
-                                :model-value="calculatePercentage(subscription.usage.contacts_validated, subscription.usage.contacts_limit)"
-                            />
-                            <p class="text-xs text-muted-foreground">
-                                {{ calculatePercentage(subscription.usage.contacts_validated, subscription.usage.contacts_limit) }}%
-                                {{ t('dashboard.usage.used', 'used') }}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <!-- Connected Numbers -->
-                <Card>
-                    <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardTitle class="text-sm font-medium">
-                                {{ t('dashboard.usage.numbers', 'Connected Numbers') }}
-                            </CardTitle>
-                            <Zap class="size-4 text-muted-foreground" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div class="space-y-2">
-                            <div class="text-2xl font-bold">0</div>
-                            <p class="text-xs text-muted-foreground">
-                                {{ t('dashboard.usage.numbers_desc', 'Active WhatsApp connections') }}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <!-- Templates Created -->
-                <Card>
-                    <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardTitle class="text-sm font-medium">
-                                {{ t('dashboard.usage.templates', 'Message Templates') }}
-                            </CardTitle>
-                            <FileText class="size-4 text-muted-foreground" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div class="space-y-2">
-                            <div class="text-2xl font-bold">0</div>
-                            <p class="text-xs text-muted-foreground">
-                                {{ t('dashboard.usage.templates_desc', 'Saved message templates') }}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
 
             <!-- Quick Actions -->
             <Card>
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
-                        <TrendingUp class="size-5 text-[#25D366]" />
+                        <Zap class="size-5 text-[#25D366]" />
                         {{ t('dashboard.quick_actions.title', 'Quick Actions') }}
                     </CardTitle>
                     <CardDescription>
@@ -366,14 +330,61 @@ const gettingStartedSteps = computed(() => [
                             v-for="(action, index) in quickActions"
                             :key="index"
                             :href="action.href"
-                            class="flex flex-col items-center gap-2 rounded-lg border border-border p-4 text-center transition-all hover:border-[#25D366] hover:bg-accent"
+                            class="flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-6 text-center transition-all hover:border-[#25D366] hover:bg-accent hover:shadow-md"
                         >
                             <div class="flex size-12 items-center justify-center rounded-full bg-[#25D366]/10">
                                 <component :is="action.icon" class="size-6 text-[#25D366]" />
                             </div>
-                            <h3 class="font-medium">{{ action.title }}</h3>
-                            <p class="text-xs text-muted-foreground">{{ action.description }}</p>
+                            <div class="space-y-1">
+                                <h3 class="font-medium leading-tight">{{ action.title }}</h3>
+                                <p class="text-xs text-muted-foreground">{{ action.description }}</p>
+                            </div>
                         </Link>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Learning Center / Video Tutorials -->
+            <Card>
+                <CardHeader>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <CardTitle class="flex items-center gap-2">
+                                <svg class="size-5 text-[#25D366]" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                </svg>
+                                {{ t('dashboard.learning.title', 'Learning Center') }}
+                            </CardTitle>
+                            <CardDescription>{{ t('dashboard.learning.description', 'Watch tutorials to master WhatsApp Sender Pro') }}</CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <Card
+                            v-for="(tutorial, index) in tutorials"
+                            :key="index"
+                            class="group cursor-pointer overflow-hidden transition-all hover:shadow-lg"
+                            @click="openVideoModal(tutorial)"
+                        >
+                            <div class="relative aspect-video overflow-hidden bg-muted">
+                                <img
+                                    :src="`https://img.youtube.com/vi/${tutorial.videoId}/maxresdefault.jpg`"
+                                    :alt="t(tutorial.title)"
+                                    class="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                                <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                    <div class="flex size-12 items-center justify-center rounded-full bg-[#25D366] shadow-lg">
+                                        <Play class="size-6 fill-white text-white" />
+                                    </div>
+                                </div>
+                            </div>
+                            <CardHeader class="p-3 pb-2">
+                                <Badge variant="secondary" class="w-fit text-xs">{{ tutorial.duration }}</Badge>
+                                <CardTitle class="mt-1.5 text-sm line-clamp-2 leading-tight">{{ t(tutorial.title) }}</CardTitle>
+                                <CardDescription class="text-xs line-clamp-2 leading-tight">{{ t(tutorial.description) }}</CardDescription>
+                            </CardHeader>
+                        </Card>
                     </div>
                 </CardContent>
             </Card>
@@ -395,6 +406,7 @@ const gettingStartedSteps = computed(() => [
                             v-for="(step, index) in gettingStartedSteps"
                             :key="index"
                             class="flex items-start gap-4"
+                            :class="isRTL() ? 'flex-row-reverse' : ''"
                         >
                             <div
                                 class="flex size-8 shrink-0 items-center justify-center rounded-full"
@@ -416,5 +428,24 @@ const gettingStartedSteps = computed(() => [
                 </CardContent>
             </Card>
         </div>
+
+        <!-- Video Modal -->
+        <Dialog v-model:open="videoModalOpen">
+            <DialogContent class="max-w-4xl p-0">
+                <DialogHeader class="p-6 pb-4">
+                    <DialogTitle>{{ currentVideo ? t(currentVideo.title) : '' }}</DialogTitle>
+                    <DialogDescription>{{ currentVideo ? t(currentVideo.description) : '' }}</DialogDescription>
+                </DialogHeader>
+                <div class="aspect-video w-full">
+                    <iframe
+                        v-if="currentVideo"
+                        :src="`https://www.youtube.com/embed/${currentVideo.videoId}?autoplay=1`"
+                        class="size-full"
+                        allowfullscreen
+                        allow="autoplay"
+                    ></iframe>
+                </div>
+            </DialogContent>
+        </Dialog>
     </AppLayout>
 </template>

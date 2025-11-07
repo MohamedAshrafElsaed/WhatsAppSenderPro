@@ -1,52 +1,68 @@
 import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 export function useTranslation() {
     const page = usePage();
 
+    const locale = computed(() => page.props.locale || 'en');
+    const translations = computed(() => page.props.translations || {});
+
     /**
-     * Translate a key using dot notation
-     * @param key - Translation key (e.g., 'landing.features.badge')
-     * @param fallback - Optional fallback text if key not found
-     * @returns Translated string
+     * Translate a key with optional fallback
+     * Supports dot notation for nested keys
      */
-    const t = (key: string, fallback?: string): string => {
-        const translations = (page.props.translations as Record<string, any>) || {};
-
-        // Split the key by dots (e.g., 'landing.features.badge' -> ['landing', 'features', 'badge'])
+    const t = (key: string, fallback?: string, replacements?: Record<string, any>): string => {
         const keys = key.split('.');
+        let value: any = translations.value;
 
-        // Navigate through the nested object
-        let value: any = translations;
         for (const k of keys) {
             if (value && typeof value === 'object' && k in value) {
                 value = value[k];
             } else {
-                // Key not found, return fallback or original key
-                return fallback || key;
+                value = fallback || key;
+                break;
             }
         }
 
-        // Return the value or fallback/key if undefined
-        return (typeof value === 'string' ? value : null) || fallback || key;
-    };
+        let result = typeof value === 'string' ? value : (fallback || key);
 
-    /**
-     * Get current locale
-     */
-    const locale = () => {
-        return (page.props.locale as string) || 'en';
+        // Handle replacements like {name}, {count}, etc.
+        if (replacements) {
+            Object.keys(replacements).forEach(replaceKey => {
+                const replaceValue = replacements[replaceKey];
+                result = result.replace(new RegExp(`{${replaceKey}}`, 'g'), replaceValue);
+            });
+        }
+
+        return result;
     };
 
     /**
      * Check if current locale is RTL
      */
-    const isRTL = () => {
-        return locale() === 'ar';
+    const isRTL = (): boolean => {
+        return locale.value === 'ar';
+    };
+
+    /**
+     * Get current locale
+     */
+    const getLocale = (): string => {
+        return <string>locale.value;
+    };
+
+    /**
+     * Get text direction based on locale
+     */
+    const getDirection = (): 'rtl' | 'ltr' => {
+        return isRTL() ? 'rtl' : 'ltr';
     };
 
     return {
         t,
+        isRTL,
+        getLocale,
+        getDirection,
         locale,
-        isRTL
     };
 }

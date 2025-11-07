@@ -18,9 +18,15 @@ class TrackUserDevice
     public function handle(Request $request, Closure $next)
     {
         if ($request->user()) {
-            dispatch(function () use ($request) {
+            // Track device synchronously - no need to queue this lightweight operation
+            // The previous dispatch() with closure was causing serialization errors
+            // because Request objects contain PDO connections that can't be serialized
+            try {
                 $this->deviceService->track($request, $request->user()->id);
-            })->afterResponse();
+            } catch (\Exception $e) {
+                // Silently fail - device tracking shouldn't break the app
+                // You can log this if needed: logger()->warning('Device tracking failed', ['error' => $e->getMessage()]);
+            }
         }
 
         return $next($request);
