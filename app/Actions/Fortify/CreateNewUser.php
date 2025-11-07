@@ -7,8 +7,8 @@ use App\Services\SubscriptionService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Throwable;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -18,7 +18,7 @@ class CreateNewUser implements CreatesNewUsers
      * Validate and create a newly registered user.
      *
      * @param array<string, string> $input
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function create(array $input): User
     {
@@ -44,7 +44,7 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         // Device tracking and JWT generation handled by event listener
-        $user =  User::create([
+        $user = User::create([
             'first_name' => $input['first_name'],
             'last_name' => $input['last_name'],
             'email' => $input['email'],

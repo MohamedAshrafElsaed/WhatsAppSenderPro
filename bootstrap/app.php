@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\CheckFeatureAccess;
+use App\Http\Middleware\CheckSubscription;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
@@ -18,12 +20,20 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
+        // Global web middleware
         $middleware->web(append: [
             SetLocale::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             TrackUserDevice::class,
+        ]);
+
+        // Register route-specific middleware aliases
+        $middleware->alias([
+            'feature' => CheckFeatureAccess::class,
+            'subscribed' => CheckSubscription::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

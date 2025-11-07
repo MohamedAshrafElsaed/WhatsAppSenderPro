@@ -6,7 +6,7 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Whats App Sender Pro';
+const appName = import.meta.env.VITE_APP_NAME || 'WhatsApp Sender Pro';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -16,12 +16,19 @@ createInertiaApp({
             import.meta.glob<DefineComponent>('./pages/**/*.vue'),
         ),
     setup({ el, App, props, plugin }) {
+        // Set RTL direction and language based on locale
+        const locale = props.initialPage.props.locale || 'en';
+        const isRTL = locale === 'ar';
+
+        document.documentElement.setAttribute('lang', locale);
+        document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .mount(el);
     },
     progress: {
-        color: '#4B5563',
+        color: '#25D366',
     },
 });
 

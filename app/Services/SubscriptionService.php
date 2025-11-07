@@ -153,7 +153,7 @@ class SubscriptionService
 
     /**
      * Convert trial to paid subscription
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function convertTrialToActive(UserSubscription $subscription, Transaction $transaction): UserSubscription
     {
@@ -199,7 +199,7 @@ class SubscriptionService
             'status' => $subscription->status,
             'package' => $package->name,
             'days_remaining' => $subscription->daysRemaining(),
-            'ends_at' => $subscription->ends_at,
+            'ends_at' => $subscription->ends_at->toISOString(), // Convert to ISO string
             'is_trial' => $subscription->isTrial(),
             'usage' => [
                 'messages_sent' => $usage->messages_sent,

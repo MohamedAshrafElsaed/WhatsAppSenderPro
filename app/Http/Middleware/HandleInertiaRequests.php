@@ -13,17 +13,11 @@ class HandleInertiaRequests extends Middleware
 {
     /**
      * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
-     * @var string
      */
     protected $rootView = 'app';
 
     /**
      * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
      */
     public function version(Request $request): ?string
     {
@@ -32,17 +26,22 @@ class HandleInertiaRequests extends Middleware
 
     /**
      * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
      */
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        return [
-            ...parent::share($request),
+        // Get parent shared data but evaluate it immediately to avoid closures
+        $parentShared = parent::share($request);
+
+        // Evaluate any lazy props from parent immediately
+        $evaluatedParentShared = [];
+        foreach ($parentShared as $key => $value) {
+            // If it's a closure, call it now to get the value
+            $evaluatedParentShared[$key] = $value instanceof \Closure ? $value() : $value;
+        }
+
+        return array_merge($evaluatedParentShared, [
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
@@ -66,28 +65,26 @@ class HandleInertiaRequests extends Middleware
                         'slug' => $request->user()->industry->slug,
                     ] : null,
                     'locale' => $request->user()->locale,
-                    'email_verified_at' => $request->user()->email_verified_at,
-                    'mobile_verified_at' => $request->user()->mobile_verified_at,
+                    'email_verified_at' => $request->user()->email_verified_at?->toISOString(),
+                    'mobile_verified_at' => $request->user()->mobile_verified_at?->toISOString(),
                 ] : null,
                 'jwt_token' => session('jwt_token'),
             ],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
-                'success' => fn() => $request->session()->get('success'),
-                'error' => fn() => $request->session()->get('error'),
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
             ],
-            'errors' => fn() => $request->session()->get('errors')
+            'errors' => $request->session()->get('errors')
                 ? $request->session()->get('errors')->getBag('default')->getMessages()
                 : (object)[],
             'locale' => app()->getLocale(),
             'translations' => $this->getTranslations(),
-        ];
+        ]);
     }
 
     /**
      * Get translations for current locale
-     *
-     * @return array
      */
     protected function getTranslations(): array
     {
@@ -111,7 +108,6 @@ class HandleInertiaRequests extends Middleware
             return [];
         }
     }
-
 
     public function handle(Request $request, $next): Response
     {

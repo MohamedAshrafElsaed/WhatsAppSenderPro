@@ -9,13 +9,15 @@
         "login": "Login",
         "register": "Register",
         "get_started": "Get Started",
+        "imports": "Imports",
+        "whatsapp": "WhatsApp Devices",
+        "logout": "Logout",
         "dashboard": "Dashboard",
         "campaigns": "Campaigns",
         "contacts": "Contacts",
-        "imports": "Imports",
-        "whatsapp": "WhatsApp Devices",
-        "settings": "Settings",
-        "logout": "Logout"
+        "templates": "Templates",
+        "subscription": "Subscription",
+        "settings": "Settings"
     },
     "whatsapp": {
         "devices": "Connected Devices",
@@ -673,17 +675,6 @@
             "rights": "All rights reserved."
         }
     },
-    "dashboard": {
-        "title": "Dashboard",
-        "welcome": "Welcome back",
-        "stats": {
-            "sessions": "Active Sessions",
-            "contacts": "Total Contacts",
-            "messages": "Messages Sent",
-            "campaigns": "Active Campaigns"
-        }
-    },
-
     "packages": {
         "basic": {
             "name": "Basic Plan",
@@ -889,6 +880,58 @@
             "section7_text": "We are not liable for any indirect, incidental, or consequential damages arising from your use of the service. Our total liability shall not exceed the amount you paid us in the past 12 months.",
             "section8_title": "8. Contact Us",
             "section8_text": "If you have questions about these Terms, please contact us at legal@convertedin.com"
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome Back!",
+        "subtitle": "Here's an overview of your WhatsApp campaigns",
+        "usage": {
+            "messages": "Messages Sent",
+            "contacts": "Contacts Validated",
+            "numbers": "Connected Numbers",
+            "templates": "Message Templates",
+            "used": "used",
+            "numbers_desc": "Active WhatsApp connections",
+            "templates_desc": "Saved message templates"
+        },
+        "quick_actions": {
+            "title": "Quick Actions",
+            "description": "Get started with these common tasks",
+            "connect_whatsapp": "Connect WhatsApp",
+            "connect_whatsapp_desc": "Link your WhatsApp number",
+            "import_contacts": "Import Contacts",
+            "import_contacts_desc": "Upload your contact list",
+            "create_campaign": "Create Campaign",
+            "create_campaign_desc": "Send bulk messages",
+            "view_templates": "View Templates",
+            "view_templates_desc": "Manage message templates"
+        },
+        "learning": {
+            "title": "Learning Center",
+            "description": "Watch tutorials to master WhatsApp Sender Pro",
+            "video1_title": "Getting Started Guide",
+            "video1_desc": "Complete introduction to WhatsApp Sender Pro platform",
+            "video2_title": "Connect Your WhatsApp",
+            "video2_desc": "Step-by-step guide to connecting your WhatsApp number",
+            "video3_title": "Import Contacts",
+            "video3_desc": "Learn how to import contacts from CSV and Google Sheets",
+            "video4_title": "Create Your First Campaign",
+            "video4_desc": "Send personalized messages to your contacts",
+            "video5_title": "Advanced Features",
+            "video5_desc": "Explore automation, templates, and advanced tools",
+            "video6_title": "Best Practices & Tips",
+            "video6_desc": "Avoid bans and maximize campaign success"
+        },
+        "getting_started": {
+            "title": "Getting Started",
+            "description": "Complete these steps to get the most out of the platform",
+            "step1": "Connect your WhatsApp number",
+            "step1_desc": "Scan QR code to link your WhatsApp",
+            "step2": "Import your contacts",
+            "step2_desc": "Upload CSV or connect Google Sheets",
+            "step3": "Create your first campaign",
+            "step3_desc": "Send personalized messages to your contacts"
         }
     }
 }

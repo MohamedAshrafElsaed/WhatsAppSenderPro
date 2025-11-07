@@ -21,7 +21,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<int, class-string>
      */
     protected $subscribe = [
-        \App\Listeners\HandleSuccessfulAuthentication::class,
+        // ✅ TEMPORARILY DISABLED to fix serialization error
+        // This will be re-enabled after fixing the JWT generation
+        // \App\Listeners\HandleSuccessfulAuthentication::class,
     ];
 
     /**

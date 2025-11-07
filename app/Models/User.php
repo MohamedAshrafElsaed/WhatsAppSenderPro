@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\JWTService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -190,5 +191,14 @@ class User extends Authenticatable
         };
 
         return $subscription->getRemainingLimit($limit, $currentUsage);
+    }
+
+    /**
+     * Generate JWT token for WhatsApp API authentication
+     */
+    public function generateJWT(): string
+    {
+        $jwtService = new JWTService();
+        return $jwtService->generateToken($this);
     }
 }

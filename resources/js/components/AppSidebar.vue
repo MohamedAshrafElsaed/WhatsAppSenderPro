@@ -11,32 +11,59 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useTranslation } from '@/composables/useTranslation';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import {
+    LayoutGrid,
+    MessageSquare,
+    Users,
+    FileText,
+    Settings,
+    CreditCard
+} from 'lucide-vue-next';
+import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
+
+const { t } = useTranslation();
+const page = usePage();
+const locale = computed(() => page.props.locale || 'en');
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: t('nav.dashboard', 'Dashboard'),
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: t('nav.campaigns', 'Campaigns'),
+        href: '/campaigns',
+        icon: MessageSquare,
+    },
+    {
+        title: t('nav.contacts', 'Contacts'),
+        href: '/contacts',
+        icon: Users,
+    },
+    {
+        title: t('nav.templates', 'Templates'),
+        href: '/templates',
+        icon: FileText,
+    },
+    {
+        title: t('nav.subscription', 'Subscription'),
+        href: '/subscription',
+        icon: CreditCard,
+    },
+    {
+        title: t('nav.settings', 'Settings'),
+        href: '/settings',
+        icon: Settings,
+    },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+const footerNavItems: NavItem[] = [];
 </script>
 
 <template>
@@ -58,9 +85,8 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
+            <NavFooter v-if="footerNavItems.length" :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
-    <slot />
 </template>
