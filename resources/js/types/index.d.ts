@@ -255,3 +255,38 @@ export type AppPageProps<
     auth: Auth;
     sidebarOpen: boolean;
 };
+
+export interface WhatsAppSession {
+    id: string;
+    session_name: string;
+    status: 'pending' | 'qr_ready' | 'connected' | 'disconnected' | 'failed';
+    phone_number?: string;
+    jid?: string;
+    push_name?: string;
+    platform?: string;
+    connected_at?: string;
+    disconnected_at?: string;
+    last_seen?: string;
+    device_info?: Record<string, any>;
+    is_business_account?: boolean;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface WhatsAppSessionSummary {
+    total_sessions: number;
+    connected: number;
+    pending: number;
+    max_devices: number;
+    available_slots: number | string;
+}
+
+export interface OnboardingData {
+    tour_completed?: boolean;
+    whatsapp_connected?: boolean;
+    contacts_imported?: boolean;
+    template_created?: boolean;
+    campaign_sent?: boolean;
+    completed_at?: string;
+}

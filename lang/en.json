@@ -20,6 +20,56 @@
         "settings": "Settings"
     },
     "whatsapp": {
+        "title": "WhatsApp Connection",
+        "subtitle": "Connect your WhatsApp numbers to start sending campaigns",
+        "connect_new": "Connect Number",
+        "no_sessions": "No WhatsApp numbers connected",
+        "get_started": "Connect your first WhatsApp number to start sending campaigns",
+        "connect_first": "Connect WhatsApp",
+        "business_recommendation": "It's recommended to use a business number instead of your personal WhatsApp.",
+        "limit_reached": "You have reached the maximum number of connected devices for your plan. Upgrade to connect more numbers.",
+        "confirm_delete": "Are you sure you want to disconnect this session?",
+        "connected_since": "Connected since",
+        "session_created": "WhatsApp session created successfully. Please scan the QR code.",
+        "create_failed": "Failed to create session",
+        "error_occurred": "An error occurred. Please try again.",
+        "qr_failed": "Failed to retrieve QR code",
+        "status_failed": "Failed to retrieve session status",
+        "refresh_failed": "Failed to refresh session",
+        "delete_failed": "Failed to delete session",
+        "disconnected": "Session disconnected successfully",
+        "ws_failed": "Failed to generate WebSocket URL",
+        "summary": {
+            "total": "Total Sessions",
+            "connected": "Connected",
+            "pending": "Pending",
+            "available": "Available Slots",
+            "max": "of"
+        },
+        "sessions": {
+            "title": "Connected Numbers",
+            "description": "Manage your WhatsApp connections"
+        },
+        "status": {
+            "connected": "Connected",
+            "pending": "Pending",
+            "qr_ready": "Scan QR",
+            "disconnected": "Disconnected",
+            "failed": "Failed"
+        },
+        "create": {
+            "title": "Connect WhatsApp Number",
+            "description": "Give your connection a name to identify it easily",
+            "name": "Session Name",
+            "placeholder": "e.g., Main Business Number"
+        },
+        "qr": {
+            "title": "Scan QR Code",
+            "description": "Open WhatsApp on your phone and scan this QR code",
+            "step1": "Open WhatsApp on your phone",
+            "step2": "Tap Menu or Settings and select Linked Devices",
+            "step3": "Point your phone at this screen to scan the code"
+        },
         "devices": "Connected Devices",
         "groups": "WhatsApp Groups",
         "auto_reply": "Auto Reply",
@@ -282,6 +332,8 @@
         }
     },
     "campaigns": {
+        "status_pending": "Pending",
+        "start": "Start",
         "recipient_source": "Recipient Source",
         "delay_between_messages": "Delay Between Messages",
         "from_segment": "From Segment",
@@ -500,8 +552,42 @@
         "poll_options": "Poll Options",
         "max_answers": "Maximum Answers"
     },
+    "onboarding": {
+        "progress": "Step",
+        "of": "of",
+        "progress_title": "Complete your setup",
+        "steps_completed": "steps completed",
+        "skip_confirm": "Are you sure you want to skip the tour? You can restart it from settings.",
+        "finish": "Get Started!",
+        "step_completed": "Step completed successfully",
+        "step1": {
+            "title": "Welcome to WhatsApp Sender Pro! 👋",
+            "desc": "Let's get you started with a quick tour of the platform."
+        },
+        "step2": {
+            "title": "Connect Your WhatsApp",
+            "desc": "First, connect your WhatsApp number to start sending campaigns.",
+            "action": "Connect WhatsApp"
+        },
+        "step3": {
+            "title": "Import Your Contacts",
+            "desc": "Upload your contacts via CSV or connect with Google Sheets.",
+            "action": "Import Contacts"
+        },
+        "step4": {
+            "title": "Create Message Templates",
+            "desc": "Design personalized message templates for your campaigns.",
+            "action": "Create Template"
+        },
+        "step5": {
+            "title": "Launch Your First Campaign",
+            "desc": "Ready to send? Create and launch your first WhatsApp campaign!",
+            "action": "Create Campaign"
+        }
+    },
     "common": {
         "save": "Save",
+        "completed": "Completed",
         "cancel": "Cancel",
         "delete": "Delete",
         "edit": "Edit",
@@ -523,12 +609,9 @@
         "send": "Send",
         "optional": "optional",
         "error": "something went wrong",
-        "back_to_dashboard": "Back to Dashboard"
-
+        "back_to_dashboard": "Back to Dashboard",
+        "create": "Create"
     },
-
-
-
     "landing": {
         "brand_name": "WA Pro",
         "meta": {
@@ -732,6 +815,10 @@
         "trial": "Free Trial",
         "trial_days": ":days days free trial",
         "active": "Active",
+        "status": "Status",
+        "manage": "Manage Plan",
+        "messages_sent": "Messages Sent",
+        "contacts_validated": "Contacts Validated",
         "expired": "Expired",
         "cancelled": "Cancelled",
         "popular": "Most Popular",
@@ -883,6 +970,14 @@
         }
     },
     "dashboard": {
+        "trial_warning": "Your trial expires in",
+        "trial_warning_days": "days. Upgrade now to continue using all features!",
+        "upgrade_now": "Upgrade Now",
+        "onboarding": {
+            "progress_title": "Complete your setup",
+            "of": "of",
+            "steps_completed": "steps completed"
+        },
         "title": "Dashboard",
         "welcome": "Welcome Back!",
         "subtitle": "Here's an overview of your WhatsApp campaigns",
@@ -896,6 +991,9 @@
             "templates_desc": "Saved message templates"
         },
         "quick_actions": {
+            "connected_count": "{count} connected",
+            "create_template": "Create Template",
+            "create_template_desc": "Design message templates",
             "title": "Quick Actions",
             "description": "Get started with these common tasks",
             "connect_whatsapp": "Connect WhatsApp",
@@ -931,7 +1029,9 @@
             "step2": "Import your contacts",
             "step2_desc": "Upload CSV or connect Google Sheets",
             "step3": "Create your first campaign",
-            "step3_desc": "Send personalized messages to your contacts"
+            "step3_desc": "Send personalized messages to your contacts",
+            "step4": "Send your first campaign",
+            "step4_desc": "Launch your first bulk WhatsApp campaign"
         }
     }
 }

@@ -27,12 +27,13 @@ import {
     CheckCircle2,
     FileText,
     MessageSquare,
+    Phone,
     Play,
-    Plus,
     Upload,
     Zap,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import OnboardingTour from '@/components/OnboardingTour.vue';
 
 interface SubscriptionUsage {
     messages_sent: number;
@@ -51,6 +52,26 @@ interface SubscriptionSummary {
     usage?: SubscriptionUsage;
 }
 
+interface OnboardingStatus {
+    tour_completed: boolean;
+    whatsapp_connected: boolean;
+    contacts_imported: boolean;
+    template_created: boolean;
+    campaign_sent: boolean;
+}
+
+interface OnboardingData {
+    status: OnboardingStatus;
+    progress: number;
+    completed_count: number;
+    total_steps: number;
+}
+
+interface WhatsAppSummary {
+    connected: number;
+    total: number;
+}
+
 interface Tutorial {
     videoId: string;
     title: string;
@@ -60,6 +81,8 @@ interface Tutorial {
 
 interface Props {
     subscription: SubscriptionSummary;
+    onboarding: OnboardingData;
+    whatsapp: WhatsAppSummary;
 }
 
 const props = defineProps<Props>();
@@ -122,57 +145,85 @@ const formatLimit = (limit: number | string): string => {
     return limit.toString();
 };
 
-// Quick Actions
+// Quick Actions with completion tracking
 const quickActions = computed(() => [
     {
         title: t('dashboard.quick_actions.connect_whatsapp', 'Connect WhatsApp'),
         description: t('dashboard.quick_actions.connect_whatsapp_desc', 'Link your WhatsApp number'),
-        icon: Plus,
-        href: '/whatsapp/connect',
+        icon: Phone,
+        href: '/whatsapp/connection',
+        completed: props.onboarding.status.whatsapp_connected,
+        repeatable: true, // Can connect multiple numbers
+        completedText: props.whatsapp.connected > 0
+            ? t('dashboard.quick_actions.connected_count', `${props.whatsapp.connected} connected`)
+            : null,
     },
     {
         title: t('dashboard.quick_actions.import_contacts', 'Import Contacts'),
         description: t('dashboard.quick_actions.import_contacts_desc', 'Upload your contact list'),
         icon: Upload,
         href: '/contacts/import',
+        completed: props.onboarding.status.contacts_imported,
+        repeatable: true, // Can import multiple times
+        completedText: null,
+    },
+    {
+        title: t('dashboard.quick_actions.create_template', 'Create Template'),
+        description: t('dashboard.quick_actions.create_template_desc', 'Design message templates'),
+        icon: FileText,
+        href: '/templates/create',
+        completed: props.onboarding.status.template_created,
+        repeatable: true, // Can create multiple templates
+        completedText: null,
     },
     {
         title: t('dashboard.quick_actions.create_campaign', 'Create Campaign'),
         description: t('dashboard.quick_actions.create_campaign_desc', 'Send bulk messages'),
         icon: MessageSquare,
         href: '/campaigns/create',
-    },
-    {
-        title: t('dashboard.quick_actions.view_templates', 'View Templates'),
-        description: t('dashboard.quick_actions.view_templates_desc', 'Manage message templates'),
-        icon: FileText,
-        href: '/templates',
+        completed: props.onboarding.status.campaign_sent,
+        repeatable: true, // Can create multiple campaigns
+        completedText: null,
     },
 ]);
 
-// Getting Started Steps
+// Getting Started Steps with real completion status
 const gettingStartedSteps = computed(() => [
     {
         title: t('dashboard.getting_started.step1', 'Connect your WhatsApp number'),
         description: t('dashboard.getting_started.step1_desc', 'Scan QR code to link your WhatsApp'),
-        completed: false,
+        completed: props.onboarding.status.whatsapp_connected,
+        href: '/whatsapp/connection',
     },
     {
         title: t('dashboard.getting_started.step2', 'Import your contacts'),
         description: t('dashboard.getting_started.step2_desc', 'Upload CSV or connect Google Sheets'),
-        completed: false,
+        completed: props.onboarding.status.contacts_imported,
+        href: '/contacts/import',
     },
     {
-        title: t('dashboard.getting_started.step3', 'Create your first campaign'),
-        description: t('dashboard.getting_started.step3_desc', 'Send personalized messages to your contacts'),
-        completed: false,
+        title: t('dashboard.getting_started.step3', 'Create message template'),
+        description: t('dashboard.getting_started.step3_desc', 'Design reusable message templates'),
+        completed: props.onboarding.status.template_created,
+        href: '/templates/create',
+    },
+    {
+        title: t('dashboard.getting_started.step4', 'Send your first campaign'),
+        description: t('dashboard.getting_started.step4_desc', 'Launch your first bulk WhatsApp campaign'),
+        completed: props.onboarding.status.campaign_sent,
+        href: '/campaigns/create',
     },
 ]);
+
+// Show onboarding progress if not all steps completed
+const showOnboardingProgress = computed(() => {
+    return props.onboarding.progress < 100;
+});
 
 // Video Tutorials Data
 const tutorials: Tutorial[] = [
     {
-        videoId: 'dQw4w9WgXcQ', // Replace with actual YouTube video IDs
+        videoId: 'dQw4w9WgXcQ',
         title: 'dashboard.learning.video1_title',
         description: 'dashboard.learning.video1_desc',
         duration: '5:30',
@@ -210,6 +261,8 @@ const openVideoModal = (video: Tutorial) => {
 <template>
     <Head :title="t('dashboard.title', 'Dashboard')" />
 
+    <OnboardingTour />
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
             class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6"
@@ -235,6 +288,33 @@ const openVideoModal = (video: Tutorial) => {
                     <Link href="/subscription/upgrade" class="ml-2 font-semibold text-[#25D366] hover:underline">
                         {{ t('dashboard.upgrade_now', 'Upgrade Now') }}
                     </Link>
+                </AlertDescription>
+            </Alert>
+
+            <!-- Onboarding Progress Alert -->
+            <Alert v-if="showOnboardingProgress" class="border-[#25D366] bg-[#25D366]/5">
+                <CheckCircle2 class="size-4 text-[#25D366]" />
+                <AlertDescription>
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <p class="font-medium text-[#25D366]">
+                                {{ t('dashboard.onboarding.progress_title', 'Complete your setup') }}
+                            </p>
+                            <p class="mt-1 text-sm text-muted-foreground">
+                                {{ onboarding.completed_count }} {{ t('dashboard.onboarding.of', 'of') }}
+                                {{ onboarding.total_steps }} {{ t('dashboard.onboarding.steps_completed', 'steps completed') }}
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Progress
+                                :model-value="onboarding.progress"
+                                class="h-2 w-24 bg-[#25D366]/20"
+                            />
+                            <span class="text-sm font-medium text-[#25D366]">
+                                {{ onboarding.progress }}%
+                            </span>
+                        </div>
+                    </div>
                 </AlertDescription>
             </Alert>
 
@@ -330,14 +410,100 @@ const openVideoModal = (video: Tutorial) => {
                             v-for="(action, index) in quickActions"
                             :key="index"
                             :href="action.href"
-                            class="flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-6 text-center transition-all hover:border-[#25D366] hover:bg-accent hover:shadow-md"
+                            class="relative flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-6 text-center transition-all hover:border-[#25D366] hover:bg-accent hover:shadow-md"
+                            :class="{ 'opacity-90': action.completed && !action.repeatable }"
                         >
-                            <div class="flex size-12 items-center justify-center rounded-full bg-[#25D366]/10">
-                                <component :is="action.icon" class="size-6 text-[#25D366]" />
+                            <!-- Completion Badge -->
+                            <div
+                                v-if="action.completed && !action.repeatable"
+                                class="absolute right-2 top-2"
+                            >
+                                <CheckCircle2 class="size-5 text-[#25D366]" />
                             </div>
+
+                            <div
+                                class="flex size-12 items-center justify-center rounded-full"
+                                :class="action.completed && !action.repeatable
+                                    ? 'bg-[#25D366]/20'
+                                    : 'bg-[#25D366]/10'"
+                            >
+                                <component
+                                    :is="action.icon"
+                                    class="size-6"
+                                    :class="action.completed && !action.repeatable
+                                        ? 'text-[#25D366]/70'
+                                        : 'text-[#25D366]'"
+                                />
+                            </div>
+
                             <div class="space-y-1">
                                 <h3 class="font-medium leading-tight">{{ action.title }}</h3>
-                                <p class="text-xs text-muted-foreground">{{ action.description }}</p>
+                                <p class="text-xs text-muted-foreground">
+                                    {{ action.completedText || action.description }}
+                                </p>
+                            </div>
+
+                            <!-- Completed indicator for non-repeatable actions -->
+                            <Badge
+                                v-if="action.completed && !action.repeatable"
+                                variant="secondary"
+                                class="mt-auto text-xs"
+                            >
+                                {{ t('common.completed', 'Completed') }}
+                            </Badge>
+                        </Link>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Getting Started Guide -->
+            <Card v-if="showOnboardingProgress">
+                <CardHeader>
+                    <CardTitle class="flex items-center gap-2">
+                        <CheckCircle2 class="size-5 text-[#25D366]" />
+                        {{ t('dashboard.getting_started.title', 'Getting Started') }}
+                    </CardTitle>
+                    <CardDescription>
+                        {{ t('dashboard.getting_started.description', 'Complete these steps to get the most out of the platform') }}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-4">
+                        <Link
+                            v-for="(step, index) in gettingStartedSteps"
+                            :key="index"
+                            :href="step.href"
+                            class="flex items-start gap-4 rounded-lg p-3 transition-colors hover:bg-accent"
+                            :class="[
+                                isRTL() ? 'flex-row-reverse' : '',
+                                step.completed ? 'opacity-60' : ''
+                            ]"
+                        >
+                            <div
+                                class="flex size-8 shrink-0 items-center justify-center rounded-full"
+                                :class="step.completed ? 'bg-[#25D366]' : 'bg-muted'"
+                            >
+                                <CheckCircle2
+                                    v-if="step.completed"
+                                    class="size-4 text-white"
+                                />
+                                <span
+                                    v-else
+                                    class="text-sm font-bold"
+                                >
+                                    {{ index + 1 }}
+                                </span>
+                            </div>
+                            <div class="flex-1">
+                                <h3
+                                    class="font-medium"
+                                    :class="step.completed ? 'line-through' : ''"
+                                >
+                                    {{ step.title }}
+                                </h3>
+                                <p class="text-sm text-muted-foreground">
+                                    {{ step.description }}
+                                </p>
                             </div>
                         </Link>
                     </div>
@@ -381,49 +547,10 @@ const openVideoModal = (video: Tutorial) => {
                             </div>
                             <CardHeader class="p-3 pb-2">
                                 <Badge variant="secondary" class="w-fit text-xs">{{ tutorial.duration }}</Badge>
-                                <CardTitle class="mt-1.5 text-sm line-clamp-2 leading-tight">{{ t(tutorial.title) }}</CardTitle>
-                                <CardDescription class="text-xs line-clamp-2 leading-tight">{{ t(tutorial.description) }}</CardDescription>
+                                <CardTitle class="mt-1.5 line-clamp-2 text-sm leading-tight">{{ t(tutorial.title) }}</CardTitle>
+                                <CardDescription class="line-clamp-2 text-xs leading-tight">{{ t(tutorial.description) }}</CardDescription>
                             </CardHeader>
                         </Card>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <!-- Getting Started Guide -->
-            <Card>
-                <CardHeader>
-                    <CardTitle class="flex items-center gap-2">
-                        <CheckCircle2 class="size-5 text-[#25D366]" />
-                        {{ t('dashboard.getting_started.title', 'Getting Started') }}
-                    </CardTitle>
-                    <CardDescription>
-                        {{ t('dashboard.getting_started.description', 'Complete these steps to get the most out of the platform') }}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div class="space-y-4">
-                        <div
-                            v-for="(step, index) in gettingStartedSteps"
-                            :key="index"
-                            class="flex items-start gap-4"
-                            :class="isRTL() ? 'flex-row-reverse' : ''"
-                        >
-                            <div
-                                class="flex size-8 shrink-0 items-center justify-center rounded-full"
-                                :class="step.completed ? 'bg-[#25D366]' : 'bg-muted'"
-                            >
-                                <span
-                                    class="text-sm font-bold"
-                                    :class="step.completed ? 'text-white' : ''"
-                                >
-                                    {{ index + 1 }}
-                                </span>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-medium">{{ step.title }}</h3>
-                                <p class="text-sm text-muted-foreground">{{ step.description }}</p>
-                            </div>
-                        </div>
                     </div>
                 </CardContent>
             </Card>

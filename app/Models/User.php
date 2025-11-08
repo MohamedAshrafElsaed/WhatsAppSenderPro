@@ -26,6 +26,7 @@ class User extends Authenticatable
         'locale',
         'email_verified_at',
         'mobile_verified_at',
+        'onboarding_data',
     ];
 
     protected $hidden = [
@@ -36,6 +37,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'mobile_verified_at' => 'datetime',
+        'onboarding_data' => 'array',
     ];
 
     // Existing Relationships

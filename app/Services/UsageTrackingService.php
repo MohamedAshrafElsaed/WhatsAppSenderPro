@@ -172,4 +172,16 @@ class UsageTrackingService
 
         return $resetCount;
     }
+
+    /**
+     * Decrement connected number count when user disconnects
+     */
+    public function decrementConnectedNumber(User $user): void
+    {
+        $usage = UserUsage::getCurrentPeriodUsage($user);
+
+        if ($usage->connected_numbers_count > 0) {
+            $usage->decrement('connected_numbers_count');
+        }
+    }
 }
