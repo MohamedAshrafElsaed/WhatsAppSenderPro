@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { computed } from 'vue';
 import type { User } from '@/types';
+import { computed } from 'vue';
 
 interface Props {
     user: User;
@@ -54,16 +54,18 @@ const fullName = computed(() => {
         <Avatar class="size-8">
             <AvatarImage
                 v-if="user.avatar"
-                :src="user.avatar"
                 :alt="fullName"
+                :src="user.avatar"
             />
-            <AvatarFallback class="text-xs bg-[#25D366] text-white">
+            <AvatarFallback class="bg-[#25D366] text-xs text-white">
                 {{ userInitials }}
             </AvatarFallback>
         </Avatar>
         <div class="flex flex-col">
-            <span class="text-sm font-medium leading-none">{{ fullName }}</span>
-            <span v-if="showEmail" class="text-xs text-muted-foreground">{{ user.email }}</span>
+            <span class="text-sm leading-none font-medium">{{ fullName }}</span>
+            <span v-if="showEmail" class="text-xs text-muted-foreground">{{
+                user.email
+            }}</span>
         </div>
     </div>
 </template>

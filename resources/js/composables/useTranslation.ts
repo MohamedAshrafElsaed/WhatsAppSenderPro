@@ -11,7 +11,11 @@ export function useTranslation() {
      * Translate a key with optional fallback
      * Supports dot notation for nested keys
      */
-    const t = (key: string, fallback?: string, replacements?: Record<string, any>): string => {
+    const t = (
+        key: string,
+        fallback?: string,
+        replacements?: Record<string, any>,
+    ): string => {
         const keys = key.split('.');
         let value: any = translations.value;
 
@@ -24,13 +28,16 @@ export function useTranslation() {
             }
         }
 
-        let result = typeof value === 'string' ? value : (fallback || key);
+        let result = typeof value === 'string' ? value : fallback || key;
 
         // Handle replacements like {name}, {count}, etc.
         if (replacements) {
-            Object.keys(replacements).forEach(replaceKey => {
+            Object.keys(replacements).forEach((replaceKey) => {
                 const replaceValue = replacements[replaceKey];
-                result = result.replace(new RegExp(`{${replaceKey}}`, 'g'), replaceValue);
+                result = result.replace(
+                    new RegExp(`{${replaceKey}}`, 'g'),
+                    replaceValue,
+                );
             });
         }
 

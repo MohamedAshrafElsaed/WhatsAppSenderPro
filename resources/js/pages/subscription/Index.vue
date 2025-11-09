@@ -18,10 +18,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useTranslation } from '@/composables/useTranslation';
+import { upgrade } from '@/routes/subscription';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { AlertCircle, Calendar, CreditCard } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { useTranslation } from '@/composables/useTranslation';
 
 interface SubscriptionSummary {
     has_subscription: boolean;
@@ -97,7 +98,7 @@ const calculatePercentage = (used: number, limit: number | string) => {
                     {{ t('subscription.no_subscription') }}
                 </AlertDescription>
             </Alert>
-            <Link class="mt-4 inline-block" href="/subscription/upgrade">
+            <Link :href="upgrade()" class="mt-4 inline-block">
                 <Button class="bg-[#25D366] hover:bg-[#128C7E]">
                     {{ t('subscription.view_plans') }}
                 </Button>
@@ -108,9 +109,9 @@ const calculatePercentage = (used: number, limit: number | string) => {
             <Card>
                 <CardHeader>
                     <div class="flex items-center justify-between">
-                        <CardTitle>{{
-                            t('subscription.current_plan')
-                        }}</CardTitle>
+                        <CardTitle
+                            >{{ t('subscription.current_plan') }}
+                        </CardTitle>
                         <Badge :class="getStatusColor(subscription.status)">
                             {{ t(`subscription.${subscription.status}`) }}
                         </Badge>
@@ -146,7 +147,7 @@ const calculatePercentage = (used: number, limit: number | string) => {
                     </div>
 
                     <div class="pt-4">
-                        <Link href="/subscription/upgrade">
+                        <Link :href="upgrade()">
                             <Button class="w-full" variant="outline">
                                 {{ t('subscription.upgrade_plan') }}
                             </Button>
@@ -167,9 +168,9 @@ const calculatePercentage = (used: number, limit: number | string) => {
             <Card v-if="subscription.usage">
                 <CardHeader>
                     <CardTitle>{{ t('subscription.usage_title') }}</CardTitle>
-                    <CardDescription>{{
-                        t('subscription.usage_description')
-                    }}</CardDescription>
+                    <CardDescription
+                        >{{ t('subscription.usage_description') }}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-6">
                     <div>
@@ -236,9 +237,9 @@ const calculatePercentage = (used: number, limit: number | string) => {
         <Dialog v-model:open="showCancelDialog">
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{{
-                        t('subscription.confirm_cancel_title')
-                    }}</DialogTitle>
+                    <DialogTitle
+                        >{{ t('subscription.confirm_cancel_title') }}
+                    </DialogTitle>
                     <DialogDescription>
                         {{ t('subscription.confirm_cancel_description') }}
                     </DialogDescription>

@@ -4,9 +4,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/composables/useTranslation';
 import { Head } from '@inertiajs/vue3';
 import { AlertCircle, Check } from 'lucide-vue-next';
-import { useTranslation } from '@/composables/useTranslation';
 
 interface Package {
     id: number;
@@ -37,6 +37,7 @@ interface Props {
     packages: Package[];
     currentSubscription: SubscriptionSummary;
 }
+
 const { t } = useTranslation();
 
 const props = defineProps<Props>();

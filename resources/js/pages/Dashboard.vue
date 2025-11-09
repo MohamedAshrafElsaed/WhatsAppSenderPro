@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import OnboardingTour from '@/components/OnboardingTour.vue';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,10 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { dashboard } from '@/routes';
+import { index as dashboard } from '@/routes/dashboard';
+import { connection } from '@/routes/dashboard/whatsapp';
+import { index as importsIndex } from '@/routes/dashboard/contacts/imports';
+import { index as subscriptionIndex, upgrade } from '@/routes/subscription';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
@@ -33,7 +37,6 @@ import {
     Zap,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import OnboardingTour from '@/components/OnboardingTour.vue';
 
 interface SubscriptionUsage {
     messages_sent: number;
@@ -151,9 +154,9 @@ const quickActions = computed(() => [
         title: t('dashboard.quick_actions.connect_whatsapp', 'Connect WhatsApp'),
         description: t('dashboard.quick_actions.connect_whatsapp_desc', 'Link your WhatsApp number'),
         icon: Phone,
-        href: '/whatsapp/connection',
+        href: connection(),
         completed: props.onboarding.status.whatsapp_connected,
-        repeatable: true, // Can connect multiple numbers
+        repeatable: true,
         completedText: props.whatsapp.connected > 0
             ? t('dashboard.quick_actions.connected_count', `${props.whatsapp.connected} connected`)
             : null,
@@ -162,27 +165,27 @@ const quickActions = computed(() => [
         title: t('dashboard.quick_actions.import_contacts', 'Import Contacts'),
         description: t('dashboard.quick_actions.import_contacts_desc', 'Upload your contact list'),
         icon: Upload,
-        href: '/contacts/import',
+        href: importsIndex(),
         completed: props.onboarding.status.contacts_imported,
-        repeatable: true, // Can import multiple times
+        repeatable: true,
         completedText: null,
     },
     {
         title: t('dashboard.quick_actions.create_template', 'Create Template'),
         description: t('dashboard.quick_actions.create_template_desc', 'Design message templates'),
         icon: FileText,
-        href: '/templates/create',
+        href: '#', // ✅ FIXED: Placeholder until route exists
         completed: props.onboarding.status.template_created,
-        repeatable: true, // Can create multiple templates
+        repeatable: true,
         completedText: null,
     },
     {
         title: t('dashboard.quick_actions.create_campaign', 'Create Campaign'),
         description: t('dashboard.quick_actions.create_campaign_desc', 'Send bulk messages'),
         icon: MessageSquare,
-        href: '/campaigns/create',
+        href: '#', // ✅ FIXED: Placeholder until route exists
         completed: props.onboarding.status.campaign_sent,
-        repeatable: true, // Can create multiple campaigns
+        repeatable: true,
         completedText: null,
     },
 ]);
@@ -193,25 +196,25 @@ const gettingStartedSteps = computed(() => [
         title: t('dashboard.getting_started.step1', 'Connect your WhatsApp number'),
         description: t('dashboard.getting_started.step1_desc', 'Scan QR code to link your WhatsApp'),
         completed: props.onboarding.status.whatsapp_connected,
-        href: '/whatsapp/connection',
+        href: connection(),
     },
     {
         title: t('dashboard.getting_started.step2', 'Import your contacts'),
         description: t('dashboard.getting_started.step2_desc', 'Upload CSV or connect Google Sheets'),
         completed: props.onboarding.status.contacts_imported,
-        href: '/contacts/import',
+        href: importsIndex(),
     },
     {
         title: t('dashboard.getting_started.step3', 'Create message template'),
         description: t('dashboard.getting_started.step3_desc', 'Design reusable message templates'),
         completed: props.onboarding.status.template_created,
-        href: '/templates/create',
+        href: '#', // ✅ FIXED: Placeholder until route exists
     },
     {
         title: t('dashboard.getting_started.step4', 'Send your first campaign'),
         description: t('dashboard.getting_started.step4_desc', 'Launch your first bulk WhatsApp campaign'),
         completed: props.onboarding.status.campaign_sent,
-        href: '/campaigns/create',
+        href: '#', // ✅ FIXED: Placeholder until route exists
     },
 ]);
 
@@ -245,7 +248,7 @@ const tutorials: Tutorial[] = [
         title: 'dashboard.learning.video4_title',
         description: 'dashboard.learning.video4_desc',
         duration: '10:20',
-    }
+    },
 ];
 
 // Video Modal State
@@ -265,44 +268,77 @@ const openVideoModal = (video: Tutorial) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
-            class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6"
             :class="isRTL() ? 'text-right' : 'text-left'"
+            class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6"
         >
             <!-- Welcome Section -->
             <div class="space-y-2">
                 <h1 class="text-3xl font-bold tracking-tight">
-                    {{ t('dashboard.welcome', 'Welcome Back') }}{{ userName ? `, ${userName}` : '' }}!
+                    {{ t('dashboard.welcome', 'Welcome Back')
+                    }}{{ userName ? `, ${userName}` : '' }}!
                 </h1>
                 <p class="text-muted-foreground">
-                    {{ t('dashboard.subtitle', "Here's what's happening with your WhatsApp campaigns today") }}
+                    {{
+                        t(
+                            'dashboard.subtitle',
+                            "Here's what's happening with your WhatsApp campaigns today",
+                        )
+                    }}
                 </p>
             </div>
 
             <!-- Trial Warning Alert -->
-            <Alert v-if="showTrialWarning" variant="default" class="border-[#25D366]">
+            <Alert
+                v-if="showTrialWarning"
+                class="border-[#25D366]"
+                variant="default"
+            >
                 <AlertCircle class="size-4 text-[#25D366]" />
                 <AlertDescription>
                     {{ t('dashboard.trial_warning', 'Your trial expires in') }}
                     <strong>{{ subscription.days_remaining }}</strong>
-                    {{ t('dashboard.trial_warning_days', 'days. Upgrade now to continue using all features!') }}
-                    <Link href="/subscription/upgrade" class="ml-2 font-semibold text-[#25D366] hover:underline">
+                    {{
+                        t(
+                            'dashboard.trial_warning_days',
+                            'days. Upgrade now to continue using all features!',
+                        )
+                    }}
+                    <Link
+                        :href="upgrade()"
+                        class="ml-2 font-semibold text-[#25D366] hover:underline"
+                    >
                         {{ t('dashboard.upgrade_now', 'Upgrade Now') }}
                     </Link>
                 </AlertDescription>
             </Alert>
 
             <!-- Onboarding Progress Alert -->
-            <Alert v-if="showOnboardingProgress" class="border-[#25D366] bg-[#25D366]/5">
+            <Alert
+                v-if="showOnboardingProgress"
+                class="border-[#25D366] bg-[#25D366]/5"
+            >
                 <CheckCircle2 class="size-4 text-[#25D366]" />
                 <AlertDescription>
                     <div class="flex items-center justify-between gap-4">
                         <div class="flex-1">
                             <p class="font-medium text-[#25D366]">
-                                {{ t('dashboard.onboarding.progress_title', 'Complete your setup') }}
+                                {{
+                                    t(
+                                        'dashboard.onboarding.progress_title',
+                                        'Complete your setup',
+                                    )
+                                }}
                             </p>
                             <p class="mt-1 text-sm text-muted-foreground">
-                                {{ onboarding.completed_count }} {{ t('dashboard.onboarding.of', 'of') }}
-                                {{ onboarding.total_steps }} {{ t('dashboard.onboarding.steps_completed', 'steps completed') }}
+                                {{ onboarding.completed_count }}
+                                {{ t('dashboard.onboarding.of', 'of') }}
+                                {{ onboarding.total_steps }}
+                                {{
+                                    t(
+                                        'dashboard.onboarding.steps_completed',
+                                        'steps completed',
+                                    )
+                                }}
                             </p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -321,18 +357,32 @@ const openVideoModal = (video: Tutorial) => {
             <!-- Subscription Status Card -->
             <Card v-if="subscription.has_subscription">
                 <CardHeader>
-                    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div
+                        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+                    >
                         <div>
-                            <CardTitle>{{ t('subscription.current_plan', 'Current Plan') }}</CardTitle>
+                            <CardTitle>
+                                {{
+                                    t(
+                                        'subscription.current_plan',
+                                        'Current Plan',
+                                    )
+                                }}
+                            </CardTitle>
                             <CardDescription class="mt-1">
                                 {{ t('subscription.status', 'Status') }}:
                                 <Badge :variant="getStatusColor" class="ml-2">
-                                    {{ t(`subscription.${subscription.status}`, subscription.status) }}
+                                    {{
+                                        t(
+                                            `subscription.${subscription.status}`,
+                                            subscription.status,
+                                        )
+                                    }}
                                 </Badge>
                             </CardDescription>
                         </div>
-                        <Link href="/subscription">
-                            <Button variant="outline" size="sm">
+                        <Link :href="subscriptionIndex()">
+                            <Button size="sm" variant="outline">
                                 {{ t('subscription.manage', 'Manage Plan') }}
                             </Button>
                         </Link>
@@ -342,51 +392,83 @@ const openVideoModal = (video: Tutorial) => {
                     <div class="grid gap-4 md:grid-cols-2">
                         <!-- Messages Usage -->
                         <div v-if="subscription.usage" class="space-y-2">
-                            <div class="flex items-center justify-between text-sm">
+                            <div
+                                class="flex items-center justify-between text-sm"
+                            >
                                 <span class="text-muted-foreground">
-                                    {{ t('subscription.messages_sent', 'Messages Sent') }}
+                                    {{
+                                        t(
+                                            'subscription.messages_sent',
+                                            'Messages Sent',
+                                        )
+                                    }}
                                 </span>
                                 <span class="font-medium">
                                     {{ subscription.usage.messages_sent }} /
-                                    {{ formatLimit(subscription.usage.messages_limit) }}
+                                    {{
+                                        formatLimit(
+                                            subscription.usage.messages_limit,
+                                        )
+                                    }}
                                 </span>
                             </div>
                             <Progress
-                                :model-value="calculatePercentage(
-                                    subscription.usage.messages_sent,
-                                    subscription.usage.messages_limit
-                                )"
-                                :class="getProgressColor(
+                                :class="
+                                    getProgressColor(
+                                        calculatePercentage(
+                                            subscription.usage.messages_sent,
+                                            subscription.usage.messages_limit,
+                                        ),
+                                    )
+                                "
+                                :model-value="
                                     calculatePercentage(
                                         subscription.usage.messages_sent,
-                                        subscription.usage.messages_limit
+                                        subscription.usage.messages_limit,
                                     )
-                                )"
+                                "
                             />
                         </div>
 
                         <!-- Contacts Usage -->
                         <div v-if="subscription.usage" class="space-y-2">
-                            <div class="flex items-center justify-between text-sm">
+                            <div
+                                class="flex items-center justify-between text-sm"
+                            >
                                 <span class="text-muted-foreground">
-                                    {{ t('subscription.contacts_validated', 'Contacts Validated') }}
+                                    {{
+                                        t(
+                                            'subscription.contacts_validated',
+                                            'Contacts Validated',
+                                        )
+                                    }}
                                 </span>
                                 <span class="font-medium">
-                                    {{ subscription.usage.contacts_validated }} /
-                                    {{ formatLimit(subscription.usage.contacts_limit) }}
+                                    {{ subscription.usage.contacts_validated }}
+                                    /
+                                    {{
+                                        formatLimit(
+                                            subscription.usage.contacts_limit,
+                                        )
+                                    }}
                                 </span>
                             </div>
                             <Progress
-                                :model-value="calculatePercentage(
-                                    subscription.usage.contacts_validated,
-                                    subscription.usage.contacts_limit
-                                )"
-                                :class="getProgressColor(
+                                :class="
+                                    getProgressColor(
+                                        calculatePercentage(
+                                            subscription.usage
+                                                .contacts_validated,
+                                            subscription.usage.contacts_limit,
+                                        ),
+                                    )
+                                "
+                                :model-value="
                                     calculatePercentage(
                                         subscription.usage.contacts_validated,
-                                        subscription.usage.contacts_limit
+                                        subscription.usage.contacts_limit,
                                     )
-                                )"
+                                "
                             />
                         </div>
                     </div>
@@ -398,10 +480,17 @@ const openVideoModal = (video: Tutorial) => {
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
                         <Zap class="size-5 text-[#25D366]" />
-                        {{ t('dashboard.quick_actions.title', 'Quick Actions') }}
+                        {{
+                            t('dashboard.quick_actions.title', 'Quick Actions')
+                        }}
                     </CardTitle>
                     <CardDescription>
-                        {{ t('dashboard.quick_actions.description', 'Get started with these common tasks') }}
+                        {{
+                            t(
+                                'dashboard.quick_actions.description',
+                                'Get started with these common tasks',
+                            )
+                        }}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -409,45 +498,57 @@ const openVideoModal = (video: Tutorial) => {
                         <Link
                             v-for="(action, index) in quickActions"
                             :key="index"
+                            :class="{
+                                'opacity-90':
+                                    action.completed && !action.repeatable,
+                            }"
                             :href="action.href"
                             class="relative flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-6 text-center transition-all hover:border-[#25D366] hover:bg-accent hover:shadow-md"
-                            :class="{ 'opacity-90': action.completed && !action.repeatable }"
                         >
                             <!-- Completion Badge -->
                             <div
                                 v-if="action.completed && !action.repeatable"
-                                class="absolute right-2 top-2"
+                                class="absolute top-2 right-2"
                             >
                                 <CheckCircle2 class="size-5 text-[#25D366]" />
                             </div>
 
                             <div
+                                :class="
+                                    action.completed && !action.repeatable
+                                        ? 'bg-[#25D366]/20'
+                                        : 'bg-[#25D366]/10'
+                                "
                                 class="flex size-12 items-center justify-center rounded-full"
-                                :class="action.completed && !action.repeatable
-                                    ? 'bg-[#25D366]/20'
-                                    : 'bg-[#25D366]/10'"
                             >
                                 <component
                                     :is="action.icon"
+                                    :class="
+                                        action.completed && !action.repeatable
+                                            ? 'text-[#25D366]/70'
+                                            : 'text-[#25D366]'
+                                    "
                                     class="size-6"
-                                    :class="action.completed && !action.repeatable
-                                        ? 'text-[#25D366]/70'
-                                        : 'text-[#25D366]'"
                                 />
                             </div>
 
                             <div class="space-y-1">
-                                <h3 class="font-medium leading-tight">{{ action.title }}</h3>
+                                <h3 class="leading-tight font-medium">
+                                    {{ action.title }}
+                                </h3>
                                 <p class="text-xs text-muted-foreground">
-                                    {{ action.completedText || action.description }}
+                                    {{
+                                        action.completedText ||
+                                        action.description
+                                    }}
                                 </p>
                             </div>
 
                             <!-- Completed indicator for non-repeatable actions -->
                             <Badge
                                 v-if="action.completed && !action.repeatable"
-                                variant="secondary"
                                 class="mt-auto text-xs"
+                                variant="secondary"
                             >
                                 {{ t('common.completed', 'Completed') }}
                             </Badge>
@@ -461,10 +562,20 @@ const openVideoModal = (video: Tutorial) => {
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
                         <CheckCircle2 class="size-5 text-[#25D366]" />
-                        {{ t('dashboard.getting_started.title', 'Getting Started') }}
+                        {{
+                            t(
+                                'dashboard.getting_started.title',
+                                'Getting Started',
+                            )
+                        }}
                     </CardTitle>
                     <CardDescription>
-                        {{ t('dashboard.getting_started.description', 'Complete these steps to get the most out of the platform') }}
+                        {{
+                            t(
+                                'dashboard.getting_started.description',
+                                'Complete these steps to get the most out of the platform',
+                            )
+                        }}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -472,32 +583,33 @@ const openVideoModal = (video: Tutorial) => {
                         <Link
                             v-for="(step, index) in gettingStartedSteps"
                             :key="index"
-                            :href="step.href"
-                            class="flex items-start gap-4 rounded-lg p-3 transition-colors hover:bg-accent"
                             :class="[
                                 isRTL() ? 'flex-row-reverse' : '',
-                                step.completed ? 'opacity-60' : ''
+                                step.completed ? 'opacity-60' : '',
                             ]"
+                            :href="step.href"
+                            class="flex items-start gap-4 rounded-lg p-3 transition-colors hover:bg-accent"
                         >
                             <div
+                                :class="
+                                    step.completed ? 'bg-[#25D366]' : 'bg-muted'
+                                "
                                 class="flex size-8 shrink-0 items-center justify-center rounded-full"
-                                :class="step.completed ? 'bg-[#25D366]' : 'bg-muted'"
                             >
                                 <CheckCircle2
                                     v-if="step.completed"
                                     class="size-4 text-white"
                                 />
-                                <span
-                                    v-else
-                                    class="text-sm font-bold"
-                                >
+                                <span v-else class="text-sm font-bold">
                                     {{ index + 1 }}
                                 </span>
                             </div>
                             <div class="flex-1">
                                 <h3
+                                    :class="
+                                        step.completed ? 'line-through' : ''
+                                    "
                                     class="font-medium"
-                                    :class="step.completed ? 'line-through' : ''"
                                 >
                                     {{ step.title }}
                                 </h3>
@@ -516,39 +628,75 @@ const openVideoModal = (video: Tutorial) => {
                     <div class="flex items-center justify-between">
                         <div>
                             <CardTitle class="flex items-center gap-2">
-                                <svg class="size-5 text-[#25D366]" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                <svg
+                                    class="size-5 text-[#25D366]"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                                    />
                                 </svg>
-                                {{ t('dashboard.learning.title', 'Learning Center') }}
+                                {{
+                                    t(
+                                        'dashboard.learning.title',
+                                        'Learning Center',
+                                    )
+                                }}
                             </CardTitle>
-                            <CardDescription>{{ t('dashboard.learning.description', 'Watch tutorials to master WhatsApp Sender Pro') }}</CardDescription>
+                            <CardDescription>
+                                {{
+                                    t(
+                                        'dashboard.learning.description',
+                                        'Watch tutorials to master WhatsApp Sender Pro',
+                                    )
+                                }}
+                            </CardDescription>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div
+                        class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    >
                         <Card
                             v-for="(tutorial, index) in tutorials"
                             :key="index"
                             class="group cursor-pointer overflow-hidden transition-all hover:shadow-lg"
                             @click="openVideoModal(tutorial)"
                         >
-                            <div class="relative aspect-video overflow-hidden bg-muted">
+                            <div
+                                class="relative aspect-video overflow-hidden bg-muted"
+                            >
                                 <img
-                                    :src="`https://img.youtube.com/vi/${tutorial.videoId}/maxresdefault.jpg`"
                                     :alt="t(tutorial.title)"
+                                    :src="`https://img.youtube.com/vi/${tutorial.videoId}/maxresdefault.jpg`"
                                     class="size-full object-cover transition-transform duration-300 group-hover:scale-105"
                                 />
-                                <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                    <div class="flex size-12 items-center justify-center rounded-full bg-[#25D366] shadow-lg">
-                                        <Play class="size-6 fill-white text-white" />
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                                >
+                                    <div
+                                        class="flex size-12 items-center justify-center rounded-full bg-[#25D366] shadow-lg"
+                                    >
+                                        <Play
+                                            class="size-6 fill-white text-white"
+                                        />
                                     </div>
                                 </div>
                             </div>
                             <CardHeader class="p-3 pb-2">
-                                <Badge variant="secondary" class="w-fit text-xs">{{ tutorial.duration }}</Badge>
-                                <CardTitle class="mt-1.5 line-clamp-2 text-sm leading-tight">{{ t(tutorial.title) }}</CardTitle>
-                                <CardDescription class="line-clamp-2 text-xs leading-tight">{{ t(tutorial.description) }}</CardDescription>
+                                <Badge class="w-fit text-xs" variant="secondary"
+                                    >{{ tutorial.duration }}
+                                </Badge>
+                                <CardTitle
+                                    class="mt-1.5 line-clamp-2 text-sm leading-tight"
+                                    >{{ t(tutorial.title) }}
+                                </CardTitle>
+                                <CardDescription
+                                    class="line-clamp-2 text-xs leading-tight"
+                                    >{{ t(tutorial.description) }}
+                                </CardDescription>
                             </CardHeader>
                         </Card>
                     </div>
@@ -560,16 +708,20 @@ const openVideoModal = (video: Tutorial) => {
         <Dialog v-model:open="videoModalOpen">
             <DialogContent class="max-w-4xl p-0">
                 <DialogHeader class="p-6 pb-4">
-                    <DialogTitle>{{ currentVideo ? t(currentVideo.title) : '' }}</DialogTitle>
-                    <DialogDescription>{{ currentVideo ? t(currentVideo.description) : '' }}</DialogDescription>
+                    <DialogTitle
+                        >{{ currentVideo ? t(currentVideo.title) : '' }}
+                    </DialogTitle>
+                    <DialogDescription
+                        >{{ currentVideo ? t(currentVideo.description) : '' }}
+                    </DialogDescription>
                 </DialogHeader>
                 <div class="aspect-video w-full">
                     <iframe
                         v-if="currentVideo"
                         :src="`https://www.youtube.com/embed/${currentVideo.videoId}?autoplay=1`"
-                        class="size-full"
-                        allowfullscreen
                         allow="autoplay"
+                        allowfullscreen
+                        class="size-full"
                     ></iframe>
                 </div>
             </DialogContent>

@@ -1,8 +1,8 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import LanguageToggle from '@/components/LanguageToggle.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
-import LanguageToggle from '@/components/LanguageToggle.vue';
 import {
     Sidebar,
     SidebarContent,
@@ -13,16 +13,19 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useTranslation } from '@/composables/useTranslation';
-import { dashboard } from '@/routes';
+import { index as dashboard } from '@/routes/dashboard';
+import { index as contactsIndex } from '@/routes/dashboard/contacts';
+import { edit as settingsProfile } from '@/routes/dashboard/settings/profile';
+import { index as subscriptionIndex } from '@/routes/subscription';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
+    CreditCard,
+    FileText,
     LayoutGrid,
     MessageSquare,
-    Users,
-    FileText,
     Settings,
-    CreditCard
+    Users,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from './AppLogo.vue';
@@ -47,40 +50,39 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: t('nav.campaigns', 'Campaigns'),
-        href: 'dashboard/campaigns',
+        href: '#',
         icon: MessageSquare,
     },
     {
         title: t('nav.contacts', 'Contacts'),
-        href: 'dashboard/contacts',
+        href: contactsIndex(),
         icon: Users,
     },
     {
         title: t('nav.templates', 'Templates'),
-        href: 'dashboard/templates',
+        href: '#',
         icon: FileText,
     },
     {
         title: t('nav.subscription', 'Subscription'),
-        href: 'dashboard/subscription',
+        href: subscriptionIndex(),
         icon: CreditCard,
     },
     {
         title: t('nav.settings', 'Settings'),
-        href: 'dashboard/settings',
+        href: settingsProfile(),
         icon: Settings,
     },
 ];
 
 const footerNavItems: NavItem[] = [];
 </script>
-
 <template>
-    <Sidebar collapsible="icon" variant="inset" :side="side">
+    <Sidebar :side="side" collapsible="icon" variant="inset">
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton size="lg" as-child>
+                    <SidebarMenuButton as-child size="lg">
                         <Link :href="dashboard()">
                             <AppLogo />
                         </Link>

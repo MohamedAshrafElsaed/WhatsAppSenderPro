@@ -1,17 +1,17 @@
-<script setup lang="ts">
-import { Head, Link, Form } from '@inertiajs/vue3';
-import { computed, watch, ref } from 'vue';
+<script lang="ts" setup>
 import InputError from '@/components/InputError.vue';
 import SearchableSelect from '@/components/SearchableSelect.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import LandingLayout from '@/layouts/LandingLayout.vue';
-import { useTranslation } from '@/composables/useTranslation';
 import { usePhoneNumber } from '@/composables/usePhoneNumber';
-import { Loader2 } from 'lucide-vue-next';
+import { useTranslation } from '@/composables/useTranslation';
+import LandingLayout from '@/layouts/LandingLayout.vue';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { Loader2 } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 
 interface Country {
     id: number;
@@ -41,7 +41,7 @@ const selectedIndustry = ref<number | null>(null);
 // Phone number handling with auto country code removal
 const { mobileNumber, handlePhoneInput } = usePhoneNumber(
     selectedCountry,
-    props.countries
+    props.countries,
 );
 
 // Transform countries for SearchableSelect
@@ -49,7 +49,7 @@ const countryOptions = computed(() =>
     props.countries.map((country) => ({
         value: country.id.toString(),
         label: `${country.name} (+${country.phone_code})`,
-    }))
+    })),
 );
 
 // Transform industries for SearchableSelect
@@ -57,7 +57,7 @@ const industryOptions = computed(() =>
     props.industries.map((industry) => ({
         value: industry.id.toString(),
         label: industry.name,
-    }))
+    })),
 );
 
 // Handle mobile number input with auto country code removal
@@ -69,7 +69,9 @@ const onMobileInput = () => {
 
 // Watch country changes to update hidden input
 watch(selectedCountry, (newValue) => {
-    const countryInput = document.querySelector('input[name="country_id"]') as HTMLInputElement;
+    const countryInput = document.querySelector(
+        'input[name="country_id"]',
+    ) as HTMLInputElement;
     if (countryInput && newValue) {
         countryInput.value = newValue.toString();
     }
@@ -77,7 +79,9 @@ watch(selectedCountry, (newValue) => {
 
 // Watch industry changes to update hidden input
 watch(selectedIndustry, (newValue) => {
-    const industryInput = document.querySelector('input[name="industry_id"]') as HTMLInputElement;
+    const industryInput = document.querySelector(
+        'input[name="industry_id"]',
+    ) as HTMLInputElement;
     if (industryInput && newValue) {
         industryInput.value = newValue.toString();
     }
@@ -85,7 +89,9 @@ watch(selectedIndustry, (newValue) => {
 
 // Watch mobile number to update hidden input
 watch(mobileNumber, (newValue) => {
-    const mobileInput = document.querySelector('input[name="mobile_number"]') as HTMLInputElement;
+    const mobileInput = document.querySelector(
+        'input[name="mobile_number"]',
+    ) as HTMLInputElement;
     if (mobileInput) {
         mobileInput.value = newValue;
     }
@@ -106,7 +112,7 @@ watch(mobileNumber, (newValue) => {
                     {{
                         t(
                             'auth.register.description',
-                            'Enter your details to get started'
+                            'Enter your details to get started',
                         )
                     }}
                 </p>
@@ -115,10 +121,10 @@ watch(mobileNumber, (newValue) => {
             <!-- Register Form -->
             <div class="rounded-lg border bg-card p-8 shadow-sm">
                 <Form
-                    v-bind="store.form()"
-                    :reset-on-success="['password', 'password_confirmation']"
                     v-slot="{ errors, processing }"
+                    :reset-on-success="['password', 'password_confirmation']"
                     class="flex flex-col gap-6"
+                    v-bind="store.form()"
                 >
                     <div class="grid gap-6">
                         <!-- First Name & Last Name (Side by Side) -->
@@ -128,48 +134,54 @@ watch(mobileNumber, (newValue) => {
                                     {{
                                         t(
                                             'auth.register.first_name',
-                                            'First Name'
+                                            'First Name',
                                         )
                                     }}
                                     <span class="text-destructive">*</span>
                                 </Label>
                                 <Input
                                     id="first_name"
-                                    type="text"
-                                    name="first_name"
-                                    required
-                                    autofocus
-                                    :tabindex="1"
-                                    autocomplete="given-name"
-                                    :placeholder="
-                                        t('auth.placeholders.first_name', 'John')
-                                    "
                                     :class="{
                                         'border-destructive': errors.first_name,
                                     }"
+                                    :placeholder="
+                                        t(
+                                            'auth.placeholders.first_name',
+                                            'John',
+                                        )
+                                    "
+                                    :tabindex="1"
+                                    autocomplete="given-name"
+                                    autofocus
+                                    name="first_name"
+                                    required
+                                    type="text"
                                 />
                                 <InputError :message="errors.first_name" />
                             </div>
                             <div class="grid gap-2">
                                 <Label for="last_name">
                                     {{
-                                        t('auth.register.last_name', 'Last Name')
+                                        t(
+                                            'auth.register.last_name',
+                                            'Last Name',
+                                        )
                                     }}
                                     <span class="text-destructive">*</span>
                                 </Label>
                                 <Input
                                     id="last_name"
-                                    type="text"
-                                    name="last_name"
-                                    required
-                                    :tabindex="2"
-                                    autocomplete="family-name"
-                                    :placeholder="
-                                        t('auth.placeholders.last_name', 'Doe')
-                                    "
                                     :class="{
                                         'border-destructive': errors.last_name,
                                     }"
+                                    :placeholder="
+                                        t('auth.placeholders.last_name', 'Doe')
+                                    "
+                                    :tabindex="2"
+                                    autocomplete="family-name"
+                                    name="last_name"
+                                    required
+                                    type="text"
                                 />
                                 <InputError :message="errors.last_name" />
                             </div>
@@ -178,28 +190,23 @@ watch(mobileNumber, (newValue) => {
                         <!-- Email -->
                         <div class="grid gap-2">
                             <Label for="email">
-                                {{
-                                    t(
-                                        'auth.register.email',
-                                        'Email Address'
-                                    )
-                                }}
+                                {{ t('auth.register.email', 'Email Address') }}
                                 <span class="text-destructive">*</span>
                             </Label>
                             <Input
                                 id="email"
-                                type="email"
-                                name="email"
-                                required
-                                :tabindex="3"
-                                autocomplete="email"
+                                :class="{ 'border-destructive': errors.email }"
                                 :placeholder="
                                     t(
                                         'auth.placeholders.email',
-                                        'email@example.com'
+                                        'email@example.com',
                                     )
                                 "
-                                :class="{ 'border-destructive': errors.email }"
+                                :tabindex="3"
+                                autocomplete="email"
+                                name="email"
+                                required
+                                type="email"
                             />
                             <InputError :message="errors.email" />
                         </div>
@@ -217,21 +224,21 @@ watch(mobileNumber, (newValue) => {
                                     :placeholder="
                                         t(
                                             'auth.placeholders.select_country',
-                                            'Select country'
+                                            'Select country',
                                         )
                                     "
                                     :search-placeholder="
                                         t('common.search', 'Search...')
                                     "
+                                    :tabindex="4"
                                     name="country_id_display"
                                     required
-                                    :tabindex="4"
                                 />
                                 <!-- Hidden input for form submission -->
                                 <input
-                                    type="hidden"
-                                    name="country_id"
                                     :value="selectedCountry || ''"
+                                    name="country_id"
+                                    type="hidden"
                                 />
                                 <InputError :message="errors.country_id" />
                             </div>
@@ -240,35 +247,35 @@ watch(mobileNumber, (newValue) => {
                                     {{
                                         t(
                                             'auth.register.mobile',
-                                            'Mobile Number'
+                                            'Mobile Number',
                                         )
                                     }}
                                     <span class="text-destructive">*</span>
                                 </Label>
                                 <Input
                                     id="mobile_number_display"
-                                    type="tel"
                                     v-model="mobileNumber"
-                                    @input="onMobileInput"
-                                    required
-                                    :tabindex="5"
-                                    autocomplete="tel"
-                                    :placeholder="
-                                        t(
-                                            'auth.placeholders.mobile',
-                                            '1234567890'
-                                        )
-                                    "
                                     :class="{
                                         'border-destructive':
                                             errors.mobile_number,
                                     }"
+                                    :placeholder="
+                                        t(
+                                            'auth.placeholders.mobile',
+                                            '1234567890',
+                                        )
+                                    "
+                                    :tabindex="5"
+                                    autocomplete="tel"
+                                    required
+                                    type="tel"
+                                    @input="onMobileInput"
                                 />
                                 <!-- Hidden input for form submission -->
                                 <input
-                                    type="hidden"
-                                    name="mobile_number"
                                     :value="mobileNumber"
+                                    name="mobile_number"
+                                    type="hidden"
                                 />
                                 <p
                                     v-if="selectedCountry"
@@ -277,7 +284,7 @@ watch(mobileNumber, (newValue) => {
                                     {{
                                         t(
                                             'auth.register.mobile_hint',
-                                            'Enter number without country code'
+                                            'Enter number without country code',
                                         )
                                     }}
                                 </p>
@@ -297,21 +304,21 @@ watch(mobileNumber, (newValue) => {
                                 :placeholder="
                                     t(
                                         'auth.placeholders.select_industry',
-                                        'Select industry'
+                                        'Select industry',
                                     )
                                 "
                                 :search-placeholder="
                                     t('common.search', 'Search...')
                                 "
+                                :tabindex="6"
                                 name="industry_id_display"
                                 required
-                                :tabindex="6"
                             />
                             <!-- Hidden input for form submission -->
                             <input
-                                type="hidden"
-                                name="industry_id"
                                 :value="selectedIndustry || ''"
+                                name="industry_id"
+                                type="hidden"
                             />
                             <InputError :message="errors.industry_id" />
                         </div>
@@ -324,20 +331,20 @@ watch(mobileNumber, (newValue) => {
                             </Label>
                             <Input
                                 id="password"
-                                type="password"
-                                name="password"
-                                required
-                                :tabindex="7"
-                                autocomplete="new-password"
-                                :placeholder="
-                                    t(
-                                        'auth.placeholders.password',
-                                        'Min 8 characters'
-                                    )
-                                "
                                 :class="{
                                     'border-destructive': errors.password,
                                 }"
+                                :placeholder="
+                                    t(
+                                        'auth.placeholders.password',
+                                        'Min 8 characters',
+                                    )
+                                "
+                                :tabindex="7"
+                                autocomplete="new-password"
+                                name="password"
+                                required
+                                type="password"
                             />
                             <InputError :message="errors.password" />
                         </div>
@@ -348,28 +355,28 @@ watch(mobileNumber, (newValue) => {
                                 {{
                                     t(
                                         'auth.register.password_confirmation',
-                                        'Confirm Password'
+                                        'Confirm Password',
                                     )
                                 }}
                                 <span class="text-destructive">*</span>
                             </Label>
                             <Input
                                 id="password_confirmation"
-                                type="password"
-                                name="password_confirmation"
-                                required
-                                :tabindex="8"
-                                autocomplete="new-password"
-                                :placeholder="
-                                    t(
-                                        'auth.placeholders.password',
-                                        'Confirm password'
-                                    )
-                                "
                                 :class="{
                                     'border-destructive':
                                         errors.password_confirmation,
                                 }"
+                                :placeholder="
+                                    t(
+                                        'auth.placeholders.password',
+                                        'Confirm password',
+                                    )
+                                "
+                                :tabindex="8"
+                                autocomplete="new-password"
+                                name="password_confirmation"
+                                required
+                                type="password"
                             />
                             <InputError
                                 :message="errors.password_confirmation"
@@ -378,19 +385,17 @@ watch(mobileNumber, (newValue) => {
 
                         <!-- Submit Button -->
                         <Button
-                            type="submit"
-                            class="mt-2 w-full bg-[#25D366] hover:bg-[#128C7E]"
-                            :tabindex="9"
                             :disabled="processing"
+                            :tabindex="9"
+                            class="mt-2 w-full bg-[#25D366] hover:bg-[#128C7E]"
                             data-test="register-user-button"
+                            type="submit"
                         >
                             <Loader2
                                 v-if="processing"
                                 class="mr-2 h-4 w-4 animate-spin"
                             />
-                            {{
-                                t('auth.register.submit', 'Create Account')
-                            }}
+                            {{ t('auth.register.submit', 'Create Account') }}
                         </Button>
                     </div>
 
@@ -399,7 +404,7 @@ watch(mobileNumber, (newValue) => {
                         {{
                             t(
                                 'auth.register.have_account',
-                                'Already have an account?'
+                                'Already have an account?',
                             )
                         }}
                         <Link

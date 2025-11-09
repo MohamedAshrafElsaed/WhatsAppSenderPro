@@ -1,8 +1,6 @@
-<script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
-import { useTranslation } from '@/composables/useTranslation';
-import AppLayout from '@/layouts/AppLayout.vue';
+<script lang="ts" setup>
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -11,10 +9,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
     Dialog,
     DialogContent,
@@ -23,9 +17,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/composables/useTranslation';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Head, router } from '@inertiajs/vue3';
 import {
     AlertCircle,
-    CheckCircle2,
     Phone,
     QrCode,
     RefreshCw,
@@ -34,6 +32,7 @@ import {
     Wifi,
     WifiOff,
 } from 'lucide-vue-next';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 interface Session {
     id: string;
@@ -369,17 +368,17 @@ onMounted(() => {
                 <CardHeader>
                     <div class="flex items-center justify-between">
                         <div>
-                            <CardTitle>{{
-                                t('whatsapp.sessions.title')
-                            }}</CardTitle>
+                            <CardTitle
+                                >{{ t('whatsapp.sessions.title') }}
+                            </CardTitle>
                             <CardDescription>
                                 {{ t('whatsapp.sessions.description') }}
                             </CardDescription>
                         </div>
                         <Button
-                            @click="showCreateDialog = true"
                             :disabled="!canConnect"
                             class="bg-[#25D366] hover:bg-[#128C7E]"
+                            @click="showCreateDialog = true"
                         >
                             <Phone class="mr-2 size-4" />
                             {{ t('whatsapp.connect_new') }}
@@ -398,8 +397,8 @@ onMounted(() => {
                             {{ t('whatsapp.get_started') }}
                         </p>
                         <Button
-                            @click="showCreateDialog = true"
                             class="mt-4 bg-[#25D366] hover:bg-[#128C7E]"
+                            @click="showCreateDialog = true"
                         >
                             {{ t('whatsapp.connect_first') }}
                         </Button>
@@ -467,9 +466,9 @@ onMounted(() => {
                                                 session.status === 'pending' ||
                                                 session.status === 'qr_ready'
                                             "
-                                            @click="showQRCode(session)"
                                             size="sm"
                                             variant="outline"
+                                            @click="showQRCode(session)"
                                         >
                                             <QrCode class="size-4" />
                                         </Button>
@@ -479,17 +478,17 @@ onMounted(() => {
                                                 session.status ===
                                                 'disconnected'
                                             "
-                                            @click="refreshSession(session.id)"
                                             size="sm"
                                             variant="outline"
+                                            @click="refreshSession(session.id)"
                                         >
                                             <RefreshCw class="size-4" />
                                         </Button>
 
                                         <Button
-                                            @click="deleteSession(session.id)"
                                             size="sm"
                                             variant="destructive"
+                                            @click="deleteSession(session.id)"
                                         >
                                             <Trash2 class="size-4" />
                                         </Button>
@@ -533,9 +532,9 @@ onMounted(() => {
                         {{ t('common.cancel') }}
                     </Button>
                     <Button
-                        @click="createSession"
                         :disabled="!sessionName.trim() || creating"
                         class="bg-[#25D366] hover:bg-[#128C7E]"
+                        @click="createSession"
                     >
                         {{
                             creating ? t('common.creating') : t('common.create')
@@ -579,7 +578,7 @@ onMounted(() => {
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button @click="qrDialogOpen = false" variant="outline">
+                    <Button variant="outline" @click="qrDialogOpen = false">
                         {{ t('common.close') }}
                     </Button>
                 </DialogFooter>

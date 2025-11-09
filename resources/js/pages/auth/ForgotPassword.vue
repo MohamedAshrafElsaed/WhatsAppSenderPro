@@ -1,14 +1,14 @@
-<script setup lang="ts">
-import { Head, Link, Form } from '@inertiajs/vue3';
+<script lang="ts" setup>
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AppLayout from '@/layouts/AppLayout.vue';
 import { useTranslation } from '@/composables/useTranslation';
-import { Loader2 } from 'lucide-vue-next';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { Loader2 } from 'lucide-vue-next';
 
 defineProps<{
     status?: string;
@@ -28,7 +28,12 @@ const { t } = useTranslation();
                     {{ t('auth.forgot_password.title', 'Forgot password') }}
                 </h1>
                 <p class="mt-2 text-muted-foreground">
-                    {{ t('auth.forgot_password.description', 'Enter your email to receive a password reset link') }}
+                    {{
+                        t(
+                            'auth.forgot_password.description',
+                            'Enter your email to receive a password reset link',
+                        )
+                    }}
                 </p>
             </div>
 
@@ -42,19 +47,29 @@ const { t } = useTranslation();
                 </div>
 
                 <div class="space-y-6">
-                    <Form v-bind="email.form()" v-slot="{ errors, processing }">
+                    <Form v-slot="{ errors, processing }" v-bind="email.form()">
                         <!-- Email -->
                         <div class="grid gap-2">
                             <Label for="email">
-                                {{ t('auth.forgot_password.email', 'Email address') }}
+                                {{
+                                    t(
+                                        'auth.forgot_password.email',
+                                        'Email address',
+                                    )
+                                }}
                             </Label>
                             <Input
                                 id="email"
-                                type="email"
-                                name="email"
+                                :placeholder="
+                                    t(
+                                        'auth.placeholders.email',
+                                        'email@example.com',
+                                    )
+                                "
                                 autocomplete="email"
                                 autofocus
-                                :placeholder="t('auth.placeholders.email', 'email@example.com')"
+                                name="email"
+                                type="email"
                             />
                             <InputError :message="errors.email" />
                         </div>
@@ -62,20 +77,30 @@ const { t } = useTranslation();
                         <!-- Submit Button -->
                         <div class="my-6 flex items-center justify-start">
                             <Button
-                                type="submit"
-                                class="w-full bg-[#25D366] hover:bg-[#128C7E]"
                                 :disabled="processing"
+                                class="w-full bg-[#25D366] hover:bg-[#128C7E]"
                                 data-test="email-password-reset-link-button"
+                                type="submit"
                             >
-                                <Loader2 v-if="processing" class="mr-2 h-4 w-4 animate-spin" />
-                                {{ t('auth.forgot_password.submit', 'Email password reset link') }}
+                                <Loader2
+                                    v-if="processing"
+                                    class="mr-2 h-4 w-4 animate-spin"
+                                />
+                                {{
+                                    t(
+                                        'auth.forgot_password.submit',
+                                        'Email password reset link',
+                                    )
+                                }}
                             </Button>
                         </div>
                     </Form>
 
                     <!-- Back to Login Link -->
                     <div class="text-center text-sm text-muted-foreground">
-                        {{ t('auth.forgot_password.back_text', 'Or, return to') }}
+                        {{
+                            t('auth.forgot_password.back_text', 'Or, return to')
+                        }}
                         <Link
                             :href="login()"
                             class="font-medium text-[#25D366] hover:text-[#128C7E] hover:underline"

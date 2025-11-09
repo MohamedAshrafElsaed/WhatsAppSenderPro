@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { Head, Link, Form } from '@inertiajs/vue3';
+<script lang="ts" setup>
+import { Form, Head, Link } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -35,7 +35,7 @@ const { t } = useTranslation();
                     {{
                         t(
                             'auth.login.description',
-                            'Enter your email and password below to log in'
+                            'Enter your email and password below to log in',
                         )
                     }}
                 </p>
@@ -51,10 +51,10 @@ const { t } = useTranslation();
                 </div>
 
                 <Form
-                    v-bind="store.form()"
-                    :reset-on-success="['password']"
                     v-slot="{ errors, processing }"
+                    :reset-on-success="['password']"
                     class="flex flex-col gap-6"
+                    v-bind="store.form()"
                 >
                     <div class="grid gap-6">
                         <!-- Email -->
@@ -65,61 +65,57 @@ const { t } = useTranslation();
                             </Label>
                             <Input
                                 id="email"
-                                type="email"
-                                name="email"
-                                required
-                                autofocus
-                                :tabindex="1"
-                                autocomplete="email"
+                                :class="{ 'border-destructive': errors.email }"
                                 :placeholder="
                                     t(
                                         'auth.placeholders.email',
-                                        'email@example.com'
+                                        'email@example.com',
                                     )
                                 "
-                                :class="{ 'border-destructive': errors.email }"
+                                :tabindex="1"
+                                autocomplete="email"
+                                autofocus
+                                name="email"
+                                required
+                                type="email"
                             />
                             <InputError :message="errors.email" />
                         </div>
 
                         <!-- Password -->
                         <div class="grid gap-2">
-                            <div
-                                class="flex items-center justify-between"
-                            >
+                            <div class="flex items-center justify-between">
                                 <Label for="password">
-                                    {{
-                                        t('auth.login.password', 'Password')
-                                    }}
+                                    {{ t('auth.login.password', 'Password') }}
                                     <span class="text-destructive">*</span>
                                 </Label>
                                 <Link
                                     v-if="canResetPassword"
                                     :href="request()"
-                                    class="text-sm font-medium text-[#25D366] hover:text-[#128C7E] hover:underline"
                                     :tabindex="5"
+                                    class="text-sm font-medium text-[#25D366] hover:text-[#128C7E] hover:underline"
                                 >
                                     {{
                                         t(
                                             'auth.login.forgot_password',
-                                            'Forgot password?'
+                                            'Forgot password?',
                                         )
                                     }}
                                 </Link>
                             </div>
                             <Input
                                 id="password"
-                                type="password"
-                                name="password"
-                                required
-                                :tabindex="2"
-                                autocomplete="current-password"
-                                :placeholder="
-                                    t('auth.placeholders.password', 'Password')
-                                "
                                 :class="{
                                     'border-destructive': errors.password,
                                 }"
+                                :placeholder="
+                                    t('auth.placeholders.password', 'Password')
+                                "
+                                :tabindex="2"
+                                autocomplete="current-password"
+                                name="password"
+                                required
+                                type="password"
                             />
                             <InputError :message="errors.password" />
                         </div>
@@ -127,27 +123,27 @@ const { t } = useTranslation();
                         <!-- Remember Me -->
                         <div class="flex items-center justify-between">
                             <Label
-                                for="remember"
                                 class="flex cursor-pointer items-center space-x-3"
+                                for="remember"
                             >
                                 <Checkbox
                                     id="remember"
-                                    name="remember"
                                     :tabindex="3"
+                                    name="remember"
                                 />
                                 <span>{{
-                                        t('auth.login.remember_me', 'Remember me')
-                                    }}</span>
+                                    t('auth.login.remember_me', 'Remember me')
+                                }}</span>
                             </Label>
                         </div>
 
                         <!-- Submit Button -->
                         <Button
-                            type="submit"
-                            class="mt-2 w-full bg-[#25D366] hover:bg-[#128C7E]"
-                            :tabindex="4"
                             :disabled="processing"
+                            :tabindex="4"
+                            class="mt-2 w-full bg-[#25D366] hover:bg-[#128C7E]"
                             data-test="login-button"
+                            type="submit"
                         >
                             <Loader2
                                 v-if="processing"
@@ -159,14 +155,11 @@ const { t } = useTranslation();
 
                     <!-- Register Link -->
                     <div
-                        class="text-center text-sm text-muted-foreground"
                         v-if="canRegister"
+                        class="text-center text-sm text-muted-foreground"
                     >
                         {{
-                            t(
-                                'auth.login.no_account',
-                                "Don't have an account?"
-                            )
+                            t('auth.login.no_account', "Don't have an account?")
                         }}
                         <Link
                             :href="register()"

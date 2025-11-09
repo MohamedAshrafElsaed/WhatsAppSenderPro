@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import UserInfo from '@/components/UserInfo.vue';
 import {
     DropdownMenuGroup,
@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/composables/useTranslation';
 import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
+import { edit } from '@/routes/dashboard/settings/profile';
 import type { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { LogOut, Settings } from 'lucide-vue-next';
@@ -29,13 +29,13 @@ const handleLogout = () => {
 <template>
     <DropdownMenuLabel class="p-0 font-normal">
         <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-            <UserInfo :user="user" :show-email="true" />
+            <UserInfo :show-email="true" :user="user" />
         </div>
     </DropdownMenuLabel>
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full" :href="edit()" prefetch as="button">
+            <Link :href="edit()" as="button" class="block w-full" prefetch>
                 <Settings class="mr-2 h-4 w-4" />
                 {{ t('nav.settings', 'Settings') }}
             </Link>
@@ -44,11 +44,11 @@ const handleLogout = () => {
     <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
         <Link
-            class="block w-full"
             :href="logout()"
-            @click="handleLogout"
             as="button"
+            class="block w-full"
             data-test="logout-button"
+            @click="handleLogout"
         >
             <LogOut class="mr-2 h-4 w-4" />
             {{ t('auth.logout', 'Log out') }}

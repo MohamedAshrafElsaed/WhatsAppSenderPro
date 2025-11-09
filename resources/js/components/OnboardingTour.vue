@@ -1,11 +1,18 @@
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { router } from '@inertiajs/vue3';
-import { useTranslation } from '@/composables/useTranslation';
+<script lang="ts" setup>
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useTranslation } from '@/composables/useTranslation';
+import { router } from '@inertiajs/vue3';
 import { ArrowRight, CheckCircle2, X } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
 
 interface TourStep {
     title: string;
@@ -80,7 +87,10 @@ const completeTour = async () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-CSRF-TOKEN':
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '',
             },
             body: JSON.stringify({ step: 'tour_completed' }),
         });
@@ -130,18 +140,18 @@ onMounted(async () => {
             <Card class="w-full max-w-2xl">
                 <CardHeader>
                     <div class="flex items-start justify-between">
-                        <div class="space-y-2 flex-1">
+                        <div class="flex-1 space-y-2">
                             <div class="flex items-center gap-2">
                                 <CheckCircle2 class="size-5 text-[#25D366]" />
-                                <CardTitle>{{ steps[currentStep].title }}</CardTitle>
+                                <CardTitle>{{
+                                    steps[currentStep].title
+                                }}</CardTitle>
                             </div>
-                            <CardDescription>{{ steps[currentStep].description }}</CardDescription>
+                            <CardDescription>{{
+                                steps[currentStep].description
+                            }}</CardDescription>
                         </div>
-                        <Button
-                            @click="skipTour"
-                            variant="ghost"
-                            size="sm"
-                        >
+                        <Button size="sm" variant="ghost" @click="skipTour">
                             <X class="size-4" />
                         </Button>
                     </div>
@@ -149,19 +159,24 @@ onMounted(async () => {
 
                 <CardContent>
                     <div class="space-y-4">
-                        <Progress :model-value="progressPercentage" class="h-2" />
+                        <Progress
+                            :model-value="progressPercentage"
+                            class="h-2"
+                        />
 
-                        <div class="text-sm text-muted-foreground text-center">
-                            {{ t('onboarding.progress') }} {{ currentStep + 1 }} {{ t('onboarding.of') }} {{ steps.length }}
+                        <div class="text-center text-sm text-muted-foreground">
+                            {{ t('onboarding.progress') }}
+                            {{ currentStep + 1 }} {{ t('onboarding.of') }}
+                            {{ steps.length }}
                         </div>
                     </div>
                 </CardContent>
 
                 <CardFooter class="flex justify-between gap-2">
                     <Button
-                        @click="previousStep"
-                        variant="outline"
                         :disabled="currentStep === 0"
+                        variant="outline"
+                        @click="previousStep"
                     >
                         {{ t('common.previous') }}
                     </Button>
@@ -169,8 +184,8 @@ onMounted(async () => {
                     <div class="flex gap-2">
                         <Button
                             v-if="steps[currentStep].action"
-                            @click="goToAction(steps[currentStep].action!)"
                             class="bg-[#25D366] hover:bg-[#128C7E]"
+                            @click="goToAction(steps[currentStep].action!)"
                         >
                             {{ steps[currentStep].actionLabel }}
                             <ArrowRight class="ml-2 size-4" />
@@ -186,8 +201,8 @@ onMounted(async () => {
 
                         <Button
                             v-else
-                            @click="completeTour"
                             class="bg-[#25D366] hover:bg-[#128C7E]"
+                            @click="completeTour"
                         >
                             {{ t('onboarding.finish') }}
                         </Button>

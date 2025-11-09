@@ -1,10 +1,11 @@
-<script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { useTranslation } from '@/composables/useTranslation';
+<script lang="ts" setup>
+import LanguageToggle from '@/components/LanguageToggle.vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import LanguageToggle from '@/components/LanguageToggle.vue';
+import { useTranslation } from '@/composables/useTranslation';
+import { home as landing } from '@/routes';
+import { Head, Link } from '@inertiajs/vue3';
 import { MessageCircle } from 'lucide-vue-next';
 
 const { t } = useTranslation();
@@ -13,33 +14,50 @@ const { t } = useTranslation();
 <template>
     <Head>
         <title>{{ t('static.privacy.meta_title') }}</title>
-        <meta :content="t('static.privacy.meta_description')" name="description" />
+        <meta
+            :content="t('static.privacy.meta_description')"
+            name="description"
+        />
     </Head>
 
     <div class="min-h-screen bg-background">
         <!-- Header/Navigation -->
-        <header class="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
-            <div class="container mx-auto flex h-16 items-center justify-between px-4">
-                <Link href="/" class="flex items-center gap-2">
-                    <div class="flex items-center justify-center rounded-lg bg-[#25D366] p-2">
+        <header
+            class="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur"
+        >
+            <div
+                class="container mx-auto flex h-16 items-center justify-between px-4"
+            >
+                <Link :href="landing()" class="flex items-center gap-2">
+                    <div
+                        class="flex items-center justify-center rounded-lg bg-[#25D366] p-2"
+                    >
                         <MessageCircle class="size-6 text-white" />
                     </div>
-                    <span class="text-xl font-bold">{{ t('landing.brand_name') }}</span>
+                    <span class="text-xl font-bold">{{
+                        t('landing.brand_name')
+                    }}</span>
                 </Link>
                 <div class="flex items-center gap-3">
                     <LanguageToggle />
-                    <Link href="/">
-                        <Button variant="outline">{{ t('static.back_home') }}</Button>
+                    <Link :href="landing()">
+                        <Button variant="outline">{{
+                            t('static.back_home')
+                        }}</Button>
                     </Link>
                 </div>
             </div>
         </header>
 
         <!-- Hero Section -->
-        <section class="border-b border-border bg-gradient-to-br from-[#25D366]/10 to-transparent py-16">
+        <section
+            class="border-b border-border bg-gradient-to-br from-[#25D366]/10 to-transparent py-16"
+        >
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-3xl text-center">
-                    <Badge class="mb-4 bg-[#25D366]">{{ t('static.privacy.badge') }}</Badge>
+                    <Badge class="mb-4 bg-[#25D366]">{{
+                        t('static.privacy.badge')
+                    }}</Badge>
                     <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
                         {{ t('static.privacy.title') }}
                     </h1>
@@ -58,26 +76,44 @@ const { t } = useTranslation();
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-4xl">
                     <Card>
-                        <CardContent class="prose prose-gray max-w-none p-8 dark:prose-invert">
+                        <CardContent
+                            class="prose prose-gray dark:prose-invert max-w-none p-8"
+                        >
                             <h2>{{ t('static.privacy.section1_title') }}</h2>
                             <p>{{ t('static.privacy.section1_text') }}</p>
 
                             <h2>{{ t('static.privacy.section2_title') }}</h2>
                             <p>{{ t('static.privacy.section2_text') }}</p>
                             <ul>
-                                <li>{{ t('static.privacy.section2_item1') }}</li>
-                                <li>{{ t('static.privacy.section2_item2') }}</li>
-                                <li>{{ t('static.privacy.section2_item3') }}</li>
-                                <li>{{ t('static.privacy.section2_item4') }}</li>
+                                <li>
+                                    {{ t('static.privacy.section2_item1') }}
+                                </li>
+                                <li>
+                                    {{ t('static.privacy.section2_item2') }}
+                                </li>
+                                <li>
+                                    {{ t('static.privacy.section2_item3') }}
+                                </li>
+                                <li>
+                                    {{ t('static.privacy.section2_item4') }}
+                                </li>
                             </ul>
 
                             <h2>{{ t('static.privacy.section3_title') }}</h2>
                             <p>{{ t('static.privacy.section3_text') }}</p>
                             <ul>
-                                <li>{{ t('static.privacy.section3_item1') }}</li>
-                                <li>{{ t('static.privacy.section3_item2') }}</li>
-                                <li>{{ t('static.privacy.section3_item3') }}</li>
-                                <li>{{ t('static.privacy.section3_item4') }}</li>
+                                <li>
+                                    {{ t('static.privacy.section3_item1') }}
+                                </li>
+                                <li>
+                                    {{ t('static.privacy.section3_item2') }}
+                                </li>
+                                <li>
+                                    {{ t('static.privacy.section3_item3') }}
+                                </li>
+                                <li>
+                                    {{ t('static.privacy.section3_item4') }}
+                                </li>
                             </ul>
 
                             <h2>{{ t('static.privacy.section4_title') }}</h2>
@@ -100,8 +136,12 @@ const { t } = useTranslation();
         <!-- Footer -->
         <footer class="border-t border-border bg-muted/50 py-8">
             <div class="container mx-auto px-4">
-                <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
-                    <p class="text-sm text-muted-foreground">{{ t('landing.footer.copyright') }}</p>
+                <div
+                    class="flex flex-col items-center justify-between gap-4 sm:flex-row"
+                >
+                    <p class="text-sm text-muted-foreground">
+                        {{ t('landing.footer.copyright') }}
+                    </p>
                     <div class="flex gap-6 text-sm">
                         <Link href="/about" class="hover:text-[#25D366]">{{ t('static.about.link') }}</Link>
                         <Link href="/contact" class="hover:text-[#25D366]">{{ t('static.contact.link') }}</Link>

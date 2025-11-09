@@ -1,6 +1,6 @@
-<script setup lang="ts">
-import { MessageCircle } from 'lucide-vue-next';
+<script lang="ts" setup>
 import { usePage } from '@inertiajs/vue3';
+import { MessageCircle } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 const page = usePage();
@@ -20,8 +20,8 @@ const appName = computed(() => {
             <MessageCircle class="size-5" />
         </div>
         <div
-            class="grid flex-1 text-sm leading-tight"
             :class="isRTL ? 'text-right' : 'text-left'"
+            class="grid flex-1 text-sm leading-tight"
         >
             <span class="truncate font-semibold">
                 {{ appName }}

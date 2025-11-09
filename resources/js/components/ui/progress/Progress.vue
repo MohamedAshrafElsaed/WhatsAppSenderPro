@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed } from 'vue';
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    modelValue: 0,
+    modelValue: 0
 });
 
 const percentage = computed(() => {
@@ -19,8 +19,8 @@ const percentage = computed(() => {
     <div class="relative h-2 w-full overflow-hidden rounded-full bg-muted">
         <div
             :class="props.class"
-            class="h-full transition-all duration-300 ease-in-out"
             :style="{ width: `${percentage}%` }"
+            class="h-full transition-all duration-300 ease-in-out"
         />
     </div>
 </template>

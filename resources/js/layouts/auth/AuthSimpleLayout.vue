@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { home } from '@/routes';
 import { Link, usePage } from '@inertiajs/vue3';
@@ -16,8 +16,8 @@ const isRTL = computed(() => locale.value === 'ar');
 
 <template>
     <div
-        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
         :class="isRTL ? 'rtl' : 'ltr'"
+        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
     >
         <div class="w-full max-w-sm">
             <div class="flex flex-col gap-8">

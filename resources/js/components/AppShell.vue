@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -21,8 +21,8 @@ const isRTL = computed(() => locale.value === 'ar');
     </div>
     <SidebarProvider
         v-else
-        :default-open="isOpen"
         :class="isRTL ? 'rtl' : 'ltr'"
+        :default-open="isOpen"
         :dir="isRTL ? 'rtl' : 'ltr'"
     >
         <slot />

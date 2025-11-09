@@ -1,6 +1,7 @@
 import { usePage } from '@inertiajs/vue3';
 
-const API_BASE_URL = import.meta.env.VITE_WHATSAPP_API_URL || 'http://localhost:8988';
+const API_BASE_URL =
+    import.meta.env.VITE_WHATSAPP_API_URL || 'http://localhost:8988';
 
 /**
  * Get JWT token from page props
@@ -22,9 +23,9 @@ async function makeRequest(method: string, endpoint: string, data?: any) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method,
         headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            Accept: 'application/json',
         },
         body: data ? JSON.stringify(data) : undefined,
     });
@@ -49,8 +50,7 @@ export const whatsappApi = {
         makeRequest('POST', '/api/sessions', { session_name: sessionName }),
 
     // Get all sessions
-    getSessions: () =>
-        makeRequest('GET', '/api/sessions'),
+    getSessions: () => makeRequest('GET', '/api/sessions'),
 
     // Get session QR code
     getSessionQR: (sessionId: string) =>

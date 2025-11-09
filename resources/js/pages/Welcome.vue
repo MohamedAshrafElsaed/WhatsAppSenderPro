@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import LanguageToggle from '@/components/LanguageToggle.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,6 +10,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { useTranslation } from '@/composables/useTranslation';
+import { login, register, about, contact, privacy, terms } from '@/routes';
 import { Head, Link } from '@inertiajs/vue3';
 import {
     BarChart,
@@ -31,7 +33,6 @@ import {
     Zap,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
-import LanguageToggle from '@/components/LanguageToggle.vue';
 
 interface Package {
     id: number;
@@ -140,50 +141,189 @@ const trustIndicators = computed(() => [
     },
 ]);
 
-const getFeatureTranslations = (packageSlug: string, features: Record<string, any>) => {
-    const featureList: Array<{ text: string; available: boolean; comingSoon: boolean }> = [];
+const getFeatureTranslations = (
+    packageSlug: string,
+    features: Record<string, any>,
+) => {
+    const featureList: Array<{
+        text: string;
+        available: boolean;
+        comingSoon: boolean;
+    }> = [];
 
     if (packageSlug === 'basic') {
         featureList.push(
-            { text: t('packages.basic.messages'), available: true, comingSoon: false },
-            { text: t('packages.basic.contacts'), available: true, comingSoon: false },
-            { text: t('packages.basic.numbers'), available: true, comingSoon: false },
-            { text: t('packages.basic.templates'), available: true, comingSoon: false },
-            { text: t('packages.basic.features.csv_import'), available: true, comingSoon: false },
-            { text: t('packages.basic.features.text_messages'), available: true, comingSoon: false },
-            { text: t('packages.basic.features.basic_reports'), available: true, comingSoon: false },
-            { text: t('packages.basic.features.manual_sending'), available: true, comingSoon: false },
-            { text: t('packages.basic.features.browser_only'), available: true, comingSoon: false },
+            {
+                text: t('packages.basic.messages'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.contacts'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.numbers'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.templates'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.features.csv_import'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.features.text_messages'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.features.basic_reports'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.features.manual_sending'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.basic.features.browser_only'),
+                available: true,
+                comingSoon: false,
+            },
         );
     } else if (packageSlug === 'pro') {
         featureList.push(
-            { text: t('packages.pro.messages'), available: true, comingSoon: false },
-            { text: t('packages.pro.contacts'), available: true, comingSoon: false },
-            { text: t('packages.pro.numbers'), available: true, comingSoon: false },
-            { text: t('packages.pro.templates'), available: true, comingSoon: false },
-            { text: t('packages.pro.features.media'), available: true, comingSoon: false },
-            { text: t('packages.pro.features.groups'), available: true, comingSoon: false },
-            { text: t('packages.pro.features.tagging'), available: true, comingSoon: false },
-            { text: t('packages.pro.features.scheduling'), available: true, comingSoon: false },
-            { text: t('packages.pro.features.dashboard'), available: true, comingSoon: false },
-            { text: t('packages.pro.features.sheets'), available: true, comingSoon: false },
-            { text: t('packages.pro.features.priority_support'), available: true, comingSoon: false },
+            {
+                text: t('packages.pro.messages'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.contacts'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.numbers'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.templates'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.features.media'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.features.groups'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.features.tagging'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.features.scheduling'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.features.dashboard'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.features.sheets'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.pro.features.priority_support'),
+                available: true,
+                comingSoon: false,
+            },
         );
     } else if (packageSlug === 'golden') {
         featureList.push(
-            { text: t('packages.golden.messages'), available: true, comingSoon: false },
-            { text: t('packages.golden.contacts'), available: true, comingSoon: false },
-            { text: t('packages.golden.numbers'), available: true, comingSoon: false },
-            { text: t('packages.golden.templates'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.full_media'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.drip'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.advanced_segmentation'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.inbox'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.unsubscribe'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.teams'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.api'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.analytics'), available: true, comingSoon: false },
-            { text: t('packages.golden.features.premium_support'), available: true, comingSoon: false },
+            {
+                text: t('packages.golden.messages'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.contacts'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.numbers'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.templates'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.full_media'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.drip'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.advanced_segmentation'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.inbox'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.unsubscribe'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.teams'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.api'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.analytics'),
+                available: true,
+                comingSoon: false,
+            },
+            {
+                text: t('packages.golden.features.premium_support'),
+                available: true,
+                comingSoon: false,
+            },
         );
     }
 
@@ -199,7 +339,6 @@ const getBadgeText = (pkg: Package) => {
     }
     return '';
 };
-
 </script>
 <template>
     <Head>
@@ -222,8 +361,8 @@ const getBadgeText = (pkg: Package) => {
                         <MessageCircle class="size-6 text-white" />
                     </div>
                     <span class="text-xl font-bold">{{
-                            t('landing.brand_name')
-                        }}</span>
+                        t('landing.brand_name')
+                    }}</span>
                 </div>
                 <nav class="hidden items-center gap-6 md:flex">
                     <a
@@ -248,14 +387,13 @@ const getBadgeText = (pkg: Package) => {
                 <div class="flex items-center gap-3">
                     <!-- Language Toggle - NEW! -->
                     <LanguageToggle />
-
                     <Link
-                        :href="'/login'"
+                        :href="login()"
                         class="hidden text-sm font-medium md:inline-flex"
                     >
                         {{ t('landing.nav.login') }}
                     </Link>
-                    <Link v-if="canRegister" :href="'/register'">
+                    <Link v-if="canRegister" :href="register()">
                         <Button class="bg-[#25D366] hover:bg-[#128C7E]">
                             {{ t('landing.nav.get_started') }}
                         </Button>
@@ -382,9 +520,9 @@ const getBadgeText = (pkg: Package) => {
         >
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-2xl text-center">
-                    <Badge class="mb-4">{{
-                        t('landing.features.badge')
-                    }}</Badge>
+                    <Badge class="mb-4"
+                        >{{ t('landing.features.badge') }}
+                    </Badge>
                     <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
                         {{ t('landing.features.title') }}
                     </h2>
@@ -407,14 +545,14 @@ const getBadgeText = (pkg: Package) => {
                                     class="size-6 text-[#128C7E]"
                                 />
                             </div>
-                            <CardTitle class="text-xl">{{
-                                feature.title
-                            }}</CardTitle>
+                            <CardTitle class="text-xl"
+                                >{{ feature.title }}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <CardDescription class="text-base">{{
-                                feature.description
-                            }}</CardDescription>
+                            <CardDescription class="text-base"
+                                >{{ feature.description }}
+                            </CardDescription>
                         </CardContent>
                     </Card>
                 </div>
@@ -425,9 +563,9 @@ const getBadgeText = (pkg: Package) => {
         <section id="how-it-works" class="py-16 md:py-24">
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-2xl text-center">
-                    <Badge class="mb-4">{{
-                        t('landing.how_it_works.badge')
-                    }}</Badge>
+                    <Badge class="mb-4"
+                        >{{ t('landing.how_it_works.badge') }}
+                    </Badge>
                     <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
                         {{ t('landing.how_it_works.title') }}
                     </h2>
@@ -499,15 +637,21 @@ const getBadgeText = (pkg: Package) => {
                                 <div class="flex items-center gap-3">
                                     <Clock class="size-8 text-[#25D366]" />
                                     <div>
-                                        <CardTitle class="text-2xl">{{
+                                        <CardTitle class="text-2xl"
+                                            >{{
                                                 t('landing.pricing.free_trial')
-                                            }}</CardTitle>
-                                        <CardDescription class="text-base">{{
-                                                t('landing.pricing.free_trial_desc')
-                                            }}</CardDescription>
+                                            }}
+                                        </CardTitle>
+                                        <CardDescription class="text-base"
+                                            >{{
+                                                t(
+                                                    'landing.pricing.free_trial_desc',
+                                                )
+                                            }}
+                                        </CardDescription>
                                     </div>
                                 </div>
-                                <Link v-if="canRegister" href="/register">
+                                <Link v-if="canRegister" :href="register()">
                                     <Button
                                         class="bg-[#25D366] hover:bg-[#128C7E]"
                                     >
@@ -525,28 +669,38 @@ const getBadgeText = (pkg: Package) => {
                         v-for="pkg in packages"
                         :key="pkg.id"
                         :class="
-            pkg.is_popular
-                ? 'border-2 border-[#25D366] shadow-lg'
-                : ''
-        "
+                            pkg.is_popular
+                                ? 'border-2 border-[#25D366] shadow-lg'
+                                : ''
+                        "
                         class="relative flex flex-col transition-all hover:shadow-lg"
                     >
                         <!-- Badge - Fixed positioning to not overlap title -->
                         <Badge
                             v-if="pkg.is_popular || pkg.is_best_value"
+                            :class="isRTL ? 'top-4 left-4' : 'top-4 right-4'"
                             class="absolute bg-[#25D366]"
-                            :class="isRTL ? 'left-4 top-4' : 'right-4 top-4'"
                         >
                             {{ getBadgeText(pkg) }}
                         </Badge>
 
                         <!-- Header with extra padding if badge exists -->
-                        <CardHeader :class="(pkg.is_popular || pkg.is_best_value) ? (isRTL ? 'pl-24' : 'pr-24') : ''">
-                            <CardTitle class="text-2xl">{{ pkg.name }}</CardTitle>
+                        <CardHeader
+                            :class="
+                                pkg.is_popular || pkg.is_best_value
+                                    ? isRTL
+                                        ? 'pl-24'
+                                        : 'pr-24'
+                                    : ''
+                            "
+                        >
+                            <CardTitle class="text-2xl"
+                                >{{ pkg.name }}
+                            </CardTitle>
                             <div class="mt-4">
-                <span class="text-4xl font-bold">{{
-                        pkg.formatted_price
-                    }}</span>
+                                <span class="text-4xl font-bold">{{
+                                    pkg.formatted_price
+                                }}</span>
                             </div>
                         </CardHeader>
 
@@ -560,12 +714,20 @@ const getBadgeText = (pkg: Package) => {
                                 </div>
                                 <ul class="space-y-2">
                                     <li
-                                        v-for="(feature, index) in getFeatureTranslations(pkg.slug, pkg.features)"
+                                        v-for="(
+                                            feature, index
+                                        ) in getFeatureTranslations(
+                                            pkg.slug,
+                                            pkg.features,
+                                        )"
                                         :key="index"
                                         class="flex items-start gap-2"
                                     >
                                         <Check
-                                            v-if="feature.available && !feature.comingSoon"
+                                            v-if="
+                                                feature.available &&
+                                                !feature.comingSoon
+                                            "
                                             class="mt-0.5 size-5 shrink-0 text-[#25D366]"
                                         />
                                         <X
@@ -573,30 +735,39 @@ const getBadgeText = (pkg: Package) => {
                                             class="mt-0.5 size-5 shrink-0 text-muted-foreground"
                                         />
                                         <span
-                                            class="text-sm"
                                             :class="
-                                !feature.available || feature.comingSoon
-                                    ? 'text-muted-foreground'
-                                    : ''
-                            "
+                                                !feature.available ||
+                                                feature.comingSoon
+                                                    ? 'text-muted-foreground'
+                                                    : ''
+                                            "
+                                            class="text-sm"
                                         >
-                            {{ feature.text }}
-                        </span>
+                                            {{ feature.text }}
+                                        </span>
                                     </li>
                                 </ul>
                             </div>
 
                             <!-- Button - Fixed at bottom -->
                             <div class="pt-4">
-                                <Link v-if="canRegister" href="/register" class="block">
+                                <Link
+                                    v-if="canRegister"
+                                    :href="register()"
+                                    class="block"
+                                >
                                     <Button
-                                        class="w-full"
                                         :class="
-                            pkg.is_popular
-                                ? 'bg-[#25D366] hover:bg-[#128C7E]'
-                                : ''
-                        "
-                                        :variant="pkg.is_popular ? 'default' : 'outline'"
+                                            pkg.is_popular
+                                                ? 'bg-[#25D366] hover:bg-[#128C7E]'
+                                                : ''
+                                        "
+                                        :variant="
+                                            pkg.is_popular
+                                                ? 'default'
+                                                : 'outline'
+                                        "
+                                        class="w-full"
                                     >
                                         {{ t('landing.pricing.choose_plan') }}
                                     </Button>
@@ -665,10 +836,10 @@ const getBadgeText = (pkg: Package) => {
                     <div
                         class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center"
                     >
-                        <Link :href="'/register'" v-if="canRegister">
+                        <Link v-if="canRegister" :href="register()">
                             <Button
-                                size="lg"
                                 class="bg-[#25D366] hover:bg-[#128C7E]"
+                                size="lg"
                             >
                                 {{ t('landing.cta.start_free') }}
                             </Button>
@@ -693,8 +864,8 @@ const getBadgeText = (pkg: Package) => {
                                 <MessageCircle class="size-5 text-white" />
                             </div>
                             <span class="font-bold">{{
-                                    t('landing.brand_name')
-                                }}</span>
+                                t('landing.brand_name')
+                            }}</span>
                         </div>
                         <p class="text-sm text-muted-foreground">
                             {{ t('landing.footer.tagline') }}
@@ -707,23 +878,23 @@ const getBadgeText = (pkg: Package) => {
                         <ul class="space-y-2 text-sm text-muted-foreground">
                             <li>
                                 <a
+                                    class="hover:text-foreground"
                                     href="#features"
-                                    class="hover:text-foreground"
-                                >{{ t('landing.nav.features') }}</a
+                                    >{{ t('landing.nav.features') }}</a
                                 >
                             </li>
                             <li>
                                 <a
+                                    class="hover:text-foreground"
                                     href="#pricing"
-                                    class="hover:text-foreground"
-                                >{{ t('landing.nav.pricing') }}</a
+                                    >{{ t('landing.nav.pricing') }}</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="#how-it-works"
                                     class="hover:text-foreground"
-                                >{{ t('landing.nav.how_it_works') }}</a
+                                    href="#how-it-works"
+                                    >{{ t('landing.nav.how_it_works') }}</a
                                 >
                             </li>
                         </ul>
@@ -734,24 +905,32 @@ const getBadgeText = (pkg: Package) => {
                         </h3>
                         <ul class="space-y-2 text-sm text-muted-foreground">
                             <li>
-                                <Link href="/about" class="hover:text-foreground">{{
-                                        t('static.about.link')
-                                    }}</Link>
+                                <Link
+                                    :href="about()"
+                                    class="hover:text-foreground"
+                                    >{{ t('static.about.link') }}
+                                </Link>
                             </li>
                             <li>
-                                <Link href="/contact" class="hover:text-foreground">{{
-                                        t('static.contact.link')
-                                    }}</Link>
+                                <Link
+                                    :href="contact()"
+                                    class="hover:text-foreground"
+                                    >{{ t('static.contact.link') }}
+                                </Link>
                             </li>
                             <li>
-                                <Link href="/privacy" class="hover:text-foreground">{{
-                                        t('static.privacy.link')
-                                    }}</Link>
+                                <Link
+                                    :href="privacy()"
+                                    class="hover:text-foreground"
+                                    >{{ t('static.privacy.link') }}
+                                </Link>
                             </li>
                             <li>
-                                <Link href="/terms" class="hover:text-foreground">{{
-                                        t('static.terms.link')
-                                    }}</Link>
+                                <Link
+                                    :href="terms()"
+                                    class="hover:text-foreground"
+                                    >{{ t('static.terms.link') }}
+                                </Link>
                             </li>
                         </ul>
                     </div>
@@ -761,20 +940,20 @@ const getBadgeText = (pkg: Package) => {
                         </h3>
                         <div class="flex gap-3">
                             <a
-                                href="#"
                                 class="flex size-10 items-center justify-center rounded-full bg-muted transition-colors hover:bg-[#25D366] hover:text-white"
+                                href="#"
                             >
                                 <Facebook class="size-5" />
                             </a>
                             <a
-                                href="#"
                                 class="flex size-10 items-center justify-center rounded-full bg-muted transition-colors hover:bg-[#25D366] hover:text-white"
+                                href="#"
                             >
                                 <Twitter class="size-5" />
                             </a>
                             <a
-                                href="#"
                                 class="flex size-10 items-center justify-center rounded-full bg-muted transition-colors hover:bg-[#25D366] hover:text-white"
+                                href="#"
                             >
                                 <Instagram class="size-5" />
                             </a>

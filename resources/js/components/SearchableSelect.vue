@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { ref, computed } from 'vue';
+<script lang="ts" setup>
+import { Input } from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -7,8 +7,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
 interface Option {
     value: string;
@@ -39,8 +39,8 @@ const filteredOptions = computed(() => {
     }
 
     const query = searchQuery.value.toLowerCase();
-    return props.options.filter(option =>
-        option.label.toLowerCase().includes(query)
+    return props.options.filter((option) =>
+        option.label.toLowerCase().includes(query),
     );
 });
 
@@ -60,10 +60,10 @@ const handleValueChange = (value: string) => {
 <template>
     <Select
         :model-value="modelValue?.toString()"
-        @update:model-value="handleValueChange"
-        @open-change="handleOpenChange"
         :name="name"
         :required="required"
+        @update:model-value="handleValueChange"
+        @open-change="handleOpenChange"
     >
         <SelectTrigger :tabindex="tabindex" class="w-full">
             <SelectValue :placeholder="placeholder" />
@@ -72,7 +72,9 @@ const handleValueChange = (value: string) => {
             <!-- Search Input -->
             <div class="sticky top-0 z-10 bg-background p-2 pb-1">
                 <div class="relative">
-                    <Search class="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search
+                        class="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground"
+                    />
                     <Input
                         v-model="searchQuery"
                         :placeholder="searchPlaceholder || 'Search...'"

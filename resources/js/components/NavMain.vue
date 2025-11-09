@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -32,13 +32,13 @@ const isActive = (href: string) => {
             <SidebarMenu>
                 <SidebarMenuItem v-for="item in items" :key="item.title">
                     <SidebarMenuButton
-                        as-child
                         :is-active="isActive(item.href)"
                         :tooltip="item.title"
+                        as-child
                     >
                         <Link
-                            :href="item.href"
                             :class="isRTL ? 'flex-row-reverse' : ''"
+                            :href="item.href"
                         >
                             <component
                                 :is="item.icon"

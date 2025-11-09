@@ -1,6 +1,4 @@
-<script setup lang="ts">
-import { computed } from 'vue';
-import { usePage, router } from '@inertiajs/vue3';
+<script lang="ts" setup>
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -8,7 +6,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { usePage } from '@inertiajs/vue3';
 import { Globe } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 const page = usePage();
 const currentLocale = computed(() => page.props.locale || 'ar');
@@ -19,7 +19,7 @@ const languages = [
 ];
 
 const currentLanguage = computed(() =>
-    languages.find(lang => lang.code === currentLocale.value)
+    languages.find((lang) => lang.code === currentLocale.value),
 );
 
 const switchLanguage = (locale: string) => {
@@ -40,9 +40,9 @@ const switchLanguage = (locale: string) => {
     <DropdownMenu>
         <DropdownMenuTrigger as-child>
             <Button
-                variant="outline"
+                class="gap-2 transition-colors hover:border-[#25D366] hover:bg-[#25D366] hover:text-white"
                 size="sm"
-                class="gap-2 hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition-colors"
+                variant="outline"
             >
                 <Globe class="h-4 w-4" />
                 <span class="hidden sm:inline">
@@ -57,15 +57,17 @@ const switchLanguage = (locale: string) => {
             <DropdownMenuItem
                 v-for="lang in languages"
                 :key="lang.code"
-                @click="switchLanguage(lang.code)"
                 :class="{
                     'bg-accent': currentLocale === lang.code,
                 }"
                 class="cursor-pointer gap-2"
+                @click="switchLanguage(lang.code)"
             >
                 <span>{{ lang.flag }}</span>
                 <span>{{ lang.nativeName }}</span>
-                <span class="text-muted-foreground text-xs">({{ lang.name }})</span>
+                <span class="text-xs text-muted-foreground"
+                    >({{ lang.name }})</span
+                >
             </DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>

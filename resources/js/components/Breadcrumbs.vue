@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -34,9 +34,9 @@ const isRTL = computed(() => locale.value === 'ar');
                     </template>
                     <template v-else>
                         <BreadcrumbLink as-child>
-                            <Link :href="item.href ?? '#'">{{
-                                    item.title
-                                }}</Link>
+                            <Link :href="item.href ?? '#'"
+                                >{{ item.title }}
+                            </Link>
                         </BreadcrumbLink>
                     </template>
                 </BreadcrumbItem>

@@ -1,8 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import AlertError from '@/components/AlertError.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import {
     Dialog,
     DialogContent,
@@ -15,8 +14,9 @@ import {
     PinInputGroup,
     PinInputSlot,
 } from '@/components/ui/pin-input';
-import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { Spinner } from '@/components/ui/spinner';
 import { useTranslation } from '@/composables/useTranslation';
+import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { confirm } from '@/routes/two-factor';
 import { Form, usePage } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
@@ -53,8 +53,14 @@ const modalConfig = computed<{
 }>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: t('two_factor.enabled_title', 'Two-Factor Authentication Enabled'),
-            description: t('two_factor.enabled_desc', 'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.'),
+            title: t(
+                'two_factor.enabled_title',
+                'Two-Factor Authentication Enabled',
+            ),
+            description: t(
+                'two_factor.enabled_desc',
+                'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
+            ),
             buttonText: t('common.close', 'Close'),
         };
     }
@@ -62,14 +68,20 @@ const modalConfig = computed<{
     if (showVerificationStep.value) {
         return {
             title: t('two_factor.verify_title', 'Verify Authentication Code'),
-            description: t('two_factor.verify_desc', 'Enter the 6-digit code from your authenticator app'),
+            description: t(
+                'two_factor.verify_desc',
+                'Enter the 6-digit code from your authenticator app',
+            ),
             buttonText: t('common.continue', 'Continue'),
         };
     }
 
     return {
         title: t('two_factor.enable_title', 'Enable Two-Factor Authentication'),
-        description: t('two_factor.enable_desc', 'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app'),
+        description: t(
+            'two_factor.enable_desc',
+            'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
+        ),
         buttonText: t('common.continue', 'Continue'),
     };
 });
@@ -117,8 +129,8 @@ watch(
     <Dialog :open="isOpen" @update:open="isOpen = $event">
         <DialogContent class="sm:max-w-md">
             <DialogHeader
-                class="flex items-center justify-center"
                 :class="isRTL ? 'text-right' : 'text-left'"
+                class="flex items-center justify-center"
             >
                 <div
                     class="mb-3 w-auto rounded-full border border-border bg-card p-0.5 shadow-sm"
@@ -155,14 +167,14 @@ watch(
                     class="flex items-center justify-center"
                 >
                     <Form
-                        v-bind="confirm.form()"
-                        @success="isOpen = false"
-                        reset-on-error
-                        @error="code = []"
-                        class="w-full"
                         #default="{ errors, processing }"
+                        class="w-full"
+                        reset-on-error
+                        v-bind="confirm.form()"
+                        @error="code = []"
+                        @success="isOpen = false"
                     >
-                        <input type="hidden" name="code" :value="codeValue" />
+                        <input :value="codeValue" name="code" type="hidden" />
                         <div class="space-y-6">
                             <div
                                 ref="pinInputContainerRef"
@@ -170,11 +182,11 @@ watch(
                             >
                                 <PinInput
                                     id="code"
-                                    placeholder="○"
                                     v-model="code"
                                     :disabled="processing"
-                                    type="number"
                                     :name="t('two_factor.code_label', 'Code')"
+                                    placeholder="○"
+                                    type="number"
                                 >
                                     <PinInputGroup>
                                         <PinInputSlot
@@ -189,8 +201,8 @@ watch(
                             </div>
                             <Button
                                 :disabled="processing || code.length !== 6"
-                                type="submit"
                                 class="w-full bg-[#25D366] hover:bg-[#20BA5A]"
+                                type="submit"
                             >
                                 <Spinner
                                     v-if="processing"
@@ -214,24 +226,29 @@ watch(
 
                     <div class="space-y-2">
                         <p
-                            class="text-sm font-medium"
                             :class="isRTL ? 'text-right' : 'text-left'"
+                            class="text-sm font-medium"
                         >
-                            {{ t('two_factor.manual_entry', 'Or enter this code manually:') }}
+                            {{
+                                t(
+                                    'two_factor.manual_entry',
+                                    'Or enter this code manually:',
+                                )
+                            }}
                         </p>
                         <div
                             class="flex items-center justify-between gap-2 rounded-lg border bg-muted p-3"
                         >
                             <code
-                                class="flex-1 text-sm"
                                 :class="isRTL ? 'text-right' : 'text-left'"
+                                class="flex-1 text-sm"
                             >
                                 {{ manualSetupKey }}
                             </code>
                             <Button
-                                variant="ghost"
-                                size="icon"
                                 class="size-8 shrink-0"
+                                size="icon"
+                                variant="ghost"
                                 @click="() => copy(manualSetupKey)"
                             >
                                 <Check v-if="copied" class="size-4" />
@@ -241,8 +258,8 @@ watch(
                     </div>
 
                     <Button
-                        @click="handleModalNextStep"
                         class="w-full bg-[#25D366] hover:bg-[#20BA5A]"
+                        @click="handleModalNextStep"
                     >
                         {{ modalConfig.buttonText }}
                     </Button>

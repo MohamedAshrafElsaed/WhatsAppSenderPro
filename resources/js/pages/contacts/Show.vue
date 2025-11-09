@@ -1,10 +1,7 @@
-<script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import { useTranslation } from '@/composables/useTranslation';
-import AppLayout from '@/layouts/AppLayout.vue';
+<script lang="ts" setup>
 import Heading from '@/components/Heading.vue';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Dialog,
@@ -14,9 +11,21 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Edit, Trash2, Phone, Mail, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-vue-next';
+import { useTranslation } from '@/composables/useTranslation';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { index, edit, destroy } from '@/routes/dashboard/contacts';
+import { Head, router } from '@inertiajs/vue3';
+import {
+    Calendar,
+    CheckCircle2,
+    Clock,
+    Edit,
+    Mail,
+    Phone,
+    Trash2,
+    XCircle,
+} from 'lucide-vue-next';
 import { ref } from 'vue';
-import { index, edit, destroy } from '@/routes/contacts';
 
 interface Contact {
     id: number;
@@ -45,9 +54,12 @@ const { t, isRTL } = useTranslation();
 const showDeleteDialog = ref(false);
 
 const deleteContact = () => {
-    if (window.confirm(t('contacts.messages.confirm_delete'))) {
-        window.location.href = destroy(props.contact.id);
-    }
+    router.delete(destroy(props.contact.id), {
+        onSuccess: () => {
+            showDeleteDialog.value = false;
+            router.visit(index());
+        },
+    });
 };
 
 const formatDate = (dateString: string) => {
@@ -63,17 +75,26 @@ const formatDate = (dateString: string) => {
     <AppLayout>
         <Head :title="contact.full_name" />
 
-        <div class="max-w-4xl mx-auto space-y-6">
+        <div class="mx-auto max-w-4xl space-y-6">
             <!-- Header -->
-            <div class="flex justify-between items-start">
+            <div class="flex items-start justify-between">
                 <Heading :title="contact.full_name" />
                 <div class="flex gap-2">
                     <Button @click="$inertia.visit(edit(contact.id))">
-                        <Edit :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                        <Edit
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4"
+                        />
                         {{ t('common.edit', 'Edit') }}
                     </Button>
-                    <Button variant="destructive" @click="showDeleteDialog = true">
-                        <Trash2 :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                    <Button
+                        variant="destructive"
+                        @click="showDeleteDialog = true"
+                    >
+                        <Trash2
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4"
+                        />
                         {{ t('common.delete', 'Delete') }}
                     </Button>
                 </div>
@@ -82,71 +103,128 @@ const formatDate = (dateString: string) => {
             <!-- Contact Information -->
             <Card>
                 <CardHeader>
-                    <CardTitle>{{ t('contacts.fields.contact_info', 'Contact Information') }}</CardTitle>
+                    <CardTitle>{{
+                        t('contacts.fields.contact_info', 'Contact Information')
+                    }}</CardTitle>
                 </CardHeader>
-                <CardContent class="grid md:grid-cols-2 gap-6">
+                <CardContent class="grid gap-6 md:grid-cols-2">
                     <!-- Phone -->
                     <div>
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('contacts.fields.phone_number') }}</p>
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{ t('contacts.fields.phone_number') }}
+                        </p>
                         <div class="flex items-center gap-2">
                             <Phone class="h-4 w-4" />
-                            <span class="font-medium">{{ contact.phone_number }}</span>
+                            <span class="font-medium">{{
+                                contact.phone_number
+                            }}</span>
                         </div>
                     </div>
 
                     <!-- Email -->
                     <div>
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('contacts.fields.email') }}</p>
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{ t('contacts.fields.email') }}
+                        </p>
                         <div class="flex items-center gap-2">
                             <Mail class="h-4 w-4" />
-                            <span class="font-medium">{{ contact.email || '-' }}</span>
+                            <span class="font-medium">{{
+                                contact.email || '-'
+                            }}</span>
                         </div>
                     </div>
 
                     <!-- Country -->
                     <div v-if="contact.country">
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('contacts.fields.country') }}</p>
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{ t('contacts.fields.country') }}
+                        </p>
                         <span class="font-medium">
-                            {{ isRTL() ? contact.country.name_ar : contact.country.name_en }}
+                            {{
+                                isRTL()
+                                    ? contact.country.name_ar
+                                    : contact.country.name_en
+                            }}
                         </span>
                     </div>
 
                     <!-- WhatsApp Status -->
                     <div>
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('contacts.fields.whatsapp_status') }}</p>
-                        <Badge :variant="contact.is_whatsapp_valid ? 'default' : 'destructive'">
-                            <component :is="contact.is_whatsapp_valid ? CheckCircle2 : XCircle" :class="isRTL() ? 'ml-1' : 'mr-1'" class="h-3 w-3" />
-                            {{ contact.is_whatsapp_valid ? t('contacts.validation.valid') : t('contacts.validation.invalid') }}
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{ t('contacts.fields.whatsapp_status') }}
+                        </p>
+                        <Badge
+                            :variant="
+                                contact.is_whatsapp_valid
+                                    ? 'default'
+                                    : 'destructive'
+                            "
+                        >
+                            <component
+                                :is="
+                                    contact.is_whatsapp_valid
+                                        ? CheckCircle2
+                                        : XCircle
+                                "
+                                :class="isRTL() ? 'ml-1' : 'mr-1'"
+                                class="h-3 w-3"
+                            />
+                            {{
+                                contact.is_whatsapp_valid
+                                    ? t('contacts.validation.valid')
+                                    : t('contacts.validation.invalid')
+                            }}
                         </Badge>
                     </div>
 
                     <!-- Source -->
                     <div>
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('contacts.fields.source') }}</p>
-                        <Badge variant="outline">{{ t(`contacts.sources.${contact.source}`) }}</Badge>
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{ t('contacts.fields.source') }}
+                        </p>
+                        <Badge variant="outline">{{
+                            t(`contacts.sources.${contact.source}`)
+                        }}</Badge>
                     </div>
 
                     <!-- Import File -->
                     <div v-if="contact.import">
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('imports.history.filename') }}</p>
-                        <span class="font-medium">{{ contact.import.filename }}</span>
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{ t('imports.history.filename') }}
+                        </p>
+                        <span class="font-medium">{{
+                            contact.import.filename
+                        }}</span>
                     </div>
 
                     <!-- Created Date -->
                     <div>
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('contacts.fields.created') }}</p>
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{ t('contacts.fields.created') }}
+                        </p>
                         <div class="flex items-center gap-2">
                             <Calendar class="h-4 w-4" />
-                            <span class="font-medium">{{ formatDate(contact.created_at) }}</span>
+                            <span class="font-medium">{{
+                                formatDate(contact.created_at)
+                            }}</span>
                         </div>
                     </div>
 
                     <!-- Validated Date -->
                     <div v-if="contact.validated_at">
-                        <p class="text-sm text-muted-foreground mb-1">{{ t('contacts.validation.validated_at', 'Validated At') }}</p>
+                        <p class="mb-1 text-sm text-muted-foreground">
+                            {{
+                                t(
+                                    'contacts.validation.validated_at',
+                                    'Validated At',
+                                )
+                            }}
+                        </p>
                         <div class="flex items-center gap-2">
                             <Clock class="h-4 w-4" />
-                            <span class="font-medium">{{ formatDate(contact.validated_at) }}</span>
+                            <span class="font-medium">{{
+                                formatDate(contact.validated_at)
+                            }}</span>
                         </div>
                     </div>
                 </CardContent>
@@ -186,9 +264,16 @@ const formatDate = (dateString: string) => {
         <Dialog v-model:open="showDeleteDialog">
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{{ t('contacts.messages.confirm_delete') }}</DialogTitle>
+                    <DialogTitle>{{
+                        t('contacts.messages.confirm_delete')
+                    }}</DialogTitle>
                     <DialogDescription>
-                        {{ t('common.cannot_undone', 'This action cannot be undone.') }}
+                        {{
+                            t(
+                                'common.cannot_undone',
+                                'This action cannot be undone.',
+                            )
+                        }}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

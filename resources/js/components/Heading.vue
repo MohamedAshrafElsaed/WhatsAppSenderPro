@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -15,10 +15,7 @@ const isRTL = computed(() => locale.value === 'ar');
 </script>
 
 <template>
-    <div
-        class="mb-8 space-y-0.5"
-        :class="isRTL ? 'text-right' : 'text-left'"
-    >
+    <div :class="isRTL ? 'text-right' : 'text-left'" class="mb-8 space-y-0.5">
         <h2 class="text-xl font-semibold tracking-tight">{{ title }}</h2>
         <p v-if="description" class="text-sm text-muted-foreground">
             {{ description }}

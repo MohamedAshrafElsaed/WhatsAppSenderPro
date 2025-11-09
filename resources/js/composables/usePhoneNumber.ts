@@ -1,5 +1,5 @@
-import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
-import { ref, watch, Ref } from 'vue';
+import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
+import { ref, Ref, watch } from 'vue';
 
 interface Country {
     id: number;
@@ -7,7 +7,10 @@ interface Country {
     iso_code: string;
 }
 
-export function usePhoneNumber(selectedCountry: Ref<number | null>, countries: Country[]) {
+export function usePhoneNumber(
+    selectedCountry: Ref<number | null>,
+    countries: Country[],
+) {
     const mobileNumber = ref('');
     const formattedNumber = ref('');
     const isValid = ref(false);
@@ -17,7 +20,7 @@ export function usePhoneNumber(selectedCountry: Ref<number | null>, countries: C
      */
     const getPhoneCode = (countryId: number | null): string => {
         if (!countryId) return '';
-        const country = countries.find(c => c.id === countryId);
+        const country = countries.find((c) => c.id === countryId);
         return country?.phone_code || '';
     };
 
@@ -26,7 +29,7 @@ export function usePhoneNumber(selectedCountry: Ref<number | null>, countries: C
      */
     const getISOCode = (countryId: number | null): string => {
         if (!countryId) return '';
-        const country = countries.find(c => c.id === countryId);
+        const country = countries.find((c) => c.id === countryId);
         return country?.iso_code || '';
     };
 
@@ -41,9 +44,9 @@ export function usePhoneNumber(selectedCountry: Ref<number | null>, countries: C
 
         // Check if starts with country code (with or without +)
         const patterns = [
-            new RegExp(`^\\+${phoneCode}`),  // +20
-            new RegExp(`^00${phoneCode}`),   // 0020
-            new RegExp(`^${phoneCode}`),     // 20
+            new RegExp(`^\\+${phoneCode}`), // +20
+            new RegExp(`^00${phoneCode}`), // 0020
+            new RegExp(`^${phoneCode}`), // 20
         ];
 
         for (const pattern of patterns) {
@@ -80,7 +83,10 @@ export function usePhoneNumber(selectedCountry: Ref<number | null>, countries: C
     /**
      * Validate phone number
      */
-    const validatePhoneNumber = (value: string, countryCode: string): boolean => {
+    const validatePhoneNumber = (
+        value: string,
+        countryCode: string,
+    ): boolean => {
         if (!value || !countryCode) return false;
 
         try {

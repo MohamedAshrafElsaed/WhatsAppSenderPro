@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import AlertError from '@/components/AlertError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,8 +8,8 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { useTranslation } from '@/composables/useTranslation';
+import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form, usePage } from '@inertiajs/vue3';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-vue-next';
@@ -47,43 +47,57 @@ onMounted(async () => {
 <template>
     <Card class="w-full">
         <CardHeader :class="isRTL ? 'text-right' : 'text-left'">
-            <CardTitle class="flex gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
+            <CardTitle
+                :class="isRTL ? 'flex-row-reverse' : ''"
+                class="flex gap-3"
+            >
                 <LockKeyhole class="size-4" />
                 {{ t('two_factor.recovery_codes', '2FA Recovery Codes') }}
             </CardTitle>
             <CardDescription>
-                {{ t('two_factor.recovery_codes_desc', 'Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.') }}
+                {{
+                    t(
+                        'two_factor.recovery_codes_desc',
+                        'Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.',
+                    )
+                }}
             </CardDescription>
         </CardHeader>
         <CardContent>
             <div
-                class="flex flex-col gap-3 select-none sm:flex-row sm:items-center sm:justify-between"
                 :class="isRTL ? 'sm:flex-row-reverse' : ''"
+                class="flex flex-col gap-3 select-none sm:flex-row sm:items-center sm:justify-between"
             >
-                <Button @click="toggleRecoveryCodesVisibility" class="w-fit">
+                <Button class="w-fit" @click="toggleRecoveryCodesVisibility">
                     <component
                         :is="isRecoveryCodesVisible ? EyeOff : Eye"
                         class="size-4"
                     />
-                    {{ isRecoveryCodesVisible ? t('two_factor.hide_codes', 'Hide') : t('two_factor.view_codes', 'View') }}
+                    {{
+                        isRecoveryCodesVisible
+                            ? t('two_factor.hide_codes', 'Hide')
+                            : t('two_factor.view_codes', 'View')
+                    }}
                     {{ t('two_factor.recovery_codes_short', 'Recovery Codes') }}
                 </Button>
 
                 <Form
                     v-if="isRecoveryCodesVisible && recoveryCodesList.length"
-                    v-bind="regenerateRecoveryCodes.form()"
-                    method="post"
-                    :options="{ preserveScroll: true }"
-                    @success="fetchRecoveryCodes"
                     #default="{ processing }"
+                    :options="{ preserveScroll: true }"
+                    method="post"
+                    v-bind="regenerateRecoveryCodes.form()"
+                    @success="fetchRecoveryCodes"
                 >
                     <Button
-                        variant="secondary"
-                        type="submit"
                         :disabled="processing"
+                        type="submit"
+                        variant="secondary"
                     >
                         <RefreshCw />
-                        {{ t('two_factor.regenerate_codes', 'Regenerate Codes') }}
+                        {{
+                            t('two_factor.regenerate_codes', 'Regenerate Codes')
+                        }}
                     </Button>
                 </Form>
             </div>
@@ -101,8 +115,8 @@ onMounted(async () => {
                 <div v-else class="mt-3 space-y-3">
                     <div
                         ref="recoveryCodeSectionRef"
-                        class="grid gap-1 rounded-lg bg-muted p-4 font-mono text-sm"
                         :class="isRTL ? 'text-right' : 'text-left'"
+                        class="grid gap-1 rounded-lg bg-muted p-4 font-mono text-sm"
                     >
                         <div v-if="!recoveryCodesList.length" class="space-y-2">
                             <div
@@ -112,19 +126,26 @@ onMounted(async () => {
                             ></div>
                         </div>
                         <div
-                            v-else
                             v-for="(code, index) in recoveryCodesList"
+                            v-else
                             :key="index"
                         >
                             {{ code }}
                         </div>
                     </div>
                     <p
-                        class="text-xs text-muted-foreground select-none"
                         :class="isRTL ? 'text-right' : 'text-left'"
+                        class="text-xs text-muted-foreground select-none"
                     >
-                        {{ t('two_factor.recovery_codes_note', 'Each recovery code can be used once to access your account and will be removed after use. If you need more, click') }}
-                        <span class="font-bold">{{ t('two_factor.regenerate_codes', 'Regenerate Codes') }}</span>
+                        {{
+                            t(
+                                'two_factor.recovery_codes_note',
+                                'Each recovery code can be used once to access your account and will be removed after use. If you need more, click',
+                            )
+                        }}
+                        <span class="font-bold">{{
+                            t('two_factor.regenerate_codes', 'Regenerate Codes')
+                        }}</span>
                         {{ t('two_factor.above', 'above') }}.
                     </p>
                 </div>

@@ -1,33 +1,7 @@
-<script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
-import { useTranslation } from '@/composables/useTranslation';
-import AppLayout from '@/layouts/AppLayout.vue';
+<script lang="ts" setup>
 import Heading from '@/components/Heading.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -37,20 +11,45 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { useTranslation } from '@/composables/useTranslation';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { create, destroy, edit, index, show } from '@/routes/dashboard/contacts';
+import { index as importsIndex } from '@/routes/dashboard/contacts';
+import { Head, router } from '@inertiajs/vue3';
+import {
+    CheckCircle2,
+    Clock,
+    Edit,
+    Eye,
+    MoreVertical,
     Plus,
     Search,
-    Filter,
-    MoreVertical,
-    Eye,
-    Edit,
     Trash2,
-    CheckCircle2,
-    XCircle,
-    Clock,
     Upload,
+    XCircle,
 } from 'lucide-vue-next';
-import { index as importsIndex } from '@/routes/contacts/imports';
-import { index, create, show, edit, destroy } from '@/routes/contacts';
+import { computed, ref } from 'vue';
 
 interface Contact {
     id: number;
@@ -120,15 +119,24 @@ const applyFilters = () => {
         index(),
         {
             search: searchQuery.value || undefined,
-            source: selectedSource.value === 'all' ? undefined : selectedSource.value,
+            source:
+                selectedSource.value === 'all'
+                    ? undefined
+                    : selectedSource.value,
             tag_id: selectedTag.value === 'all' ? undefined : selectedTag.value,
-            country_id: selectedCountry.value === 'all' ? undefined : selectedCountry.value,
-            validation_status: selectedStatus.value === 'all' ? undefined : selectedStatus.value,
+            country_id:
+                selectedCountry.value === 'all'
+                    ? undefined
+                    : selectedCountry.value,
+            validation_status:
+                selectedStatus.value === 'all'
+                    ? undefined
+                    : selectedStatus.value,
         },
         {
             preserveState: true,
             preserveScroll: true,
-        }
+        },
     );
 };
 
@@ -147,7 +155,7 @@ const toggleSelectAll = () => {
     if (selectedContacts.value.length === props.contacts.data.length) {
         selectedContacts.value = [];
     } else {
-        selectedContacts.value = props.contacts.data.map(c => c.id);
+        selectedContacts.value = props.contacts.data.map((c) => c.id);
     }
 };
 
@@ -160,10 +168,12 @@ const toggleSelect = (contactId: number) => {
     }
 };
 
-const isSelected = (contactId: number) => selectedContacts.value.includes(contactId);
-const allSelected = computed(() =>
-    props.contacts.data.length > 0 &&
-    selectedContacts.value.length === props.contacts.data.length
+const isSelected = (contactId: number) =>
+    selectedContacts.value.includes(contactId);
+const allSelected = computed(
+    () =>
+        props.contacts.data.length > 0 &&
+        selectedContacts.value.length === props.contacts.data.length,
 );
 
 // Delete handlers
@@ -185,31 +195,49 @@ const deleteContact = () => {
 
 // Bulk validate
 const bulkValidate = () => {
-    router.post('/contacts/bulk-validate', {
-        contact_ids: selectedContacts.value,
-    }, {
-        onSuccess: () => {
-            selectedContacts.value = [];
+    router.post(
+        '/contacts/bulk-validate',
+        {
+            contact_ids: selectedContacts.value,
         },
-    });
+        {
+            onSuccess: () => {
+                selectedContacts.value = [];
+            },
+        },
+    );
 };
 
 // Get validation status badge
 const getStatusBadge = (contact: Contact) => {
     if (contact.is_whatsapp_valid) {
-        return { variant: 'default' as const, icon: CheckCircle2, text: t('contacts.validation.valid') };
+        return {
+            variant: 'default' as const,
+            icon: CheckCircle2,
+            text: t('contacts.validation.valid'),
+        };
     } else if (contact.validated_at) {
-        return { variant: 'destructive' as const, icon: XCircle, text: t('contacts.validation.invalid') };
+        return {
+            variant: 'destructive' as const,
+            icon: XCircle,
+            text: t('contacts.validation.invalid'),
+        };
     }
-    return { variant: 'secondary' as const, icon: Clock, text: t('contacts.validation.pending') };
+    return {
+        variant: 'secondary' as const,
+        icon: Clock,
+        text: t('contacts.validation.pending'),
+    };
 };
 
 // Get source badge color
 const getSourceColor = (source: string): string => {
     const colors: Record<string, string> = {
         manual: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-        csv_import: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-        excel_import: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+        csv_import:
+            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+        excel_import:
+            'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
         api: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
     };
     return colors[source] || colors.manual;
@@ -220,33 +248,46 @@ const getSourceColor = (source: string): string => {
     <AppLayout>
         <Head :title="t('contacts.title')" />
 
-        <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6" :class="isRTL() ? 'text-right' : 'text-left'">
+        <div
+            :class="isRTL() ? 'text-right' : 'text-left'"
+            class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6"
+        >
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
                 <Heading
-                    :title="t('contacts.title')"
                     :description="t('contacts.description')"
+                    :title="t('contacts.title')"
                 />
                 <div class="flex gap-2">
                     <Button
                         variant="outline"
                         @click="router.visit(importsIndex())"
                     >
-                        <Upload :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                        <Upload
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4"
+                        />
                         {{ t('contacts.import') }}
                     </Button>
                     <Button @click="router.visit(create())">
-                        <Plus :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                        <Plus
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4"
+                        />
                         {{ t('contacts.add') }}
                     </Button>
                 </div>
             </div>
 
             <!-- Filters -->
-            <div class="flex flex-col lg:flex-row gap-4">
+            <div class="flex flex-col gap-4 lg:flex-row">
                 <!-- Search -->
                 <div class="relative flex-1">
-                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search
+                        class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                    />
                     <Input
                         v-model="searchQuery"
                         :placeholder="t('contacts.search')"
@@ -257,30 +298,54 @@ const getSourceColor = (source: string): string => {
 
                 <!-- Filters -->
                 <div class="flex flex-wrap gap-2">
-                    <Select v-model="selectedSource" @update:model-value="applyFilters">
+                    <Select
+                        v-model="selectedSource"
+                        @update:model-value="applyFilters"
+                    >
                         <SelectTrigger class="w-[180px]">
-                            <SelectValue :placeholder="t('contacts.filters.all_sources')" />
+                            <SelectValue
+                                :placeholder="t('contacts.filters.all_sources')"
+                            />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{{ t('contacts.filters.all_sources') }}</SelectItem>
-                            <SelectItem value="manual">{{ t('contacts.sources.manual') }}</SelectItem>
-                            <SelectItem value="csv_import">{{ t('contacts.sources.csv_import') }}</SelectItem>
-                            <SelectItem value="excel_import">{{ t('contacts.sources.excel_import') }}</SelectItem>
+                            <SelectItem value="all">{{
+                                t('contacts.filters.all_sources')
+                            }}</SelectItem>
+                            <SelectItem value="manual">{{
+                                t('contacts.sources.manual')
+                            }}</SelectItem>
+                            <SelectItem value="csv_import">{{
+                                t('contacts.sources.csv_import')
+                            }}</SelectItem>
+                            <SelectItem value="excel_import">{{
+                                t('contacts.sources.excel_import')
+                            }}</SelectItem>
                         </SelectContent>
                     </Select>
 
-                    <Select v-model="selectedStatus" @update:model-value="applyFilters">
+                    <Select
+                        v-model="selectedStatus"
+                        @update:model-value="applyFilters"
+                    >
                         <SelectTrigger class="w-[180px]">
-                            <SelectValue :placeholder="t('contacts.filters.all_status')" />
+                            <SelectValue
+                                :placeholder="t('contacts.filters.all_status')"
+                            />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{{ t('contacts.filters.all_status') }}</SelectItem>
-                            <SelectItem value="valid">{{ t('contacts.validation.valid') }}</SelectItem>
-                            <SelectItem value="invalid">{{ t('contacts.validation.invalid') }}</SelectItem>
+                            <SelectItem value="all">{{
+                                t('contacts.filters.all_status')
+                            }}</SelectItem>
+                            <SelectItem value="valid">{{
+                                t('contacts.validation.valid')
+                            }}</SelectItem>
+                            <SelectItem value="invalid">{{
+                                t('contacts.validation.invalid')
+                            }}</SelectItem>
                         </SelectContent>
                     </Select>
 
-                    <Button variant="ghost" size="sm" @click="clearFilters">
+                    <Button size="sm" variant="ghost" @click="clearFilters">
                         Clear
                     </Button>
                 </div>
@@ -289,10 +354,14 @@ const getSourceColor = (source: string): string => {
             <!-- Bulk Actions -->
             <div
                 v-if="selectedContacts.length > 0"
-                class="flex items-center justify-between p-4 bg-muted rounded-lg"
+                class="flex items-center justify-between rounded-lg bg-muted p-4"
             >
                 <span class="text-sm font-medium">
-                    {{ t('contacts.selected', { count: selectedContacts.length }) }}
+                    {{
+                        t('contacts.selected', {
+                            count: selectedContacts.length,
+                        })
+                    }}
                 </span>
                 <div class="flex gap-2">
                     <Button size="sm" variant="outline" @click="bulkValidate">
@@ -305,48 +374,69 @@ const getSourceColor = (source: string): string => {
             </div>
 
             <!-- Table -->
-            <div class="border rounded-lg">
+            <div class="rounded-lg border">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead class="w-12">
                                 <input
-                                    type="checkbox"
                                     :checked="allSelected"
-                                    @change="toggleSelectAll"
                                     class="rounded border-gray-300"
+                                    type="checkbox"
+                                    @change="toggleSelectAll"
                                 />
                             </TableHead>
-                            <TableHead>{{ t('contacts.fields.first_name') }}</TableHead>
-                            <TableHead>{{ t('contacts.fields.phone_number') }}</TableHead>
-                            <TableHead>{{ t('contacts.fields.email') }}</TableHead>
-                            <TableHead>{{ t('contacts.fields.tags') }}</TableHead>
-                            <TableHead>{{ t('contacts.fields.source') }}</TableHead>
-                            <TableHead>{{ t('contacts.fields.whatsapp_status') }}</TableHead>
-                            <TableHead>{{ t('contacts.fields.actions') }}</TableHead>
+                            <TableHead>{{
+                                t('contacts.fields.first_name')
+                            }}</TableHead>
+                            <TableHead>{{
+                                t('contacts.fields.phone_number')
+                            }}</TableHead>
+                            <TableHead>{{
+                                t('contacts.fields.email')
+                            }}</TableHead>
+                            <TableHead>{{
+                                t('contacts.fields.tags')
+                            }}</TableHead>
+                            <TableHead>{{
+                                t('contacts.fields.source')
+                            }}</TableHead>
+                            <TableHead>{{
+                                t('contacts.fields.whatsapp_status')
+                            }}</TableHead>
+                            <TableHead>{{
+                                t('contacts.fields.actions')
+                            }}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         <TableRow v-if="contacts.data.length === 0">
-                            <TableCell colspan="8" class="text-center py-12">
+                            <TableCell class="py-12 text-center" colspan="8">
                                 <div class="flex flex-col items-center gap-2">
-                                    <p class="text-muted-foreground">{{ t('contacts.no_contacts') }}</p>
+                                    <p class="text-muted-foreground">
+                                        {{ t('contacts.no_contacts') }}
+                                    </p>
                                     <p class="text-sm text-muted-foreground">
                                         {{ t('contacts.import_to_start') }}
                                     </p>
                                 </div>
                             </TableCell>
                         </TableRow>
-                        <TableRow v-for="contact in contacts.data" :key="contact.id">
+                        <TableRow
+                            v-for="contact in contacts.data"
+                            :key="contact.id"
+                        >
                             <TableCell>
                                 <input
-                                    type="checkbox"
                                     :checked="isSelected(contact.id)"
-                                    @change="toggleSelect(contact.id)"
                                     class="rounded border-gray-300"
+                                    type="checkbox"
+                                    @change="toggleSelect(contact.id)"
                                 />
                             </TableCell>
-                            <TableCell class="font-medium">{{ contact.full_name }}</TableCell>
+                            <TableCell class="font-medium">{{
+                                contact.full_name
+                            }}</TableCell>
                             <TableCell>{{ contact.phone_number }}</TableCell>
                             <TableCell>{{ contact.email || '-' }}</TableCell>
                             <TableCell>
@@ -362,15 +452,22 @@ const getSourceColor = (source: string): string => {
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <Badge :class="getSourceColor(contact.source)" variant="outline">
-                                    {{ t(`contacts.sources.${contact.source}`) }}
+                                <Badge
+                                    :class="getSourceColor(contact.source)"
+                                    variant="outline"
+                                >
+                                    {{
+                                        t(`contacts.sources.${contact.source}`)
+                                    }}
                                 </Badge>
                             </TableCell>
                             <TableCell>
-                                <Badge :variant="getStatusBadge(contact).variant">
+                                <Badge
+                                    :variant="getStatusBadge(contact).variant"
+                                >
                                     <component
                                         :is="getStatusBadge(contact).icon"
-                                        class="w-3 h-3 mr-1"
+                                        class="mr-1 h-3 w-3"
                                     />
                                     {{ getStatusBadge(contact).text }}
                                 </Badge>
@@ -378,16 +475,24 @@ const getSourceColor = (source: string): string => {
                             <TableCell>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>
-                                        <Button variant="ghost" size="sm">
+                                        <Button size="sm" variant="ghost">
                                             <MoreVertical class="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem @click="router.visit(show(contact.id))">
+                                        <DropdownMenuItem
+                                            @click="
+                                                router.visit(show(contact.id))
+                                            "
+                                        >
                                             <Eye class="mr-2 h-4 w-4" />
                                             View
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem @click="router.visit(edit(contact.id))">
+                                        <DropdownMenuItem
+                                            @click="
+                                                router.visit(edit(contact.id))
+                                            "
+                                        >
                                             <Edit class="mr-2 h-4 w-4" />
                                             Edit
                                         </DropdownMenuItem>
@@ -410,13 +515,18 @@ const getSourceColor = (source: string): string => {
             <Dialog v-model:open="showDeleteDialog">
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{{ t('contacts.messages.confirm_delete') }}</DialogTitle>
+                        <DialogTitle>{{
+                            t('contacts.messages.confirm_delete')
+                        }}</DialogTitle>
                         <DialogDescription>
                             This action cannot be undone.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" @click="showDeleteDialog = false">
+                        <Button
+                            variant="outline"
+                            @click="showDeleteDialog = false"
+                        >
                             Cancel
                         </Button>
                         <Button variant="destructive" @click="deleteContact">
