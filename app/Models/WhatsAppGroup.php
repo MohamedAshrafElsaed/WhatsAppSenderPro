@@ -4,6 +4,72 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string|null $session_id
+ * @property string $group_jid
+ * @property string|null $group_name
+ * @property string|null $group_subject
+ * @property string|null $group_owner_jid
+ * @property int $participant_count
+ * @property int $admin_count
+ * @property bool $is_announcement
+ * @property bool $is_locked
+ * @property bool $is_active
+ * @property bool $is_member
+ * @property bool $is_admin
+ * @property \Illuminate\Support\Carbon|null $created_time
+ * @property \Illuminate\Support\Carbon|null $joined_at
+ * @property \Illuminate\Support\Carbon|null $left_at
+ * @property array<array-key, mixed>|null $group_settings
+ * @property string|null $invite_code
+ * @property string|null $group_picture_url
+ * @property int $message_count
+ * @property \Illuminate\Support\Carbon|null $last_activity_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WhatsAppContact> $contacts
+ * @property-read int|null $contacts_count
+ * @property-read bool|null $contacts_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WhatsAppMessage> $messages
+ * @property-read int|null $messages_count
+ * @property-read bool|null $messages_exists
+ * @property-read \App\Models\WhatsAppSession|null $session
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup adminGroups()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup largeGroups($minParticipants = 100)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup recentlyActive($days = 7)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereAdminCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereCreatedTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereGroupJid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereGroupName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereGroupOwnerJid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereGroupPictureUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereGroupSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereGroupSubject($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereInviteCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereIsAdmin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereIsAnnouncement($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereIsLocked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereIsMember($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereJoinedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereLastActivityAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereLeftAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereMessageCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereParticipantCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereSessionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppGroup whereUserId($value)
+ * @mixin \Eloquent
+ */
 class WhatsAppGroup extends Model
 {
     protected $table = 'whatsapp_groups';

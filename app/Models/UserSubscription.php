@@ -5,6 +5,44 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $package_id
+ * @property string $status
+ * @property \Illuminate\Support\Carbon|null $trial_ends_at
+ * @property \Illuminate\Support\Carbon $starts_at
+ * @property \Illuminate\Support\Carbon $ends_at
+ * @property \Illuminate\Support\Carbon|null $cancelled_at
+ * @property bool $auto_renew
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\Package $package
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription expired()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription trial()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereAutoRenew($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereCancelledAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereEndsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription wherePackageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereStartsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereTrialEndsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription withoutTrashed()
+ * @mixin \Eloquent
+ */
 class UserSubscription extends Model
 {
     use SoftDeletes;

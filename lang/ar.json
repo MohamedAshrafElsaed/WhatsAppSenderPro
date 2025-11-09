@@ -482,109 +482,6 @@
             "feature_5": "مقارنات نطاق التاريخ المخصص والبيانات التاريخية"
         }
     },
-    "contacts": {
-        "never": "أبدًا",
-        "title": "جميع جهات الاتصال",
-        "description": "إدارة وإرسال رسائل إلى جهات الاتصال الخاصة بك",
-        "add": "إضافة جهة اتصال",
-        "add_description": "إضافة جهة اتصال جديدة يدوياً إلى قائمتك",
-        "search": "البحث بالاسم أو الهاتف أو البريد الإلكتروني...",
-        "name": "الاسم",
-        "phone": "الهاتف",
-        "email": "البريد الإلكتروني",
-        "source": "المصدر",
-        "last_message": "آخر رسالة",
-        "actions": "الإجراءات",
-        "no_contacts": "لا توجد جهات اتصال بعد",
-        "import_or_add": "استورد جهات الاتصال أو أضفها يدوياً للبدء",
-        "import_contacts": "استيراد جهات الاتصال",
-        "showing": "عرض {count} من أصل {total} جهة اتصال",
-        "personal_info": "المعلومات الشخصية",
-        "phone_note": "أدخل رقم الهاتف مع رمز الدولة (مثال: +1، +44، +20)",
-        "tips_title": "نصائح لإضافة جهات الاتصال:",
-        "tip_phone_format": "رقم الهاتف يجب أن يتضمن رمز الدولة",
-        "tip_validation": "سيتم التحقق من رقم الهاتف تلقائياً",
-        "tip_required": "الاسم الأول مطلوب، الحقول الأخرى اختيارية",
-        "tip_duplicates": "أرقام الهواتف المكررة غير مسموح بها",
-        "create_contact": "إنشاء جهة اتصال",
-        "contact_details": "تفاصيل جهة الاتصال",
-        "send_message": "إرسال رسالة",
-        "connect_whatsapp_first": "اتصل بوأتساب أولاً",
-        "no_device_connected": "لا يوجد جهاز وأتساب متصل",
-        "connect_device_to_send": "يرجى توصيل جهاز وأتساب لإرسال الرسائل",
-        "select_device": "اختر الجهاز",
-        "text": "نص",
-        "media": "وسائط",
-        "message": "الرسالة",
-        "type_message": "اكتب رسالتك هنا...",
-        "media_type": "نوع الوسائط",
-        "image": "صورة",
-        "video": "فيديو",
-        "audio": "صوت",
-        "document": "مستند",
-        "file": "ملف",
-        "max_file_size": "الحد الأقصى لحجم الملف: 100MB",
-        "caption": "التعليق (اختياري)",
-        "add_caption": "أضف تعليق...",
-        "contact_info": "معلومات الاتصال",
-        "added_on": "تاريخ الإضافة",
-        "additional_fields": "حقول إضافية",
-        "message_history": "سجل الرسائل",
-        "date": "التاريخ",
-        "no_messages": "لم يتم إرسال رسائل بعد",
-        "send_first_message": "أرسل رسالتك الأولى إلى جهة الاتصال هذه",
-        "link": "رابط",
-        "location": "موقع",
-        "contact": "جهة اتصال",
-        "poll": "استطلاع",
-        "latitude": "خط العرض",
-        "longitude": "خط الطول",
-        "contact_name": "اسم جهة الاتصال",
-        "contact_phone": "هاتف جهة الاتصال",
-        "poll_question": "سؤال الاستطلاع",
-        "poll_options": "خيارات الاستطلاع",
-        "max_answers": "الحد الأقصى للإجابات"
-    },
-    "imports": {
-        "title": "استيراد جهات الاتصال",
-        "description": "رفع وإدارة قوائم جهات الاتصال الخاصة بك",
-        "success": "نجح",
-        "error": "خطأ",
-        "upload_error": "خطأ في الرفع",
-        "download_csv": "تحميل قالب CSV",
-        "download_excel": "تحميل قالب Excel",
-        "upload_contacts": "رفع جهات الاتصال",
-        "processing": "جارٍ المعالجة...",
-        "requirements": "متطلبات الملف:",
-        "req_format": "الصيغ المقبولة: CSV أو Excel (.xlsx)",
-        "req_size": "الحد الأقصى لحجم الملف: 10MB",
-        "req_phone": "عمود مطلوب: phone (مع رمز الدولة)",
-        "req_optional": "أعمدة اختيارية: first_name, last_name, email",
-        "req_headers": "يجب أن يحتوي الصف الأول على رؤوس الأعمدة",
-        "history": "سجل الاستيراد",
-        "filename": "اسم الملف",
-        "total": "المجموع",
-        "valid": "صالح",
-        "invalid": "غير صالح",
-        "status": "الحالة",
-        "date": "التاريخ",
-        "actions": "الإجراءات",
-        "confirm_delete": "هل أنت متأكد من حذف هذا الاستيراد؟",
-        "no_imports": "لا توجد استيرادات بعد",
-        "upload_to_start": "ارفع ملف جهات اتصال للبدء",
-        "import": "استيراد",
-        "uploaded": "تم الرفع",
-        "use_in_campaign": "استخدام في حملة",
-        "total_rows": "إجمالي الصفوف",
-        "valid_contacts": "جهات اتصال صالحة",
-        "invalid_contacts": "جهات اتصال غير صالحة",
-        "recipients_preview": "معاينة المستلمين (أول 50)",
-        "phone": "الهاتف",
-        "name": "الاسم",
-        "email": "البريد الإلكتروني",
-        "errors": "الأخطاء",
-        "no_recipients": "لم يتم العثور على مستلمين"
-    },
     "common": {
         "create": "إنشاء",
         "completed": "مكتمل",
@@ -1032,5 +929,155 @@
             "step4": "إرسال أول حملة لك",
             "step4_desc": "إطلاق أول حملة واتساب جماعية لك"
         }
+    },
+    "contacts": {
+        "title": "جهات الاتصال",
+        "description": "إدارة جهات اتصال واتساب الخاصة بك",
+        "add": "إضافة جهة اتصال",
+        "import": "استيراد جهات الاتصال",
+        "search": "البحث بالاسم أو الهاتف أو البريد الإلكتروني...",
+        "no_contacts": "لا توجد جهات اتصال بعد",
+        "import_to_start": "قم باستيراد جهات الاتصال أو أضفها يدويًا للبدء",
+        "bulk_actions": "إجراءات جماعية",
+        "selected": "{count} محدد",
+        "validate_selected": "التحقق من المحدد",
+        "delete_selected": "حذف المحدد",
+
+        "fields": {
+            "first_name": "الاسم الأول",
+            "last_name": "اسم العائلة",
+            "phone_number": "رقم الهاتف",
+            "email": "البريد الإلكتروني",
+            "country": "الدولة",
+            "tags": "الوسوم",
+            "source": "المصدر",
+            "whatsapp_status": "حالة واتساب",
+            "last_message": "آخر رسالة",
+            "created": "تاريخ الإنشاء",
+            "notes": "ملاحظات",
+            "actions": "الإجراءات"
+        },
+
+        "sources": {
+            "manual": "يدوي",
+            "csv_import": "استيراد CSV",
+            "excel_import": "استيراد Excel",
+            "api": "API"
+        },
+
+        "validation": {
+            "valid": "صالح",
+            "invalid": "غير صالح",
+            "pending": "لم يتم التحقق",
+            "validate_now": "تحقق الآن"
+        },
+
+        "filters": {
+            "all_sources": "جميع المصادر",
+            "all_tags": "جميع الوسوم",
+            "all_countries": "جميع الدول",
+            "all_status": "جميع الحالات"
+        },
+
+        "messages": {
+            "created_successfully": "تم إنشاء جهة الاتصال بنجاح",
+            "updated_successfully": "تم تحديث جهة الاتصال بنجاح",
+            "deleted_successfully": "تم حذف جهة الاتصال بنجاح",
+            "validation_completed": "تم التحقق من {valid} جهة اتصال بنجاح، فشل {invalid}",
+            "confirm_delete": "هل أنت متأكد من حذف جهة الاتصال هذه؟",
+            "confirm_bulk_delete": "هل أنت متأكد من حذف {count} جهة اتصال؟"
+        },
+
+        "errors": {
+            "duplicate_phone": "رقم الهاتف هذا موجود بالفعل في جهات الاتصال",
+            "validation_failed": "فشل التحقق من رقم واتساب",
+            "limit_reached": "لقد وصلت إلى حد التحقق من جهات الاتصال"
+        }
+    },
+    "imports": {
+        "title": "استيراد جهات الاتصال",
+        "history": "سجل الاستيراد",
+        "upload_file": "رفع الملف",
+        "map_columns": "تعيين الأعمدة",
+        "processing": "جاري المعالجة",
+        "summary": "الملخص",
+
+        "upload": {
+            "drag_drop": "اسحب وأفلت الملف هنا، أو انقر للتصفح",
+            "requirements": "متطلبات الملف:",
+            "req_format": "التنسيقات: CSV أو Excel (.xlsx, .xls)",
+            "req_size": "الحد الأقصى للحجم: 10 ميجابايت",
+            "req_phone": "يجب أن تتضمن أرقام الهاتف رمز الدولة (مثل: +201234567890)",
+            "download_template": "تنزيل النموذج",
+            "download_csv": "تنزيل نموذج CSV",
+            "download_excel": "تنزيل نموذج Excel"
+        },
+
+        "mapping": {
+            "title": "تعيين الأعمدة",
+            "description": "طابق أعمدة الملف مع حقول جهات الاتصال",
+            "file_column": "عمود الملف",
+            "contact_field": "حقل جهة الاتصال",
+            "required": "مطلوب",
+            "optional": "اختياري",
+            "preview": "معاينة البيانات",
+            "validate_whatsapp": "التحقق من أرقام واتساب بعد الاستيراد",
+            "skip_duplicates": "تخطي أرقام الهاتف المكررة",
+            "assign_tag": "تعيين وسم لجهات الاتصال المستوردة",
+            "select_tag": "اختر وسماً",
+            "start_import": "بدء الاستيراد"
+        },
+
+        "summary": {
+            "total_processed": "إجمالي الصفوف المعالجة",
+            "valid_imported": "جهات الاتصال الصالحة المستوردة",
+            "invalid_skipped": "غير صالح/تم تخطيه",
+            "duplicates": "المكررات المتخطاة",
+            "view_contacts": "عرض جهات الاتصال المستوردة",
+            "import_another": "استيراد ملف آخر",
+            "download_errors": "تنزيل تقرير الأخطاء",
+            "errors_found": "الأخطاء الموجودة"
+        },
+
+        "history": {
+            "filename": "اسم الملف",
+            "date": "تاريخ الاستيراد",
+            "total": "الإجمالي",
+            "valid": "صالح",
+            "invalid": "غير صالح",
+            "status": "الحالة",
+            "view_summary": "عرض الملخص",
+            "no_imports": "لا توجد عمليات استيراد بعد"
+        },
+
+        "status": {
+            "pending": "قيد الانتظار",
+            "processing": "جاري المعالجة",
+            "completed": "مكتمل",
+            "failed": "فشل"
+        },
+
+        "messages": {
+            "completed_successfully": "تم الاستيراد بنجاح",
+            "deleted_successfully": "تم حذف عملية الاستيراد بنجاح"
+        },
+
+        "errors": {
+            "parse_failed": "فشل تحليل الملف",
+            "processing_failed": "فشلت معالجة الاستيراد",
+            "missing_required_fields": "الحقول المطلوبة مفقودة",
+            "invalid_file_format": "تنسيق الملف غير صالح"
+        }
+    },
+    "tags": {
+        "manage": "إدارة الوسوم",
+        "create": "إنشاء وسم",
+        "edit": "تعديل الوسم",
+        "delete": "حذف الوسم",
+        "name": "اسم الوسم",
+        "color": "اللون",
+        "contacts_count": "{count} جهة اتصال",
+        "no_tags": "لا توجد وسوم بعد",
+        "create_to_start": "قم بإنشاء وسوم لتنظيم جهات الاتصال"
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\HandleSuccessfulAuthentication;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -23,7 +24,7 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [
         // ✅ TEMPORARILY DISABLED to fix serialization error
         // This will be re-enabled after fixing the JWT generation
-        // \App\Listeners\HandleSuccessfulAuthentication::class,
+        HandleSuccessfulAuthentication::class,
     ];
 
     /**

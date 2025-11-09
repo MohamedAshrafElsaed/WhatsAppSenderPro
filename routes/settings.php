@@ -6,23 +6,40 @@ use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware('auth')->group(function () {
-    Route::redirect('settings', '/settings/profile');
+// ==================== SETTINGS ROUTES ====================
+// All settings routes under /dashboard/settings prefix
+Route::middleware(['auth', 'verified'])->prefix('dashboard/settings')->name('dashboard.settings.')->group(function () {
 
-    Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Redirect /dashboard/settings to /dashboard/settings/profile
+    Route::redirect('/', '/dashboard/settings/profile');
 
-    Route::get('settings/password', [PasswordController::class, 'edit'])->name('user-password.edit');
+    // Profile Settings
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::put('settings/password', [PasswordController::class, 'update'])
+    // Password Settings
+    Route::get('password', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('password', [PasswordController::class, 'update'])
         ->middleware('throttle:6,1')
-        ->name('user-password.update');
+        ->name('password.update');
 
-    Route::get('settings/appearance', function () {
+    // Appearance Settings
+    Route::get('appearance', function () {
         return Inertia::render('settings/Appearance');
     })->name('appearance.edit');
 
-    Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
+    // Two-Factor Authentication
+    Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
+});
+
+// ==================== LEGACY ROUTES (Keep for backward compatibility) ====================
+// These will redirect to new routes for a smooth transition
+Route::middleware('auth')->group(function () {
+    Route::redirect('settings', '/dashboard/settings/profile');
+    Route::redirect('settings/profile', '/dashboard/settings/profile');
+    Route::redirect('settings/password', '/dashboard/settings/password');
+    Route::redirect('settings/appearance', '/dashboard/settings/appearance');
+    Route::redirect('settings/two-factor', '/dashboard/settings/two-factor');
 });

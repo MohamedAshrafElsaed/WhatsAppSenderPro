@@ -47,27 +47,27 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: t('nav.campaigns', 'Campaigns'),
-        href: '/campaigns',
+        href: 'dashboard/campaigns',
         icon: MessageSquare,
     },
     {
         title: t('nav.contacts', 'Contacts'),
-        href: '/contacts',
+        href: 'dashboard/contacts',
         icon: Users,
     },
     {
         title: t('nav.templates', 'Templates'),
-        href: '/templates',
+        href: 'dashboard/templates',
         icon: FileText,
     },
     {
         title: t('nav.subscription', 'Subscription'),
-        href: '/subscription',
+        href: 'dashboard/subscription',
         icon: CreditCard,
     },
     {
         title: t('nav.settings', 'Settings'),
-        href: '/settings',
+        href: 'dashboard/settings',
         icon: Settings,
     },
 ];

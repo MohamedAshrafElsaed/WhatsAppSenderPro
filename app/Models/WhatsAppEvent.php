@@ -4,6 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string|null $session_id
+ * @property int $user_id
+ * @property string $event_type
+ * @property array<array-key, mixed>|null $event_data
+ * @property string|null $related_jid
+ * @property string|null $error_code
+ * @property string|null $error_message
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property-read \App\Models\WhatsAppSession|null $session
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent byType($type)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent errors()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent forSession($sessionId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent recent($hours = 24)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereErrorCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereErrorMessage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereEventData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereEventType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereIpAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereRelatedJid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereSessionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereUserAgent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppEvent whereUserId($value)
+ * @mixin \Eloquent
+ */
 class WhatsAppEvent extends Model
 {
     public $timestamps = false;

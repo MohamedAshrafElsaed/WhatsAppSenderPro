@@ -4,6 +4,57 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $session_id
+ * @property int $user_id
+ * @property string $message_id
+ * @property string $from_jid
+ * @property string $to_jid
+ * @property bool $is_outgoing
+ * @property string $message_type
+ * @property string|null $content
+ * @property array<array-key, mixed>|null $media_data
+ * @property string $status
+ * @property \Illuminate\Support\Carbon|null $sent_at
+ * @property \Illuminate\Support\Carbon|null $delivered_at
+ * @property \Illuminate\Support\Carbon|null $read_at
+ * @property bool $is_forwarded
+ * @property int|null $group_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\WhatsAppGroup|null $group
+ * @property-read \App\Models\WhatsAppContact|null $recipient
+ * @property-read \App\Models\WhatsAppContact|null $sender
+ * @property-read \App\Models\WhatsAppSession $session
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage conversation($jid1, $jid2)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage incoming()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage outgoing()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage unread()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereDeliveredAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereFromJid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereGroupId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereIsForwarded($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereIsOutgoing($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereMediaData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereMessageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereMessageType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereReadAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereSentAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereSessionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereToJid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppMessage whereUserId($value)
+ * @mixin \Eloquent
+ */
 class WhatsAppMessage extends Model
 {
     protected $table = 'whatsapp_messages';

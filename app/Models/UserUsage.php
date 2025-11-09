@@ -4,6 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon $period_start
+ * @property \Illuminate\Support\Carbon $period_end
+ * @property int $messages_sent
+ * @property int $contacts_validated
+ * @property int $connected_numbers_count
+ * @property int $templates_created
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereConnectedNumbersCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereContactsValidated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereMessagesSent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage wherePeriodEnd($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage wherePeriodStart($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereTemplatesCreated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereUserId($value)
+ * @mixin \Eloquent
+ */
 class UserUsage extends Model
 {
     protected $table = 'user_usage';
