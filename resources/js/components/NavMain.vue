@@ -37,13 +37,10 @@ const isActive = (href: string) => {
                         as-child
                     >
                         <Link
-                            :class="isRTL ? 'flex-row-reverse' : ''"
+                            class="flex items-center gap-2"
                             :href="item.href"
                         >
-                            <component
-                                :is="item.icon"
-                                :class="isRTL ? 'ml-2' : 'mr-2'"
-                            />
+                            <component :is="item.icon" />
                             <span>{{ item.title }}</span>
                         </Link>
                     </SidebarMenuButton>

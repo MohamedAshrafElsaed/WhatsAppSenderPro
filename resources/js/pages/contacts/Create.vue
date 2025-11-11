@@ -66,13 +66,11 @@ const toggleTag = (tagId: number) => {
 
 const isTagSelected = (tagId: number) => selectedTags.value.includes(tagId);
 
-// Watch mobile number changes and auto-normalize
 watch(mobileNumber, (newValue) => {
     if (newValue) {
         handlePhoneInput(newValue);
     }
 
-    // Update hidden input
     const input = document.querySelector(
         'input[name="phone_number"]',
     ) as HTMLInputElement;
@@ -81,7 +79,6 @@ watch(mobileNumber, (newValue) => {
     }
 });
 
-// Watch country to update hidden input
 watch(selectedCountry, (newValue) => {
     const input = document.querySelector(
         'input[name="country_id"]',
@@ -91,7 +88,6 @@ watch(selectedCountry, (newValue) => {
     }
 });
 
-// Watch tags to update hidden inputs
 watch(
     selectedTags,
     (newValue) => {
@@ -143,6 +139,7 @@ watch(
                                 :disabled="processing"
                                 name="first_name"
                                 required
+                                class="focus-visible:ring-[#25D366]"
                             />
                             <InputError :message="errors.first_name" />
                         </div>
@@ -156,6 +153,7 @@ watch(
                                 id="last_name"
                                 :disabled="processing"
                                 name="last_name"
+                                class="focus-visible:ring-[#25D366]"
                             />
                             <InputError :message="errors.last_name" />
                         </div>
@@ -166,7 +164,7 @@ watch(
                                     t('contacts.fields.country')
                                 }}</Label>
                             <Select v-model="selectedCountry">
-                                <SelectTrigger>
+                                <SelectTrigger class="focus:ring-[#25D366]">
                                     <SelectValue
                                         :placeholder="t('common.select')"
                                     />
@@ -203,7 +201,7 @@ watch(
                                 id="phone_number"
                                 v-model="mobileNumber"
                                 :class="{
-                                    'border-green-500 focus-visible:ring-green-500':
+                                    'border-[#25D366] focus-visible:ring-[#25D366]':
                                         isValid,
                                 }"
                                 :disabled="processing"
@@ -220,7 +218,7 @@ watch(
                             <!-- Visual Feedback -->
                             <p
                                 v-if="mobileNumber && isValid"
-                                class="mt-1 flex items-center gap-1 text-xs text-green-600"
+                                class="mt-1 flex items-center gap-1 text-xs text-[#25D366]"
                             >
                                 <CheckCircle2 class="h-3 w-3" />
                                 {{
@@ -269,6 +267,7 @@ watch(
                                 :disabled="processing"
                                 name="email"
                                 type="email"
+                                class="focus-visible:ring-[#25D366]"
                             />
                             <InputError :message="errors.email" />
                         </div>
@@ -293,7 +292,7 @@ watch(
                                             ? 'default'
                                             : 'outline'
                                     "
-                                    class="cursor-pointer"
+                                    class="cursor-pointer transition-all hover:scale-105"
                                     @click="toggleTag(tag.id)"
                                 >
                                     {{ tag.name }}
@@ -319,6 +318,7 @@ watch(
                                 :disabled="processing"
                                 name="notes"
                                 rows="3"
+                                class="focus-visible:ring-[#25D366]"
                             />
                             <InputError :message="errors.notes" />
                         </div>
@@ -330,6 +330,7 @@ watch(
                                 v-model:checked="validateWhatsApp"
                                 :disabled="processing"
                                 name="validate_whatsapp"
+                                class="data-[state=checked]:bg-[#25D366] data-[state=checked]:border-[#25D366]"
                             />
                             <Label
                                 class="cursor-pointer font-normal"
@@ -348,7 +349,11 @@ watch(
 
                 <!-- Actions -->
                 <div class="flex gap-2">
-                    <Button :disabled="processing" type="submit">
+                    <Button
+                        :disabled="processing"
+                        type="submit"
+                        class="bg-[#25D366] hover:bg-[#128C7E]"
+                    >
                         {{ t('common.save', 'Save') }}
                     </Button>
                     <Button as-child variant="outline">

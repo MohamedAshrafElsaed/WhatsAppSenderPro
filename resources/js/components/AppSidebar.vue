@@ -15,6 +15,7 @@ import {
 import { useTranslation } from '@/composables/useTranslation';
 import { index as dashboard } from '@/routes/dashboard';
 import { index as contactsIndex } from '@/routes/dashboard/contacts';
+import { index as templatesIndex } from '@/routes/dashboard/templates';
 import { edit as settingsProfile } from '@/routes/dashboard/settings/profile';
 import { index as subscriptionIndex } from '@/routes/subscription';
 import { type NavItem } from '@/types';
@@ -60,7 +61,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: t('nav.templates', 'Templates'),
-        href: '#',
+        href: templatesIndex(),
         icon: FileText,
     },
     {

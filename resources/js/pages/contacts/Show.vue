@@ -80,7 +80,10 @@ const formatDate = (dateString: string) => {
             <div class="flex items-start justify-between">
                 <Heading :title="contact.full_name" />
                 <div class="flex gap-2">
-                    <Button @click="$inertia.visit(edit(contact.id))">
+                    <Button
+                        class="bg-[#25D366] hover:bg-[#128C7E]"
+                        @click="$inertia.visit(edit(contact.id))"
+                    >
                         <Edit
                             :class="isRTL() ? 'ml-2' : 'mr-2'"
                             class="h-4 w-4"
@@ -104,8 +107,8 @@ const formatDate = (dateString: string) => {
             <Card>
                 <CardHeader>
                     <CardTitle>{{
-                        t('contacts.fields.contact_info', 'Contact Information')
-                    }}</CardTitle>
+                            t('contacts.fields.contact_info', 'Contact Information')
+                        }}</CardTitle>
                 </CardHeader>
                 <CardContent class="grid gap-6 md:grid-cols-2">
                     <!-- Phone -->
@@ -114,10 +117,10 @@ const formatDate = (dateString: string) => {
                             {{ t('contacts.fields.phone_number') }}
                         </p>
                         <div class="flex items-center gap-2">
-                            <Phone class="h-4 w-4" />
+                            <Phone class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                contact.phone_number
-                            }}</span>
+                                    contact.phone_number
+                                }}</span>
                         </div>
                     </div>
 
@@ -127,10 +130,10 @@ const formatDate = (dateString: string) => {
                             {{ t('contacts.fields.email') }}
                         </p>
                         <div class="flex items-center gap-2">
-                            <Mail class="h-4 w-4" />
+                            <Mail class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                contact.email || '-'
-                            }}</span>
+                                    contact.email || '-'
+                                }}</span>
                         </div>
                     </div>
 
@@ -154,26 +157,24 @@ const formatDate = (dateString: string) => {
                             {{ t('contacts.fields.whatsapp_status') }}
                         </p>
                         <Badge
-                            :variant="
-                                contact.is_whatsapp_valid
-                                    ? 'default'
-                                    : 'destructive'
-                            "
+                            v-if="contact.is_whatsapp_valid"
+                            class="bg-[#25D366] hover:bg-[#128C7E]"
                         >
-                            <component
-                                :is="
-                                    contact.is_whatsapp_valid
-                                        ? CheckCircle2
-                                        : XCircle
-                                "
+                            <CheckCircle2
                                 :class="isRTL() ? 'ml-1' : 'mr-1'"
                                 class="h-3 w-3"
                             />
-                            {{
-                                contact.is_whatsapp_valid
-                                    ? t('contacts.validation.valid')
-                                    : t('contacts.validation.invalid')
-                            }}
+                            {{ t('contacts.validation.valid') }}
+                        </Badge>
+                        <Badge
+                            v-else
+                            variant="destructive"
+                        >
+                            <XCircle
+                                :class="isRTL() ? 'ml-1' : 'mr-1'"
+                                class="h-3 w-3"
+                            />
+                            {{ t('contacts.validation.invalid') }}
                         </Badge>
                     </div>
 
@@ -182,9 +183,14 @@ const formatDate = (dateString: string) => {
                         <p class="mb-1 text-sm text-muted-foreground">
                             {{ t('contacts.fields.source') }}
                         </p>
-                        <Badge variant="outline">{{
-                            t(`contacts.sources.${contact.source}`)
-                        }}</Badge>
+                        <Badge
+                            variant="outline"
+                            :class="contact.source === 'csv_import' || contact.source === 'excel_import'
+                                ? 'border-[#25D366]/20 bg-[#25D366]/10 text-[#25D366]'
+                                : ''"
+                        >
+                            {{ t(`contacts.sources.${contact.source}`) }}
+                        </Badge>
                     </div>
 
                     <!-- Import File -->
@@ -193,8 +199,8 @@ const formatDate = (dateString: string) => {
                             {{ t('imports.history.filename') }}
                         </p>
                         <span class="font-medium">{{
-                            contact.import.filename
-                        }}</span>
+                                contact.import.filename
+                            }}</span>
                     </div>
 
                     <!-- Created Date -->
@@ -203,10 +209,10 @@ const formatDate = (dateString: string) => {
                             {{ t('contacts.fields.created') }}
                         </p>
                         <div class="flex items-center gap-2">
-                            <Calendar class="h-4 w-4" />
+                            <Calendar class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                formatDate(contact.created_at)
-                            }}</span>
+                                    formatDate(contact.created_at)
+                                }}</span>
                         </div>
                     </div>
 
@@ -221,10 +227,10 @@ const formatDate = (dateString: string) => {
                             }}
                         </p>
                         <div class="flex items-center gap-2">
-                            <Clock class="h-4 w-4" />
+                            <Clock class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                formatDate(contact.validated_at)
-                            }}</span>
+                                    formatDate(contact.validated_at)
+                                }}</span>
                         </div>
                     </div>
                 </CardContent>
@@ -265,8 +271,8 @@ const formatDate = (dateString: string) => {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{{
-                        t('contacts.messages.confirm_delete')
-                    }}</DialogTitle>
+                            t('contacts.messages.confirm_delete')
+                        }}</DialogTitle>
                     <DialogDescription>
                         {{
                             t(

@@ -167,9 +167,8 @@ const startImport = () => {
     if (!parseResult.value || !parseResult.value.import_id) return;
 
     isProcessing.value = true;
-    currentStep.value = 3; // Show processing step
+    currentStep.value = 3;
 
-    // Start polling for progress
     startProgressPolling(parseResult.value.import_id);
 
     router.post(
@@ -186,22 +185,19 @@ const startImport = () => {
                 stopProgressPolling();
             },
             onError: () => {
-                currentStep.value = 2; // Go back to mapping on error
+                currentStep.value = 2;
                 stopProgressPolling();
             },
         },
     );
 };
 
-// Progress polling functions
 const startProgressPolling = (importId: number) => {
-    // Poll every 500ms for real-time updates
     progressInterval = window.setInterval(async () => {
         try {
             const response = await axios.get(`/dashboard/contacts/imports/${importId}/progress`);
             importProgress.value = response.data;
 
-            // Stop polling if completed
             if (response.data.status === 'completed') {
                 stopProgressPolling();
             }
@@ -288,7 +284,6 @@ const progressPercentage = computed(() => {
     return (currentStep.value / 4) * 100;
 });
 
-// Watch for import_preview from flash data (after upload)
 watch(
     () => page.props.import_preview,
     (newPreview) => {
@@ -300,7 +295,6 @@ watch(
     { immediate: true }
 );
 
-// Watch for import_summary from flash data (after processing)
 watch(
     () => page.props.import_summary,
     (newSummary) => {
@@ -312,7 +306,6 @@ watch(
     { immediate: true }
 );
 
-// Check on mount for any flash data
 onMounted(() => {
     if (page.props.import_preview) {
         parseResult.value = page.props.import_preview as any;
@@ -324,18 +317,15 @@ onMounted(() => {
     }
 });
 
-// Cleanup on unmount
 onUnmounted(() => {
     stopProgressPolling();
 });
-
 </script>
 
 <template>
     <AppLayout>
         <Head :title="t('imports.title')" />
 
-        <!-- Dimmed overlay when processing -->
         <div
             v-if="isProcessing"
             class="fixed inset-0 z-40 bg-black/50"
@@ -344,12 +334,7 @@ onUnmounted(() => {
 
         <div class="mx-auto max-w-6xl space-y-6" :class="{ 'relative z-50': isProcessing }">
             <Heading
-                :description="
-                    t(
-                        'imports.description',
-                        'Import contacts from CSV or Excel files',
-                    )
-                "
+                :description="t('imports.description', 'Import contacts from CSV or Excel files')"
                 :title="t('imports.title')"
             />
 
@@ -360,16 +345,14 @@ onUnmounted(() => {
                     :key="step"
                     :class="[
                         'flex items-center gap-2',
-                        currentStep >= step
-                            ? 'text-primary'
-                            : 'text-muted-foreground',
+                        currentStep >= step ? 'text-[#25D366]' : 'text-muted-foreground',
                     ]"
                 >
                     <div
                         :class="[
                             'flex h-10 w-10 items-center justify-center rounded-full font-semibold',
                             currentStep >= step
-                                ? 'bg-primary text-white'
+                                ? 'bg-[#25D366] text-white'
                                 : 'bg-muted',
                         ]"
                     >
@@ -390,20 +373,18 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <Progress :model-value="progressPercentage" class="h-2" />
+            <Progress :model-value="progressPercentage" class="h-2 [&>div]:bg-[#25D366]" />
 
             <!-- Step 1: Upload -->
             <Card v-show="currentStep === 1">
                 <CardContent class="p-12">
                     <div
-                        class="cursor-pointer space-y-4 rounded-lg border-2 border-dashed p-12 text-center transition-colors hover:border-primary"
+                        class="cursor-pointer space-y-4 rounded-lg border-2 border-dashed p-12 text-center transition-colors hover:border-[#25D366]"
                         @click="fileInput?.click()"
                         @drop.prevent="handleDrop"
                         @dragover.prevent
                     >
-                        <Upload
-                            class="mx-auto h-12 w-12 text-muted-foreground"
-                        />
+                        <Upload class="mx-auto h-12 w-12 text-[#25D366]" />
                         <div>
                             <p class="text-lg font-medium">
                                 {{ t('imports.upload.drag_drop') }}
@@ -424,10 +405,9 @@ onUnmounted(() => {
                         />
                     </div>
 
-                    <!-- Download Template -->
                     <div class="mt-6 text-center">
                         <a :href="template()" download>
-                            <Button variant="outline">
+                            <Button variant="outline" class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white">
                                 <Download
                                     :class="isRTL() ? 'ml-2' : 'mr-2'"
                                     class="h-4 w-4"
@@ -505,8 +485,7 @@ onUnmounted(() => {
                                 {{ field.label }}
                                 <Badge
                                     v-if="field.required"
-                                    class="ml-2"
-                                    variant="destructive"
+                                    class="ml-2 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                                 >
                                     {{ t('imports.mapping.required') }}
                                 </Badge>
@@ -517,12 +496,7 @@ onUnmounted(() => {
                             <Select v-model="columnMapping[field.value]">
                                 <SelectTrigger>
                                     <SelectValue
-                                        :placeholder="
-                                t(
-                                    'imports.mapping.select_column',
-                                    'Select column',
-                                )
-                            "
+                                        :placeholder="t('imports.mapping.select_column', 'Select column')"
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -574,10 +548,10 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <Alert>
-                            <AlertCircle class="h-4 w-4" />
+                        <Alert class="border-[#25D366]/20 bg-[#25D366]/5">
+                            <AlertCircle class="h-4 w-4 text-[#25D366]" />
                             <AlertDescription>
-                                <p class="font-semibold mb-2">
+                                <p class="font-semibold mb-2 text-[#25D366]">
                                     {{ t('imports.phone_normalization_info', 'Phone Number Normalization') }}
                                 </p>
                                 <p class="text-sm text-muted-foreground mb-2">
@@ -597,6 +571,7 @@ onUnmounted(() => {
                             <Checkbox
                                 id="validate_whatsapp"
                                 v-model:checked="validateWhatsApp"
+                                class="data-[state=checked]:bg-[#25D366] data-[state=checked]:border-[#25D366]"
                             />
                             <Label
                                 class="cursor-pointer font-normal"
@@ -646,10 +621,8 @@ onUnmounted(() => {
                             {{ t('common.cancel', 'Cancel') }}
                         </Button>
                         <Button
-                            :disabled="
-                    !columnMapping.first_name ||
-                    !columnMapping.phone_number
-                "
+                            :disabled="!columnMapping.first_name || !columnMapping.phone_number"
+                            class="bg-[#25D366] hover:bg-[#128C7E]"
                             @click="startImport"
                         >
                             {{ t('imports.mapping.start_import') }}
@@ -662,9 +635,7 @@ onUnmounted(() => {
             <Card v-show="currentStep === 3" class="p-12 text-center">
                 <div class="space-y-6">
                     <div class="flex justify-center">
-                        <div
-                            class="h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent"
-                        ></div>
+                        <div class="h-16 w-16 animate-spin rounded-full border-4 border-[#25D366] border-t-transparent"></div>
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold">
@@ -680,11 +651,10 @@ onUnmounted(() => {
                         </p>
                     </div>
 
-                    <!-- Real-time Progress -->
                     <div v-if="importProgress" class="space-y-4">
                         <Progress
                             :model-value="progressPercentage"
-                            class="h-3"
+                            class="h-3 [&>div]:bg-[#25D366]"
                         />
 
                         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -692,15 +662,15 @@ onUnmounted(() => {
                                 <p class="text-xs text-muted-foreground">Total</p>
                                 <p class="text-lg font-bold">{{ importProgress.total }}</p>
                             </div>
-                            <div class="rounded-lg bg-green-50 p-3 dark:bg-green-950">
+                            <div class="rounded-lg bg-[#25D366]/10 border border-[#25D366]/20 p-3">
                                 <p class="text-xs text-muted-foreground">Valid</p>
-                                <p class="text-lg font-bold text-green-600">{{ importProgress.valid }}</p>
+                                <p class="text-lg font-bold text-[#25D366]">{{ importProgress.valid }}</p>
                             </div>
-                            <div class="rounded-lg bg-red-50 p-3 dark:bg-red-950">
+                            <div class="rounded-lg bg-red-50 border border-red-200 p-3 dark:bg-red-950">
                                 <p class="text-xs text-muted-foreground">Invalid</p>
                                 <p class="text-lg font-bold text-red-600">{{ importProgress.invalid }}</p>
                             </div>
-                            <div class="rounded-lg bg-yellow-50 p-3 dark:bg-yellow-950">
+                            <div class="rounded-lg bg-yellow-50 border border-yellow-200 p-3 dark:bg-yellow-950">
                                 <p class="text-xs text-muted-foreground">Duplicates</p>
                                 <p class="text-lg font-bold text-yellow-600">{{ importProgress.duplicates }}</p>
                             </div>
@@ -733,20 +703,16 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <div
-                            class="rounded-lg border border-green-200 bg-green-50 p-4 dark:bg-green-950"
-                        >
+                        <div class="rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-4">
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.valid_imported') }}
                             </p>
-                            <p class="text-2xl font-bold text-green-600">
+                            <p class="text-2xl font-bold text-[#25D366]">
                                 {{ importSummary.valid }}
                             </p>
                         </div>
 
-                        <div
-                            class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950"
-                        >
+                        <div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950">
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.invalid_skipped') }}
                             </p>
@@ -755,9 +721,7 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <div
-                            class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:bg-yellow-950"
-                        >
+                        <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:bg-yellow-950">
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.duplicates') }}
                             </p>
@@ -766,9 +730,7 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <div
-                            class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:bg-blue-950"
-                        >
+                        <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:bg-blue-950">
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.phone_normalized', 'Phone Numbers Normalized') }}
                             </p>
@@ -779,9 +741,7 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Errors Table -->
-                    <div
-                        v-if="importSummary.errors && importSummary.errors.length > 0"
-                    >
+                    <div v-if="importSummary.errors && importSummary.errors.length > 0">
                         <Alert variant="destructive">
                             <AlertCircle class="h-4 w-4" />
                             <AlertDescription>
@@ -833,7 +793,7 @@ onUnmounted(() => {
                             <Button variant="outline" @click="currentStep = 1">
                                 {{ t('imports.history.title', 'Import History') }}
                             </Button>
-                            <Button @click="$inertia.visit(contactsIndex())">
+                            <Button class="bg-[#25D366] hover:bg-[#128C7E]" @click="$inertia.visit(contactsIndex())">
                                 {{ t('imports.summary.view_contacts') }}
                             </Button>
                         </div>
@@ -895,10 +855,10 @@ onUnmounted(() => {
                                     <TableCell>{{
                                             importRecord.total_rows
                                         }}</TableCell>
-                                    <TableCell class="text-green-600">{{
+                                    <TableCell class="text-[#25D366] font-semibold">{{
                                             importRecord.valid_contacts
                                         }}</TableCell>
-                                    <TableCell class="text-red-600">{{
+                                    <TableCell class="text-red-600 font-semibold">{{
                                             importRecord.invalid_contacts
                                         }}</TableCell>
                                     <TableCell>

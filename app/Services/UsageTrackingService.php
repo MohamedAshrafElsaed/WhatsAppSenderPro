@@ -184,4 +184,16 @@ class UsageTrackingService
             $usage->decrement('connected_numbers_count');
         }
     }
+
+    /**
+     * Decrement template count when user deletes a template
+     */
+    public function decrementTemplateCount(User $user): void
+    {
+        $usage = UserUsage::getCurrentPeriodUsage($user);
+
+        if ($usage->templates_created > 0) {
+            $usage->decrement('templates_created');
+        }
+    }
 }

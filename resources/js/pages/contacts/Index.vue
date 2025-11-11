@@ -101,19 +101,16 @@ interface Props {
 const props = defineProps<Props>();
 const { t, isRTL } = useTranslation();
 
-// Search and filters - use 'all' as default to avoid empty string
 const searchQuery = ref(props.filters.search || '');
 const selectedSource = ref(props.filters.source || 'all');
 const selectedTag = ref(props.filters.tag_id?.toString() || 'all');
 const selectedCountry = ref(props.filters.country_id?.toString() || 'all');
 const selectedStatus = ref(props.filters.validation_status || 'all');
 
-// Selection
 const selectedContacts = ref<number[]>([]);
 const showDeleteDialog = ref(false);
 const contactToDelete = ref<Contact | null>(null);
 
-// Apply filters
 const applyFilters = () => {
     router.get(
         index(),
@@ -140,7 +137,6 @@ const applyFilters = () => {
     );
 };
 
-// Clear filters
 const clearFilters = () => {
     searchQuery.value = '';
     selectedSource.value = 'all';
@@ -150,7 +146,6 @@ const clearFilters = () => {
     applyFilters();
 };
 
-// Selection handlers
 const toggleSelectAll = () => {
     if (selectedContacts.value.length === props.contacts.data.length) {
         selectedContacts.value = [];
@@ -176,7 +171,6 @@ const allSelected = computed(
         selectedContacts.value.length === props.contacts.data.length,
 );
 
-// Delete handlers
 const confirmDelete = (contact: Contact) => {
     contactToDelete.value = contact;
     showDeleteDialog.value = true;
@@ -193,7 +187,6 @@ const deleteContact = () => {
     }
 };
 
-// Bulk validate
 const bulkValidate = () => {
     router.post(
         '/contacts/bulk-validate',
@@ -208,34 +201,35 @@ const bulkValidate = () => {
     );
 };
 
-// Get validation status badge
 const getStatusBadge = (contact: Contact) => {
     if (contact.is_whatsapp_valid) {
         return {
             variant: 'default' as const,
             icon: CheckCircle2,
             text: t('contacts.validation.valid'),
+            color: 'bg-[#25D366] hover:bg-[#128C7E]',
         };
     } else if (contact.validated_at) {
         return {
             variant: 'destructive' as const,
             icon: XCircle,
             text: t('contacts.validation.invalid'),
+            color: '',
         };
     }
     return {
         variant: 'secondary' as const,
         icon: Clock,
         text: t('contacts.validation.pending'),
+        color: '',
     };
 };
 
-// Get source badge color
 const getSourceColor = (source: string): string => {
     const colors: Record<string, string> = {
         manual: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
         csv_import:
-            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+            'bg-[#25D366]/10 text-[#25D366] border-[#25D366]/20',
         excel_import:
             'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
         api: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
@@ -263,6 +257,7 @@ const getSourceColor = (source: string): string => {
                 <div class="flex gap-2">
                     <Button
                         variant="outline"
+                        class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
                         @click="router.visit(importsIndex())"
                     >
                         <Upload
@@ -271,7 +266,10 @@ const getSourceColor = (source: string): string => {
                         />
                         {{ t('contacts.import') }}
                     </Button>
-                    <Button @click="router.visit(create())">
+                    <Button
+                        class="bg-[#25D366] hover:bg-[#128C7E]"
+                        @click="router.visit(create())"
+                    >
                         <Plus
                             :class="isRTL() ? 'ml-2' : 'mr-2'"
                             class="h-4 w-4"
@@ -293,6 +291,7 @@ const getSourceColor = (source: string): string => {
                         v-model="searchQuery"
                         :class="isRTL() ? 'pr-10' : 'pl-10'"
                         :placeholder="t('contacts.search')"
+                        class="focus-visible:ring-[#25D366]"
                         @keyup.enter="applyFilters"
                     />
                 </div>
@@ -355,7 +354,7 @@ const getSourceColor = (source: string): string => {
             <!-- Bulk Actions -->
             <div
                 v-if="selectedContacts.length > 0"
-                class="flex items-center justify-between rounded-lg bg-muted p-4"
+                class="flex items-center justify-between rounded-lg bg-[#25D366]/10 border border-[#25D366]/20 p-4"
             >
                 <span class="text-sm font-medium">
                     {{
@@ -365,7 +364,12 @@ const getSourceColor = (source: string): string => {
                     }}
                 </span>
                 <div class="flex gap-2">
-                    <Button size="sm" variant="outline" @click="bulkValidate">
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
+                        @click="bulkValidate"
+                    >
                         {{ t('contacts.validate_selected') }}
                     </Button>
                     <Button size="sm" variant="destructive">
@@ -382,7 +386,7 @@ const getSourceColor = (source: string): string => {
                             <TableHead :class="isRTL() ? 'text-right' : 'text-left'" class="w-12">
                                 <input
                                     :checked="allSelected"
-                                    class="rounded border-gray-300"
+                                    class="rounded border-gray-300 text-[#25D366] focus:ring-[#25D366]"
                                     type="checkbox"
                                     @change="toggleSelectAll"
                                 />
@@ -430,7 +434,7 @@ const getSourceColor = (source: string): string => {
                             <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
                                 <input
                                     :checked="isSelected(contact.id)"
-                                    class="rounded border-gray-300"
+                                    class="rounded border-gray-300 text-[#25D366] focus:ring-[#25D366]"
                                     type="checkbox"
                                     @change="toggleSelect(contact.id)"
                                 />
@@ -465,6 +469,7 @@ const getSourceColor = (source: string): string => {
                             <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
                                 <Badge
                                     :variant="getStatusBadge(contact).variant"
+                                    :class="getStatusBadge(contact).color"
                                 >
                                     <component
                                         :is="getStatusBadge(contact).icon"
@@ -483,17 +488,13 @@ const getSourceColor = (source: string): string => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem
-                                            @click="
-                                                router.visit(show(contact.id))
-                                            "
+                                            @click="router.visit(show(contact.id))"
                                         >
                                             <Eye :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
-                                            @click="
-                                                router.visit(edit(contact.id))
-                                            "
+                                            @click="router.visit(edit(contact.id))"
                                         >
                                             <Edit :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                                             Edit
