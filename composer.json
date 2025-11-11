@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "firebase/php-jwt": "^6.11",
+        "giggsey/libphonenumber-for-php": "^9.0",
         "inertiajs/inertia-laravel": "^2.0",
         "jenssegers/agent": "^2.6",
         "laravel/fortify": "^1.30",

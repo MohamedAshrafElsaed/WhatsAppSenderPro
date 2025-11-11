@@ -41,6 +41,8 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')
             Route::post('{import}/process', [ContactImportController::class, 'process'])->name('process');
             Route::delete('{import}', [ContactImportController::class, 'destroy'])->name('destroy');
             Route::get('template', [ContactImportController::class, 'downloadTemplate'])->name('template');
+            Route::get('{import}/progress', [ContactImportController::class, 'progress'])
+                ->name('dashboard.contacts.imports.progress');
         });
 
         // Contact CRUD

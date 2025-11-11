@@ -75,12 +75,16 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+                'warning' => fn () => $request->session()->get('warning'),
+                'info' => fn () => $request->session()->get('info'),
             ],
             'errors' => $request->session()->get('errors')
                 ? $request->session()->get('errors')->getBag('default')->getMessages()
                 : (object)[],
             'locale' => app()->getLocale(),
             'translations' => $this->getTranslations(),
+            'import_preview' => fn () => $request->session()->get('import_preview'),
+            'import_summary' => fn () => $request->session()->get('import_summary'),
         ];
     }
 

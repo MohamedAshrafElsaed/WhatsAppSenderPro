@@ -22,11 +22,17 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import {
     destroy as deleteImport,
-    index,
+    index as contactsIndex,
     process as processImport,
     template,
     upload,
@@ -36,11 +42,15 @@ import {
     AlertCircle,
     Check,
     Download,
+    Eye,
     FileText,
+    MoreVertical,
     Trash2,
     Upload,
 } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
+import { Country } from '@/types';
+import axios from 'axios';
 
 interface Tag {
     id: number;
@@ -59,6 +69,16 @@ interface ImportRecord {
     created_at: string;
 }
 
+interface ImportProgress {
+    total: number;
+    processed: number;
+    valid: number;
+    invalid: number;
+    duplicates: number;
+    current_row: number;
+    status: string;
+}
+
 interface Props {
     imports: {
         data: ImportRecord[];
@@ -68,8 +88,10 @@ interface Props {
         total: number;
     };
     tags: Tag[];
+    countries: Country[];
 }
 
+const defaultCountryId = ref<string>('none');
 const props = defineProps<Props>();
 const { t, isRTL } = useTranslation();
 const page = usePage();
@@ -83,12 +105,15 @@ const columnMapping = ref<Record<string, string>>({
     last_name: '',
     phone_number: '',
     email: '',
-    country: '',
 });
 const validateWhatsApp = ref(false);
 const selectedTagId = ref<string>('none');
 const isProcessing = ref(false);
 const importSummary = ref<any>(null);
+
+// Progress tracking
+const importProgress = ref<ImportProgress | null>(null);
+let progressInterval: number | null = null;
 
 // File upload
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -131,14 +156,6 @@ const uploadFile = (file: File) => {
     formData.append('file', file);
 
     router.post(upload(), formData, {
-        preserveState: true,
-        onSuccess: () => {
-            const preview = page.props.import_preview as any;
-            if (preview) {
-                parseResult.value = preview;
-                currentStep.value = 2;
-            }
-        },
         onError: (errors) => {
             console.error('Upload failed:', errors);
             uploadedFile.value = null;
@@ -147,35 +164,58 @@ const uploadFile = (file: File) => {
 };
 
 const startImport = () => {
-    if (!parseResult.value?.id) return;
+    if (!parseResult.value || !parseResult.value.import_id) return;
 
     isProcessing.value = true;
+    currentStep.value = 3; // Show processing step
+
+    // Start polling for progress
+    startProgressPolling(parseResult.value.import_id);
 
     router.post(
-        processImport(parseResult.value.id),
+        processImport(parseResult.value.import_id),
         {
             column_mapping: columnMapping.value,
             validate_whatsapp: validateWhatsApp.value,
-            tag_id: selectedTagId.value === 'none' ? null : selectedTagId.value,
+            tag_id: selectedTagId.value !== 'none' ? selectedTagId.value : null,
+            default_country_id: defaultCountryId.value !== 'none' ? defaultCountryId.value : null,
         },
         {
-            preserveState: true,
-            onSuccess: () => {
-                const summary = page.props.import_summary as any;
-                if (summary) {
-                    importSummary.value = summary;
-                    currentStep.value = 4;
-                } else {
-                    currentStep.value = 3;
-                }
+            onFinish: () => {
                 isProcessing.value = false;
+                stopProgressPolling();
             },
-            onError: (errors) => {
-                console.error('Import processing failed:', errors);
-                isProcessing.value = false;
+            onError: () => {
+                currentStep.value = 2; // Go back to mapping on error
+                stopProgressPolling();
             },
         },
     );
+};
+
+// Progress polling functions
+const startProgressPolling = (importId: number) => {
+    // Poll every 500ms for real-time updates
+    progressInterval = window.setInterval(async () => {
+        try {
+            const response = await axios.get(`/dashboard/contacts/imports/${importId}/progress`);
+            importProgress.value = response.data;
+
+            // Stop polling if completed
+            if (response.data.status === 'completed') {
+                stopProgressPolling();
+            }
+        } catch (error) {
+            console.error('Failed to fetch progress:', error);
+        }
+    }, 500);
+};
+
+const stopProgressPolling = () => {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+    }
 };
 
 const resetImport = () => {
@@ -187,11 +227,12 @@ const resetImport = () => {
         last_name: '',
         phone_number: '',
         email: '',
-        country: '',
     };
     validateWhatsApp.value = false;
     selectedTagId.value = 'none';
+    defaultCountryId.value = 'none';
     importSummary.value = null;
+    importProgress.value = null;
 };
 
 const deleteImportRecord = (importId: number) => {
@@ -205,6 +246,19 @@ const deleteImportRecord = (importId: number) => {
     ) {
         router.delete(deleteImport(importId));
     }
+};
+
+const viewImportDetails = (importRecord: ImportRecord) => {
+    importSummary.value = {
+        import_id: importRecord.id,
+        total: importRecord.total_rows,
+        valid: importRecord.valid_contacts,
+        invalid: importRecord.invalid_contacts,
+        duplicates: importRecord.duplicate_contacts,
+        phone_normalized: 0,
+        errors: [],
+    };
+    currentStep.value = 4;
 };
 
 const getStatusColor = (status: string) => {
@@ -227,28 +281,68 @@ const formatDate = (dateString: string) => {
     });
 };
 
-const progressPercentage = computed(() => (currentStep.value / 4) * 100);
+const progressPercentage = computed(() => {
+    if (currentStep.value === 3 && importProgress.value) {
+        return Math.round((importProgress.value.processed / importProgress.value.total) * 100);
+    }
+    return (currentStep.value / 4) * 100;
+});
 
-// Watch for import summary in page props
+// Watch for import_preview from flash data (after upload)
+watch(
+    () => page.props.import_preview,
+    (newPreview) => {
+        if (newPreview) {
+            parseResult.value = newPreview as any;
+            currentStep.value = 2;
+        }
+    },
+    { immediate: true }
+);
+
+// Watch for import_summary from flash data (after processing)
 watch(
     () => page.props.import_summary,
     (newSummary) => {
         if (newSummary) {
-            importSummary.value = newSummary;
-            if (currentStep.value === 3) {
-                currentStep.value = 4;
-            }
+            importSummary.value = newSummary as any;
+            currentStep.value = 4;
         }
     },
-    { deep: true },
+    { immediate: true }
 );
+
+// Check on mount for any flash data
+onMounted(() => {
+    if (page.props.import_preview) {
+        parseResult.value = page.props.import_preview as any;
+        currentStep.value = 2;
+    }
+    if (page.props.import_summary) {
+        importSummary.value = page.props.import_summary as any;
+        currentStep.value = 4;
+    }
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+    stopProgressPolling();
+});
+
 </script>
 
 <template>
     <AppLayout>
         <Head :title="t('imports.title')" />
 
-        <div class="mx-auto max-w-6xl space-y-6">
+        <!-- Dimmed overlay when processing -->
+        <div
+            v-if="isProcessing"
+            class="fixed inset-0 z-40 bg-black/50"
+            aria-hidden="true"
+        ></div>
+
+        <div class="mx-auto max-w-6xl space-y-6" :class="{ 'relative z-50': isProcessing }">
             <Heading
                 :description="
                     t(
@@ -287,10 +381,10 @@ watch(
                             step === 1
                                 ? t('imports.upload_file')
                                 : step === 2
-                                  ? t('imports.map_columns')
-                                  : step === 3
-                                    ? t('imports.processing')
-                                    : t('imports.summary')
+                                    ? t('imports.map_columns')
+                                    : step === 3
+                                        ? t('imports.processing')
+                                        : t('imports.summary')
                         }}
                     </span>
                 </div>
@@ -364,9 +458,7 @@ watch(
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead
-                                            v-for="(
-                                                header, index
-                                            ) in parseResult.headers"
+                                            v-for="(header, index) in parseResult.headers"
                                             :key="index"
                                         >
                                             {{ header }}
@@ -375,9 +467,7 @@ watch(
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow
-                                        v-for="(
-                                            row, rowIndex
-                                        ) in parseResult.preview.slice(0, 3)"
+                                        v-for="(row, rowIndex) in parseResult.preview.slice(0, 3)"
                                         :key="rowIndex"
                                     >
                                         <TableCell
@@ -428,18 +518,16 @@ watch(
                                 <SelectTrigger>
                                     <SelectValue
                                         :placeholder="
-                                            t(
-                                                'imports.mapping.select_column',
-                                                'Select column',
-                                            )
-                                        "
+                                t(
+                                    'imports.mapping.select_column',
+                                    'Select column',
+                                )
+                            "
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem
-                                        v-for="(
-                                            header, index
-                                        ) in parseResult?.headers"
+                                        v-for="(header, index) in parseResult?.headers"
                                         :key="index"
                                         :value="header"
                                     >
@@ -450,8 +538,57 @@ watch(
                         </div>
                     </div>
 
-                    <!-- Options -->
-                    <div class="space-y-4">
+                    <!-- Phone Normalization Section -->
+                    <div class="space-y-4 border-t pt-6 mt-6">
+                        <div class="space-y-2">
+                            <Label for="default_country">
+                                {{ t('imports.default_country', 'Default Country for Phone Normalization') }}
+                            </Label>
+                            <Select v-model="defaultCountryId">
+                                <SelectTrigger>
+                                    <SelectValue
+                                        :placeholder="t('imports.select_country', 'Select default country')"
+                                    />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">
+                                        {{ t('imports.no_default_country', 'No default country') }}
+                                    </SelectItem>
+                                    <SelectItem
+                                        v-for="country in countries"
+                                        :key="country.id"
+                                        :value="country.id.toString()"
+                                    >
+                                        {{ isRTL() ? country.name_ar : country.name_en }}
+                                        (+{{ country.phone_code }})
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <p class="text-xs text-muted-foreground">
+                                {{
+                                    t(
+                                        'imports.default_country_hint',
+                                        'Used to normalize phone numbers that don\'t include a country code'
+                                    )
+                                }}
+                            </p>
+                        </div>
+
+                        <Alert>
+                            <AlertCircle class="h-4 w-4" />
+                            <AlertDescription>
+                                <p class="font-semibold mb-2">
+                                    {{ t('imports.phone_normalization_info', 'Phone Number Normalization') }}
+                                </p>
+                                <p class="text-sm text-muted-foreground mb-2">
+                                    {{ t('imports.auto_country_detection', 'Country will be automatically detected from phone numbers') }}
+                                </p>
+                            </AlertDescription>
+                        </Alert>
+                    </div>
+
+                    <!-- Import Options -->
+                    <div class="space-y-4 border-t pt-6">
                         <h3 class="font-semibold">
                             {{ t('imports.options', 'Import Options') }}
                         </h3>
@@ -468,32 +605,31 @@ watch(
                                 {{ t('imports.mapping.validate_whatsapp') }}
                             </Label>
                         </div>
+                        <p class="text-xs text-muted-foreground">
+                            {{ t('imports.whatsapp_validation_note', 'Only validates if you have a connected WhatsApp session') }}
+                        </p>
 
                         <div>
                             <Label for="tag">{{
-                                t('imports.mapping.assign_tag')
-                            }}</Label>
+                                    t('imports.mapping.assign_tag')
+                                }}</Label>
                             <Select v-model="selectedTagId">
                                 <SelectTrigger>
                                     <SelectValue
-                                        :placeholder="
-                                            t('imports.mapping.select_tag')
-                                        "
+                                        :placeholder="t('imports.mapping.select_tag')"
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">{{
-                                        t('common.none', 'None')
-                                    }}</SelectItem>
+                                            t('common.none', 'None')
+                                        }}</SelectItem>
                                     <SelectItem
                                         v-for="tag in tags"
                                         :key="tag.id"
                                         :value="tag.id.toString()"
                                     >
                                         <Badge
-                                            :style="{
-                                                backgroundColor: tag.color,
-                                            }"
+                                            :style="{ backgroundColor: tag.color }"
                                             class="text-white"
                                         >
                                             {{ tag.name }}
@@ -504,15 +640,16 @@ watch(
                         </div>
                     </div>
 
-                    <div class="flex justify-between">
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between border-t pt-6">
                         <Button variant="outline" @click="resetImport">
                             {{ t('common.cancel', 'Cancel') }}
                         </Button>
                         <Button
                             :disabled="
-                                !columnMapping.first_name ||
-                                !columnMapping.phone_number
-                            "
+                    !columnMapping.first_name ||
+                    !columnMapping.phone_number
+                "
                             @click="startImport"
                         >
                             {{ t('imports.mapping.start_import') }}
@@ -521,7 +658,7 @@ watch(
                 </CardContent>
             </Card>
 
-            <!-- Step 3: Processing -->
+            <!-- Step 3: Processing with Progress -->
             <Card v-show="currentStep === 3" class="p-12 text-center">
                 <div class="space-y-6">
                     <div class="flex justify-center">
@@ -542,6 +679,38 @@ watch(
                             }}
                         </p>
                     </div>
+
+                    <!-- Real-time Progress -->
+                    <div v-if="importProgress" class="space-y-4">
+                        <Progress
+                            :model-value="progressPercentage"
+                            class="h-3"
+                        />
+
+                        <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+                            <div class="rounded-lg bg-muted p-3">
+                                <p class="text-xs text-muted-foreground">Total</p>
+                                <p class="text-lg font-bold">{{ importProgress.total }}</p>
+                            </div>
+                            <div class="rounded-lg bg-green-50 p-3 dark:bg-green-950">
+                                <p class="text-xs text-muted-foreground">Valid</p>
+                                <p class="text-lg font-bold text-green-600">{{ importProgress.valid }}</p>
+                            </div>
+                            <div class="rounded-lg bg-red-50 p-3 dark:bg-red-950">
+                                <p class="text-xs text-muted-foreground">Invalid</p>
+                                <p class="text-lg font-bold text-red-600">{{ importProgress.invalid }}</p>
+                            </div>
+                            <div class="rounded-lg bg-yellow-50 p-3 dark:bg-yellow-950">
+                                <p class="text-xs text-muted-foreground">Duplicates</p>
+                                <p class="text-lg font-bold text-yellow-600">{{ importProgress.duplicates }}</p>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-muted-foreground">
+                            Processing row {{ importProgress.current_row }} of {{ importProgress.total }}
+                            ({{ progressPercentage }}%)
+                        </p>
+                    </div>
                 </div>
             </Card>
 
@@ -549,12 +718,12 @@ watch(
             <Card v-if="importSummary" v-show="currentStep === 4">
                 <CardHeader>
                     <CardTitle>{{
-                        t('imports.summary.title', 'Import Complete')
-                    }}</CardTitle>
+                            t('imports.summary.title', 'Import Complete')
+                        }}</CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-6">
-                    <!-- Statistics -->
-                    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    <!-- Statistics Grid -->
+                    <div class="grid grid-cols-2 gap-4 md:grid-cols-5">
                         <div class="rounded-lg border p-4">
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.total_processed') }}
@@ -563,6 +732,7 @@ watch(
                                 {{ importSummary.total }}
                             </p>
                         </div>
+
                         <div
                             class="rounded-lg border border-green-200 bg-green-50 p-4 dark:bg-green-950"
                         >
@@ -573,6 +743,7 @@ watch(
                                 {{ importSummary.valid }}
                             </p>
                         </div>
+
                         <div
                             class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950"
                         >
@@ -583,6 +754,7 @@ watch(
                                 {{ importSummary.invalid }}
                             </p>
                         </div>
+
                         <div
                             class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:bg-yellow-950"
                         >
@@ -593,14 +765,22 @@ watch(
                                 {{ importSummary.duplicates }}
                             </p>
                         </div>
+
+                        <div
+                            class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:bg-blue-950"
+                        >
+                            <p class="text-sm text-muted-foreground">
+                                {{ t('imports.summary.phone_normalized', 'Phone Numbers Normalized') }}
+                            </p>
+                            <p class="text-2xl font-bold text-blue-600">
+                                {{ importSummary.phone_normalized || 0 }}
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- Errors -->
+                    <!-- Errors Table -->
                     <div
-                        v-if="
-                            importSummary.errors &&
-                            importSummary.errors.length > 0
-                        "
+                        v-if="importSummary.errors && importSummary.errors.length > 0"
                     >
                         <Alert variant="destructive">
                             <AlertCircle class="h-4 w-4" />
@@ -620,18 +800,16 @@ watch(
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>{{
-                                            t('imports.errors.row', 'Row')
-                                        }}</TableHead>
+                                                t('imports.errors.row', 'Row')
+                                            }}</TableHead>
                                         <TableHead>{{
-                                            t('imports.errors.error', 'Error')
-                                        }}</TableHead>
+                                                t('imports.errors.error', 'Error')
+                                            }}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow
-                                        v-for="(
-                                            error, index
-                                        ) in importSummary.errors.slice(0, 10)"
+                                        v-for="(error, index) in importSummary.errors.slice(0, 10)"
                                         :key="index"
                                     >
                                         <TableCell>{{ error.row }}</TableCell>
@@ -640,15 +818,25 @@ watch(
                                 </TableBody>
                             </Table>
                         </div>
+
+                        <p v-if="importSummary.errors.length > 10" class="mt-2 text-sm text-muted-foreground">
+                            {{ t('imports.showing_first_errors', 'Showing first 10 of {total} errors', { total: importSummary.errors.length }) }}
+                        </p>
                     </div>
 
+                    <!-- Action Buttons -->
                     <div class="flex justify-between">
                         <Button variant="outline" @click="resetImport">
                             {{ t('imports.summary.import_another') }}
                         </Button>
-                        <Button @click="$inertia.visit(index())">
-                            {{ t('imports.summary.view_contacts') }}
-                        </Button>
+                        <div class="flex gap-2">
+                            <Button variant="outline" @click="currentStep = 1">
+                                {{ t('imports.history.title', 'Import History') }}
+                            </Button>
+                            <Button @click="$inertia.visit(contactsIndex())">
+                                {{ t('imports.summary.view_contacts') }}
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -671,26 +859,26 @@ watch(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>{{
-                                        t('imports.history.filename')
-                                    }}</TableHead>
+                                            t('imports.history.filename')
+                                        }}</TableHead>
                                     <TableHead>{{
-                                        t('imports.history.date')
-                                    }}</TableHead>
+                                            t('imports.history.date')
+                                        }}</TableHead>
                                     <TableHead>{{
-                                        t('imports.history.total')
-                                    }}</TableHead>
+                                            t('imports.history.total')
+                                        }}</TableHead>
                                     <TableHead>{{
-                                        t('imports.history.valid')
-                                    }}</TableHead>
+                                            t('imports.history.valid')
+                                        }}</TableHead>
                                     <TableHead>{{
-                                        t('imports.history.invalid')
-                                    }}</TableHead>
+                                            t('imports.history.invalid')
+                                        }}</TableHead>
                                     <TableHead>{{
-                                        t('imports.history.status')
-                                    }}</TableHead>
+                                            t('imports.history.status')
+                                        }}</TableHead>
                                     <TableHead>{{
-                                        t('common.actions', 'Actions')
-                                    }}</TableHead>
+                                            t('common.actions', 'Actions')
+                                        }}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -699,20 +887,20 @@ watch(
                                     :key="importRecord.id"
                                 >
                                     <TableCell class="font-medium">{{
-                                        importRecord.filename
-                                    }}</TableCell>
+                                            importRecord.filename
+                                        }}</TableCell>
                                     <TableCell>{{
-                                        formatDate(importRecord.created_at)
-                                    }}</TableCell>
+                                            formatDate(importRecord.created_at)
+                                        }}</TableCell>
                                     <TableCell>{{
-                                        importRecord.total_rows
-                                    }}</TableCell>
+                                            importRecord.total_rows
+                                        }}</TableCell>
                                     <TableCell class="text-green-600">{{
-                                        importRecord.valid_contacts
-                                    }}</TableCell>
+                                            importRecord.valid_contacts
+                                        }}</TableCell>
                                     <TableCell class="text-red-600">{{
-                                        importRecord.invalid_contacts
-                                    }}</TableCell>
+                                            importRecord.invalid_contacts
+                                        }}</TableCell>
                                     <TableCell>
                                         <Badge
                                             :variant="
@@ -729,17 +917,29 @@ watch(
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            @click="
-                                                deleteImportRecord(
-                                                    importRecord.id,
-                                                )
-                                            "
-                                        >
-                                            <Trash2 class="h-4 w-4" />
-                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger as-child>
+                                                <Button size="sm" variant="ghost">
+                                                    <MoreVertical class="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    v-if="importRecord.status === 'completed'"
+                                                    @click="viewImportDetails(importRecord)"
+                                                >
+                                                    <Eye :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                                    {{ t('common.view', 'View') }}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    class="text-destructive"
+                                                    @click="deleteImportRecord(importRecord.id)"
+                                                >
+                                                    <Trash2 :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                                    {{ t('common.delete', 'Delete') }}
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

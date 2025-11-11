@@ -2,27 +2,30 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contact> $contacts
+ * @property-read Collection<int, Contact> $contacts
  * @property-read int|null $contacts_count
  * @property-read bool|null $contacts_exists
- * @property-read \App\Models\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport completed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport failed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport forUser(\App\Models\User $user)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport processing()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ContactImport withoutTrashed()
- * @mixin \Eloquent
+ * @property-read User|null $user
+ * @method static Builder<static>|ContactImport completed()
+ * @method static Builder<static>|ContactImport failed()
+ * @method static Builder<static>|ContactImport forUser(User $user)
+ * @method static Builder<static>|ContactImport newModelQuery()
+ * @method static Builder<static>|ContactImport newQuery()
+ * @method static Builder<static>|ContactImport onlyTrashed()
+ * @method static Builder<static>|ContactImport processing()
+ * @method static Builder<static>|ContactImport query()
+ * @method static Builder<static>|ContactImport withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|ContactImport withoutTrashed()
+ * @mixin Eloquent
  */
 class ContactImport extends Model
 {
@@ -32,6 +35,7 @@ class ContactImport extends Model
         'user_id',
         'filename',
         'file_path',
+        'file_type',
         'status',
         'total_rows',
         'valid_contacts',

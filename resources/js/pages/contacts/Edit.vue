@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import ContactController from '@/actions/App/Http/Controllers/ContactController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
@@ -18,8 +19,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { usePhoneNumber } from '@/composables/usePhoneNumber';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { index, update } from '@/routes/dashboard/contacts';
-import { Form, Head } from '@inertiajs/vue3';
+import { index } from '@/routes/dashboard/contacts';
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { CheckCircle2 } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 
 interface Country {
@@ -27,6 +29,7 @@ interface Country {
     name_en: string;
     name_ar: string;
     phone_code: string;
+    iso_code: string;
 }
 
 interface Tag {
@@ -59,14 +62,24 @@ const selectedCountry = ref<number | null>(props.contact.country_id);
 const selectedTags = ref<number[]>(props.contact.tags.map((t) => t.id));
 const validateWhatsApp = ref(false);
 
-const { mobileNumber, handlePhoneInput } = usePhoneNumber(
+const { mobileNumber, isValid, handlePhoneInput } = usePhoneNumber(
     selectedCountry,
     props.countries,
 );
 
-// Initialize phone number
+// Initialize phone number (remove country code if present)
 onMounted(() => {
-    mobileNumber.value = props.contact.phone_number;
+    let phone = props.contact.phone_number;
+
+    // If phone starts with +, remove country code
+    if (phone.startsWith('+') && props.contact.country_id) {
+        const country = props.countries.find(c => c.id === props.contact.country_id);
+        if (country) {
+            phone = phone.replace(`+${country.phone_code}`, '');
+        }
+    }
+
+    mobileNumber.value = phone;
 });
 
 const toggleTag = (tagId: number) => {
@@ -80,8 +93,13 @@ const toggleTag = (tagId: number) => {
 
 const isTagSelected = (tagId: number) => selectedTags.value.includes(tagId);
 
-// Watch mobile number to update hidden input
+// Watch mobile number changes and auto-normalize
 watch(mobileNumber, (newValue) => {
+    if (newValue) {
+        handlePhoneInput(newValue);
+    }
+
+    // Update hidden input
     const input = document.querySelector(
         'input[name="phone_number"]',
     ) as HTMLInputElement;
@@ -100,7 +118,7 @@ watch(selectedCountry, (newValue) => {
     }
 });
 
-// Watch tags to update hidden input
+// Watch tags to update hidden inputs
 watch(
     selectedTags,
     (newValue) => {
@@ -123,41 +141,38 @@ watch(
             :title="`${t('common.edit', 'Edit')} ${contact.first_name} ${contact.last_name}`"
         />
 
-        <div class="mx-auto max-w-3xl space-y-6">
+        <div
+            :class="isRTL() ? 'text-right' : 'text-left'"
+            class="mx-auto max-w-3xl space-y-6"
+        >
             <Heading
                 :description="t('contacts.description')"
                 :title="`${t('common.edit', 'Edit')} ${contact.first_name} ${contact.last_name}`"
             />
 
             <Form
-                #default="{ errors, processing }"
-                :reset-on-success="false"
+                v-bind="ContactController.update.form(contact.id)"
+                v-slot="{ errors, processing }"
                 class="space-y-6"
-                v-bind="update.form(contact.id)"
             >
                 <Card>
                     <CardHeader>
                         <CardTitle>{{
-                            t(
-                                'contacts.fields.contact_info',
-                                'Contact Information',
-                            )
-                        }}</CardTitle>
+                                t('contacts.basic_info', 'Basic Information')
+                            }}</CardTitle>
                     </CardHeader>
                     <CardContent class="space-y-4">
                         <!-- First Name -->
                         <div>
-                            <Label for="first_name">
-                                {{ t('contacts.fields.first_name') }}
-                                <span class="text-destructive">*</span>
-                            </Label>
+                            <Label for="first_name">{{
+                                    t('contacts.fields.first_name')
+                                }}</Label>
                             <Input
                                 id="first_name"
                                 :disabled="processing"
                                 :model-value="contact.first_name"
                                 name="first_name"
                                 required
-                                type="text"
                             />
                             <InputError :message="errors.first_name" />
                         </div>
@@ -165,35 +180,26 @@ watch(
                         <!-- Last Name -->
                         <div>
                             <Label for="last_name">{{
-                                t('contacts.fields.last_name')
-                            }}</Label>
+                                    t('contacts.fields.last_name')
+                                }}</Label>
                             <Input
                                 id="last_name"
                                 :disabled="processing"
                                 :model-value="contact.last_name"
                                 name="last_name"
-                                type="text"
                             />
                             <InputError :message="errors.last_name" />
                         </div>
 
                         <!-- Country -->
                         <div>
-                            <Label for="country">{{
-                                t('contacts.fields.country')
-                            }}</Label>
-                            <Select
-                                v-model="selectedCountry"
-                                :disabled="processing"
-                            >
+                            <Label for="country_id">{{
+                                    t('contacts.fields.country')
+                                }}</Label>
+                            <Select v-model="selectedCountry">
                                 <SelectTrigger>
                                     <SelectValue
-                                        :placeholder="
-                                            t(
-                                                'common.select_country',
-                                                'Select country',
-                                            )
-                                        "
+                                        :placeholder="t('common.select')"
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -221,24 +227,55 @@ watch(
 
                         <!-- Phone Number -->
                         <div>
-                            <Label for="phone_number">
-                                {{ t('contacts.fields.phone_number') }}
-                                <span class="text-destructive">*</span>
-                            </Label>
+                            <Label for="phone_number">{{
+                                    t('contacts.fields.phone_number')
+                                }}</Label>
                             <Input
-                                id="phone_number_display"
+                                id="phone_number"
                                 v-model="mobileNumber"
+                                :class="{
+                                    'border-green-500 focus-visible:ring-green-500':
+                                        isValid,
+                                }"
                                 :disabled="processing"
                                 placeholder="+201234567890"
                                 required
                                 type="tel"
-                                @input="handlePhoneInput"
                             />
                             <input
                                 :value="mobileNumber"
                                 name="phone_number"
                                 type="hidden"
                             />
+
+                            <!-- Visual Feedback -->
+                            <p
+                                v-if="mobileNumber && isValid"
+                                class="mt-1 flex items-center gap-1 text-xs text-green-600"
+                            >
+                                <CheckCircle2 class="h-3 w-3" />
+                                {{
+                                    t(
+                                        'contacts.phone_validation.valid_whatsapp_number',
+                                        'Valid WhatsApp number',
+                                    )
+                                }}
+                            </p>
+                            <p
+                                v-else-if="
+                                    mobileNumber &&
+                                    !isValid &&
+                                    selectedCountry
+                                "
+                                class="mt-1 text-xs text-destructive"
+                            >
+                                {{
+                                    t(
+                                        'contacts.phone_validation.invalid_format',
+                                        'Invalid phone number format',
+                                    )
+                                }}
+                            </p>
                             <p
                                 v-if="selectedCountry"
                                 class="mt-1 text-xs text-muted-foreground"
@@ -256,8 +293,8 @@ watch(
                         <!-- Email -->
                         <div>
                             <Label for="email">{{
-                                t('contacts.fields.email')
-                            }}</Label>
+                                    t('contacts.fields.email')
+                                }}</Label>
                             <Input
                                 id="email"
                                 :disabled="processing"
@@ -301,13 +338,14 @@ watch(
                                 :value="tagId"
                                 type="hidden"
                             />
+                            <InputError :message="errors.tags" />
                         </div>
 
                         <!-- Notes -->
                         <div>
                             <Label for="notes">{{
-                                t('contacts.fields.notes')
-                            }}</Label>
+                                    t('contacts.fields.notes')
+                                }}</Label>
                             <Textarea
                                 id="notes"
                                 :disabled="processing"
@@ -315,6 +353,7 @@ watch(
                                 name="notes"
                                 rows="3"
                             />
+                            <InputError :message="errors.notes" />
                         </div>
 
                         <!-- Validate WhatsApp -->
@@ -323,35 +362,32 @@ watch(
                                 id="validate_whatsapp"
                                 v-model:checked="validateWhatsApp"
                                 :disabled="processing"
-                                :value="validateWhatsApp ? '1' : '0'"
                                 name="validate_whatsapp"
                             />
                             <Label
                                 class="cursor-pointer font-normal"
                                 for="validate_whatsapp"
                             >
-                                {{ t('contacts.validation.validate_now') }}
+                                {{
+                                    t(
+                                        'contacts.validate_whatsapp',
+                                        'Validate WhatsApp number after update',
+                                    )
+                                }}
                             </Label>
                         </div>
                     </CardContent>
                 </Card>
 
                 <!-- Actions -->
-                <div class="flex justify-end gap-2">
-                    <Button
-                        :disabled="processing"
-                        type="button"
-                        variant="outline"
-                        @click="$inertia.visit(index())"
-                    >
-                        {{ t('common.cancel', 'Cancel') }}
-                    </Button>
+                <div class="flex gap-2">
                     <Button :disabled="processing" type="submit">
-                        {{
-                            processing
-                                ? t('common.saving', 'Saving...')
-                                : t('common.save', 'Save')
-                        }}
+                        {{ t('common.save', 'Save') }}
+                    </Button>
+                    <Button as-child variant="outline">
+                        <Link :href="index()">
+                            {{ t('common.cancel', 'Cancel') }}
+                        </Link>
                     </Button>
                 </div>
             </Form>

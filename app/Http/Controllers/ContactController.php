@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Models\ContactTag;
 use App\Models\Country;
+use App\Rules\ValidPhoneNumber;
 use App\Services\ContactService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -72,7 +73,7 @@ class ContactController extends Controller
     {
         $countries = Country::active()
             ->orderBy('name_en')
-            ->get(['id', 'name_en', 'name_ar', 'phone_code']);
+            ->get(['id', 'name_en', 'name_ar', 'phone_code', 'iso_code']);
 
         $tags = ContactTag::forUser(auth()->user())
             ->orderBy('name')
@@ -92,7 +93,11 @@ class ContactController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'phone_number' => 'required|string',
+            'phone_number' => [
+                'required',
+                'string',
+                new ValidPhoneNumber($request->input('country_id'))
+            ],
             'email' => 'nullable|email|max:255',
             'country_id' => 'nullable|exists:countries,id',
             'tags' => 'nullable|array',
@@ -103,6 +108,20 @@ class ContactController extends Controller
 
         $user = $request->user();
 
+        // Normalize phone number
+        $normalized = $this->contactService->normalizePhoneNumber(
+            $validated['phone_number'],
+            $validated['country_id'] ?? null
+        );
+
+        if (!$normalized) {
+            return back()->withErrors([
+                'phone_number' => trans('contacts.phone_validation.invalid_format'),
+            ])->withInput();
+        }
+
+        $validated['phone_number'] = $normalized;
+
         // Check for duplicates
         if ($this->contactService->isDuplicate($user, $validated['phone_number'])) {
             return back()->withErrors([
@@ -112,7 +131,7 @@ class ContactController extends Controller
 
         $this->contactService->createContact($user, $validated);
 
-        return redirect()->route('contacts.index')
+        return redirect()->route('dashboard.contacts.index')
             ->with('success', trans('contacts.messages.created_successfully'));
     }
 
@@ -141,7 +160,7 @@ class ContactController extends Controller
 
         $countries = Country::active()
             ->orderBy('name_en')
-            ->get(['id', 'name_en', 'name_ar', 'phone_code']);
+            ->get(['id', 'name_en', 'name_ar', 'phone_code', 'iso_code']);
 
         $tags = ContactTag::forUser(auth()->user())
             ->orderBy('name')
@@ -164,7 +183,11 @@ class ContactController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'phone_number' => 'required|string',
+            'phone_number' => [
+                'required',
+                'string',
+                new ValidPhoneNumber($request->input('country_id'))
+            ],
             'email' => 'nullable|email|max:255',
             'country_id' => 'nullable|exists:countries,id',
             'tags' => 'nullable|array',
@@ -174,6 +197,20 @@ class ContactController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Normalize phone number
+        $normalized = $this->contactService->normalizePhoneNumber(
+            $validated['phone_number'],
+            $validated['country_id'] ?? null
+        );
+
+        if (!$normalized) {
+            return back()->withErrors([
+                'phone_number' => trans('contacts.phone_validation.invalid_format'),
+            ])->withInput();
+        }
+
+        $validated['phone_number'] = $normalized;
 
         // Check for duplicates (excluding current contact)
         if ($this->contactService->isDuplicate(
@@ -188,7 +225,7 @@ class ContactController extends Controller
 
         $this->contactService->updateContact($contact, $validated);
 
-        return redirect()->route('contacts.index')
+        return redirect()->route('dashboard.contacts.index')
             ->with('success', trans('contacts.messages.updated_successfully'));
     }
 
@@ -201,7 +238,7 @@ class ContactController extends Controller
 
         $this->contactService->deleteContact($contact);
 
-        return redirect()->route('contacts.index')
+        return redirect()->route('dashboard.contacts.index')
             ->with('success', trans('contacts.messages.deleted_successfully'));
     }
 

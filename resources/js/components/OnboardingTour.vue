@@ -110,7 +110,7 @@ const goToAction = (action: string) => {
 onMounted(async () => {
     // Always check backend, don't rely only on localStorage
     try {
-        const response = await fetch('/onboarding/status');
+        const response = await fetch('dashboard/onboarding/status');
         const data = await response.json();
 
         if (data.success && !data.data.tour_completed) {

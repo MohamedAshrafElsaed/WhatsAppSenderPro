@@ -1,5 +1,5 @@
 import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js';
-import { ref, Ref, watch } from 'vue';
+import { computed, ref, Ref, watch } from 'vue';
 
 interface Country {
     id: number;
@@ -13,7 +13,6 @@ export function usePhoneNumber(
 ) {
     const mobileNumber = ref('');
     const formattedNumber = ref('');
-    const isValid = ref(false);
 
     /**
      * Get country phone code by country ID
@@ -99,9 +98,24 @@ export function usePhoneNumber(
     };
 
     /**
-     * Handle phone number input
+     * Computed: Check if current number is valid
      */
-    const handlePhoneInput = (value: string) => {
+    const isValid = computed(() => {
+        if (!mobileNumber.value || !selectedCountry.value) return false;
+        const isoCode = getISOCode(selectedCountry.value);
+        return validatePhoneNumber(mobileNumber.value, isoCode);
+    });
+
+    /**
+     * Handle phone number input - FIXED to accept both Event and string
+     */
+    const handlePhoneInput = (eventOrValue: Event | string): string => {
+        // Extract value from Event or use string directly
+        const value =
+            typeof eventOrValue === 'string'
+                ? eventOrValue
+                : (eventOrValue.target as HTMLInputElement).value;
+
         const phoneCode = getPhoneCode(selectedCountry.value);
         const isoCode = getISOCode(selectedCountry.value);
 
@@ -114,10 +128,19 @@ export function usePhoneNumber(
         // Format for display (optional)
         formattedNumber.value = formatPhoneNumber(cleanedNumber, isoCode);
 
-        // Validate
-        isValid.value = validatePhoneNumber(cleanedNumber, isoCode);
-
         return cleanedNumber;
+    };
+
+    /**
+     * Get full E164 formatted number
+     */
+    const getE164Number = (): string | null => {
+        if (!mobileNumber.value || !selectedCountry.value) return null;
+
+        const phoneCode = getPhoneCode(selectedCountry.value);
+        if (!phoneCode) return null;
+
+        return `+${phoneCode}${mobileNumber.value}`;
     };
 
     /**
@@ -135,5 +158,6 @@ export function usePhoneNumber(
         isValid,
         handlePhoneInput,
         validatePhoneNumber,
+        getE164Number,
     };
 }

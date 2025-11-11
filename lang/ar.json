@@ -70,7 +70,6 @@
             "step2": "اضغط على القائمة أو الإعدادات واختر الأجهزة المرتبطة",
             "step3": "وجه هاتفك نحو هذه الشاشة لمسح الرمز"
         },
-
         "devices": "الأجهزة المتصلة",
         "groups": "مجموعات وأتساب",
         "auto_reply": "الرد الآلي",
@@ -483,6 +482,13 @@
         }
     },
     "common": {
+        "view": "عرض",
+        "actions": "الإجراءات",
+        "select": "اختر",
+        "none": "لا شيء",
+        "clear": "مسح",
+        "saving": "جاري الحفظ...",
+        "cannot_undone": "لا يمكن التراجع عن هذا الإجراء.",
         "create": "إنشاء",
         "completed": "مكتمل",
         "back_to_dashboard": "العودة إلى لوحة التحكم",
@@ -750,7 +756,6 @@
     "static": {
         "back_home": "العودة للرئيسية",
         "get_started": "ابدأ الآن",
-
         "about": {
             "link": "من نحن",
             "meta_title": "من نحن - واتساب سندر برو",
@@ -773,7 +778,6 @@
             "cta_title": "هل أنت مستعد لتحويل اتصالات عملك؟",
             "cta_text": "انضم إلى آلاف الشركات التي تستخدم واتساب سندر برو بالفعل"
         },
-
         "contact": {
             "link": "اتصل بنا",
             "meta_title": "اتصل بنا - واتساب سندر برو",
@@ -801,7 +805,6 @@
             "location_title": "زرنا",
             "location_text": "القاهرة، مصر"
         },
-
         "privacy": {
             "link": "سياسة الخصوصية",
             "meta_title": "سياسة الخصوصية - واتساب سندر برو",
@@ -833,7 +836,6 @@
             "section7_title": "7. اتصل بنا",
             "section7_text": "إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى الاتصال بنا على privacy@convertedin.com"
         },
-
         "terms": {
             "link": "شروط الخدمة",
             "meta_title": "شروط الخدمة - واتساب سندر برو",
@@ -868,7 +870,6 @@
         "trial_warning": "تنتهي تجربتك خلال",
         "trial_warning_days": "أيام. قم بالترقية الآن لمواصلة استخدام جميع الميزات!",
         "upgrade_now": "الترقية الآن",
-
         "onboarding": {
             "progress_title": "أكمل الإعداد",
             "of": "من",
@@ -932,17 +933,18 @@
     },
     "contacts": {
         "title": "جهات الاتصال",
-        "description": "إدارة جهات اتصال واتساب الخاصة بك",
+        "description": "إدارة جهات الاتصال وأرقام واتساب",
         "add": "إضافة جهة اتصال",
         "import": "استيراد جهات الاتصال",
-        "search": "البحث بالاسم أو الهاتف أو البريد الإلكتروني...",
-        "no_contacts": "لا توجد جهات اتصال بعد",
-        "import_to_start": "قم باستيراد جهات الاتصال أو أضفها يدويًا للبدء",
-        "bulk_actions": "إجراءات جماعية",
+        "search": "بحث في جهات الاتصال...",
+        "no_contacts": "لم يتم العثور على جهات اتصال",
+        "import_to_start": "قم باستيراد جهات الاتصال للبدء",
         "selected": "{count} محدد",
-        "validate_selected": "التحقق من المحدد",
-        "delete_selected": "حذف المحدد",
-
+        "validate_selected": "التحقق من المحددة",
+        "delete_selected": "حذف المحددة",
+        "basic_info": "المعلومات الأساسية",
+        "phone_hint": "أدخل الرقم مع أو بدون رمز الدولة",
+        "validate_whatsapp": "التحقق من رقم واتساب بعد الإنشاء",
         "fields": {
             "first_name": "الاسم الأول",
             "last_name": "اسم العائلة",
@@ -955,30 +957,32 @@
             "last_message": "آخر رسالة",
             "created": "تاريخ الإنشاء",
             "notes": "ملاحظات",
-            "actions": "الإجراءات"
+            "actions": "الإجراءات",
+            "contact_info": "معلومات جهة الاتصال"
         },
-
         "sources": {
             "manual": "يدوي",
             "csv_import": "استيراد CSV",
             "excel_import": "استيراد Excel",
             "api": "API"
         },
-
         "validation": {
             "valid": "صالح",
             "invalid": "غير صالح",
             "pending": "لم يتم التحقق",
-            "validate_now": "تحقق الآن"
+            "validate_now": "تحقق الآن",
+            "validated_at": "تم التحقق في"
         },
-
+        "phone_validation": {
+            "valid_whatsapp_number": "رقم واتساب صالح",
+            "invalid_format": "تنسيق رقم الهاتف غير صالح"
+        },
         "filters": {
             "all_sources": "جميع المصادر",
             "all_tags": "جميع الوسوم",
             "all_countries": "جميع الدول",
             "all_status": "جميع الحالات"
         },
-
         "messages": {
             "created_successfully": "تم إنشاء جهة الاتصال بنجاح",
             "updated_successfully": "تم تحديث جهة الاتصال بنجاح",
@@ -987,7 +991,6 @@
             "confirm_delete": "هل أنت متأكد من حذف جهة الاتصال هذه؟",
             "confirm_bulk_delete": "هل أنت متأكد من حذف {count} جهة اتصال؟"
         },
-
         "errors": {
             "duplicate_phone": "رقم الهاتف هذا موجود بالفعل في جهات الاتصال",
             "validation_failed": "فشل التحقق من رقم واتساب",
@@ -996,12 +999,23 @@
     },
     "imports": {
         "title": "استيراد جهات الاتصال",
+        "description": "استيراد جهات الاتصال من ملفات CSV أو Excel",
         "history": "سجل الاستيراد",
         "upload_file": "رفع الملف",
         "map_columns": "تعيين الأعمدة",
         "processing": "جاري المعالجة",
         "summary": "الملخص",
-
+        "options": "خيارات الاستيراد",
+        "default_country": "الدولة الافتراضية لتطبيع أرقام الهاتف",
+        "select_country": "اختر الدولة الافتراضية",
+        "no_default_country": "لا توجد دولة افتراضية",
+        "default_country_hint": "تُستخدم لتطبيع أرقام الهاتف التي لا تتضمن رمز الدولة",
+        "phone_normalization_info": "تطبيع أرقام الهاتف",
+        "phone_normalization_description": "سيتم تحويل جميع أرقام الهاتف تلقائيًا إلى التنسيق الدولي:",
+        "phone_normalization_note": "سيتم تخطي أرقام الهاتف غير الصالحة والإبلاغ عنها في ملخص الأخطاء.",
+        "showing_rows": "عرض 3 من {total} صف",
+        "processing_desc": "يرجى الانتظار بينما نعالج جهات الاتصال الخاصة بك...",
+        "showing_first_errors": "عرض أول 10 من {total} خطأ",
         "upload": {
             "drag_drop": "اسحب وأفلت الملف هنا، أو انقر للتصفح",
             "requirements": "متطلبات الملف:",
@@ -1010,9 +1024,9 @@
             "req_phone": "يجب أن تتضمن أرقام الهاتف رمز الدولة (مثل: +201234567890)",
             "download_template": "تنزيل النموذج",
             "download_csv": "تنزيل نموذج CSV",
-            "download_excel": "تنزيل نموذج Excel"
+            "download_excel": "تنزيل نموذج Excel",
+            "file_uploaded_successfully": "تم رفع الملف بنجاح"
         },
-
         "mapping": {
             "title": "تعيين الأعمدة",
             "description": "طابق أعمدة الملف مع حقول جهات الاتصال",
@@ -1021,25 +1035,31 @@
             "required": "مطلوب",
             "optional": "اختياري",
             "preview": "معاينة البيانات",
+            "select_column": "اختر عمود",
             "validate_whatsapp": "التحقق من أرقام واتساب بعد الاستيراد",
             "skip_duplicates": "تخطي أرقام الهاتف المكررة",
             "assign_tag": "تعيين وسم لجهات الاتصال المستوردة",
             "select_tag": "اختر وسماً",
             "start_import": "بدء الاستيراد"
         },
-
         "summary": {
+            "title": "اكتمل الاستيراد",
             "total_processed": "إجمالي الصفوف المعالجة",
             "valid_imported": "جهات الاتصال الصالحة المستوردة",
             "invalid_skipped": "غير صالح/تم تخطيه",
             "duplicates": "المكررات المتخطاة",
+            "phone_normalized": "أرقام الهاتف المطبّعة",
             "view_contacts": "عرض جهات الاتصال المستوردة",
             "import_another": "استيراد ملف آخر",
             "download_errors": "تنزيل تقرير الأخطاء",
-            "errors_found": "الأخطاء الموجودة"
+            "errors_found": "تم العثور على {count} خطأ"
         },
-
+        "errors": {
+            "row": "الصف",
+            "error": "الخطأ"
+        },
         "history": {
+            "title": "سجل الاستيراد",
             "filename": "اسم الملف",
             "date": "تاريخ الاستيراد",
             "total": "الإجمالي",
@@ -1049,19 +1069,18 @@
             "view_summary": "عرض الملخص",
             "no_imports": "لا توجد عمليات استيراد بعد"
         },
-
         "status": {
             "pending": "قيد الانتظار",
             "processing": "جاري المعالجة",
             "completed": "مكتمل",
             "failed": "فشل"
         },
-
         "messages": {
             "completed_successfully": "تم الاستيراد بنجاح",
-            "deleted_successfully": "تم حذف عملية الاستيراد بنجاح"
+            "deleted_successfully": "تم حذف عملية الاستيراد بنجاح",
+            "file_uploaded_successfully": "تم رفع الملف بنجاح",
+            "confirm_delete": "هل أنت متأكد من حذف هذا الاستيراد؟"
         },
-
         "errors": {
             "parse_failed": "فشل تحليل الملف",
             "processing_failed": "فشلت معالجة الاستيراد",

@@ -7,6 +7,9 @@ use App\Models\ContactTag;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use libphonenumber\PhoneNumberUtil;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\NumberParseException;
 
 readonly class ContactService
 {
@@ -16,12 +19,90 @@ readonly class ContactService
     ) {}
 
     /**
+     * Normalize phone number to E164 format (+201xxxxxxxxx)
+     */
+    public function normalizePhoneNumber(
+        string $phoneNumber,
+        ?int $countryId = null
+    ): ?string {
+        try {
+            $phoneUtil = PhoneNumberUtil::getInstance();
+
+            // Get country ISO code
+            $countryISO = $this->getCountryISOCode($countryId);
+
+            // Parse number with country context
+            $numberProto = $phoneUtil->parse($phoneNumber, $countryISO);
+
+            // Validate it's a valid number
+            if (!$phoneUtil->isValidNumber($numberProto)) {
+                Log::warning('Invalid phone number during normalization', [
+                    'phone' => $phoneNumber,
+                    'country_id' => $countryId,
+                ]);
+                return null;
+            }
+
+            // Return in E164 format (+201xxxxxxxxx)
+            return $phoneUtil->format($numberProto, PhoneNumberFormat::E164);
+
+        } catch (NumberParseException $e) {
+            Log::warning('Phone normalization failed', [
+                'phone' => $phoneNumber,
+                'country_id' => $countryId,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Get country ISO code from country ID
+     */
+    private function getCountryISOCode(?int $countryId): string
+    {
+        if (!$countryId) {
+            return 'EG'; // Default to Egypt
+        }
+
+        $country = \App\Models\Country::find($countryId);
+        return $country?->iso_code ?? 'EG';
+    }
+
+    /**
+     * Validate if phone number format is correct
+     */
+    public function validatePhoneFormat(string $phoneNumber, ?int $countryId = null): bool
+    {
+        try {
+            $phoneUtil = PhoneNumberUtil::getInstance();
+            $countryISO = $this->getCountryISOCode($countryId);
+            $numberProto = $phoneUtil->parse($phoneNumber, $countryISO);
+            return $phoneUtil->isValidNumber($numberProto);
+        } catch (NumberParseException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Create a new contact
      * @throws \Throwable
      */
     public function createContact(User $user, array $data): Contact
     {
         return DB::transaction(function () use ($user, $data) {
+            // Normalize phone number if not already normalized
+            if (!empty($data['phone_number']) && !str_starts_with($data['phone_number'], '+')) {
+                $normalized = $this->normalizePhoneNumber(
+                    $data['phone_number'],
+                    $data['country_id'] ?? null
+                );
+
+                if ($normalized) {
+                    $data['phone_number'] = $normalized;
+                }
+            }
+
             $contact = Contact::create([
                 'user_id' => $user->id,
                 'first_name' => $data['first_name'],
@@ -56,6 +137,21 @@ readonly class ContactService
     public function updateContact(Contact $contact, array $data): Contact
     {
         return DB::transaction(function () use ($contact, $data) {
+            // Normalize phone number if changed and not already normalized
+            if (!empty($data['phone_number']) &&
+                $data['phone_number'] !== $contact->phone_number &&
+                !str_starts_with($data['phone_number'], '+')) {
+
+                $normalized = $this->normalizePhoneNumber(
+                    $data['phone_number'],
+                    $data['country_id'] ?? $contact->country_id
+                );
+
+                if ($normalized) {
+                    $data['phone_number'] = $normalized;
+                }
+            }
+
             $contact->update([
                 'first_name' => $data['first_name'] ?? $contact->first_name,
                 'last_name' => $data['last_name'] ?? $contact->last_name,
@@ -98,11 +194,71 @@ readonly class ContactService
     }
 
     /**
+     * Check if phone number is duplicate
+     */
+    public function isDuplicate(
+        User $user,
+        string $phoneNumber,
+        ?int $excludeContactId = null
+    ): bool {
+        // Normalize the phone number for comparison
+        $normalized = $this->normalizePhoneNumber($phoneNumber);
+        if (!$normalized) {
+            $normalized = $phoneNumber;
+        }
+
+        $query = Contact::forUser($user)
+            ->where('phone_number', $normalized);
+
+        if ($excludeContactId) {
+            $query->where('id', '!=', $excludeContactId);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Sync tags for a contact
+     */
+    private function syncTags(Contact $contact, array $tagIds): void
+    {
+        // Get old tag IDs before sync
+        $oldTagIds = $contact->tags->pluck('id')->toArray();
+
+        // Sync tags
+        $contact->tags()->sync($tagIds);
+
+        // Update counts for old and new tags
+        $affectedTagIds = array_unique(array_merge($oldTagIds, $tagIds));
+        foreach ($affectedTagIds as $tagId) {
+            $tag = ContactTag::find($tagId);
+            if ($tag) {
+                $tag->updateContactsCount();
+            }
+        }
+    }
+
+    /**
      * Validate WhatsApp number using Go API
+     * Only validates if user has an active WhatsApp session
      */
     public function validateWhatsAppNumber(User $user, Contact $contact): bool
     {
         try {
+            // Check if user has an active WhatsApp session
+            $hasActiveSession = \App\Models\WhatsAppSession::where('user_id', $user->id)
+                ->where('status', 'connected')
+                ->where('is_active', true)
+                ->exists();
+
+            if (!$hasActiveSession) {
+                Log::info('Skipping WhatsApp validation - no active session', [
+                    'user_id' => $user->id,
+                    'contact_id' => $contact->id,
+                ]);
+                return false;
+            }
+
             // Check usage limits
             if (!$this->usageTracking->canValidateContact($user)) {
                 Log::warning('Contact validation limit reached', [
@@ -129,11 +285,10 @@ readonly class ContactService
             ]);
 
             // Track usage
-            if ($isValid) {
-                $this->usageTracking->trackContactValidated($user);
-            }
+            $this->usageTracking->trackContactValidation($user);
 
             return $isValid;
+
         } catch (\Exception $e) {
             Log::error('WhatsApp validation failed', [
                 'user_id' => $user->id,
@@ -150,32 +305,19 @@ readonly class ContactService
      */
     public function bulkValidateWhatsApp(User $user, array $contactIds): array
     {
-        $contacts = Contact::whereIn('id', $contactIds)
-            ->forUser($user)
-            ->get();
-
         $results = [
-            'total' => $contacts->count(),
             'valid' => 0,
             'invalid' => 0,
-            'errors' => [],
         ];
 
-        foreach ($contacts as $contact) {
-            try {
-                $isValid = $this->validateWhatsAppNumber($user, $contact);
+        $contacts = Contact::forUser($user)
+            ->whereIn('id', $contactIds)
+            ->get();
 
-                if ($isValid) {
-                    $results['valid']++;
-                } else {
-                    $results['invalid']++;
-                }
-            } catch (\Exception $e) {
-                $results['errors'][] = [
-                    'contact_id' => $contact->id,
-                    'name' => $contact->full_name,
-                    'error' => $e->getMessage(),
-                ];
+        foreach ($contacts as $contact) {
+            if ($this->validateWhatsAppNumber($user, $contact)) {
+                $results['valid']++;
+            } else {
                 $results['invalid']++;
             }
         }
@@ -184,39 +326,13 @@ readonly class ContactService
     }
 
     /**
-     * Sync contact tags
+     * Get all contacts for a user
      */
-    private function syncTags(Contact $contact, array $tagIds): void
+    public function getAll(User $user)
     {
-        // Get old tags before sync
-        $oldTags = $contact->tags()->pluck('contact_tags.id')->toArray();
-
-        // Sync tags
-        $contact->tags()->sync($tagIds);
-
-        // Update counts for affected tags
-        $affectedTagIds = array_unique(array_merge($oldTags, $tagIds));
-
-        foreach ($affectedTagIds as $tagId) {
-            $tag = ContactTag::find($tagId);
-            if ($tag) {
-                $tag->updateContactsCount();
-            }
-        }
-    }
-
-    /**
-     * Check if phone number is duplicate for user
-     */
-    public function isDuplicate(User $user, string $phoneNumber, ?int $excludeContactId = null): bool
-    {
-        $query = Contact::forUser($user)
-            ->where('phone_number', $phoneNumber);
-
-        if ($excludeContactId) {
-            $query->where('id', '!=', $excludeContactId);
-        }
-
-        return $query->exists();
+        return Contact::forUser($user)
+            ->with(['tags', 'country'])
+            ->latest()
+            ->paginate(20);
     }
 }

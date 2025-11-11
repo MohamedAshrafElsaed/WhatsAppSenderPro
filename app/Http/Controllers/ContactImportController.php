@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactImport;
 use App\Models\ContactTag;
+use App\Models\Country;
 use App\Services\ContactImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,65 +20,65 @@ class ContactImportController extends Controller
     /**
      * Display import history
      */
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $user = $request->user();
+        $user = auth()->user();
 
         $imports = ContactImport::forUser($user)
-            ->latest()
-            ->paginate(20);
+            ->orderBy('id', 'desc')  // Changed from created_at to id
+            ->paginate(10);
 
-        return Inertia::render('contacts/Import', [
+        $tags = ContactTag::forUser($user)
+            ->orderBy('name')
+            ->get(['id', 'name', 'color']);
+
+        $countries = Country::active()
+            ->orderBy('name_en')
+            ->get(['id', 'name_en', 'name_ar', 'phone_code', 'iso_code']);
+
+        return Inertia::render('contacts/imports/Index', [
             'imports' => $imports,
-            'tags' => ContactTag::forUser($user)->orderBy('name')->get(['id', 'name', 'color']),
+            'tags' => $tags,
+            'countries' => $countries,
         ]);
     }
 
     /**
-     * Handle file upload and parsing
+     * Upload and parse import file
      */
     public function upload(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'file' => 'required|file|mimes:csv,xlsx,xls|max:10240',
         ]);
 
         $user = $request->user();
-        $file = $request->file('file');
-        $filename = $file->getClientOriginalName();
-        $extension = $file->getClientOriginalExtension();
-
-        // Store file
-        $path = $file->store('imports', 'local');
 
         try {
-            // Parse file
-            $fileType = in_array($extension, ['xlsx', 'xls']) ? 'excel' : 'csv';
-            $parseResult = $this->importService->parseFile($path, $fileType);
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('imports', $filename, 'local');
+
+            // Parse file to get preview
+            $fileType = $file->getClientOriginalExtension();
+            $preview = $this->importService->parseFile($path, $fileType);
 
             // Create import record
             $import = ContactImport::create([
                 'user_id' => $user->id,
                 'filename' => $filename,
                 'file_path' => $path,
+                'file_type' => $fileType,
+                'total_rows' => $preview['total_rows'],
                 'status' => 'pending',
-                'total_rows' => $parseResult['total_rows'],
             ]);
 
-            return back()->with([
-                'import_preview' => [
-                    'id' => $import->id,
-                    'filename' => $filename,
-                    'headers' => $parseResult['headers'],
-                    'preview' => $parseResult['preview'],
-                    'total_rows' => $parseResult['total_rows'],
-                ],
+            // Share the preview data using Inertia's share method
+            return redirect()->route('dashboard.contacts.imports.index')->with([
+                'import_preview' => array_merge($preview, ['import_id' => $import->id]),
             ]);
 
         } catch (\Exception $e) {
-            // Clean up file
-            Storage::delete($path);
-
             return back()->withErrors([
                 'file' => trans('imports.errors.parse_failed') . ': ' . $e->getMessage(),
             ]);
@@ -97,6 +98,7 @@ class ContactImportController extends Controller
             'column_mapping.phone_number' => 'required',
             'validate_whatsapp' => 'boolean',
             'tag_id' => 'nullable|exists:contact_tags,id',
+            'default_country_id' => 'nullable|exists:countries,id',
         ]);
 
         $user = $request->user();
@@ -107,19 +109,21 @@ class ContactImportController extends Controller
                 $import,
                 $validated['column_mapping'],
                 $validated['validate_whatsapp'] ?? false,
-                $validated['tag_id'] ?? null
+                $validated['tag_id'] ?? null,
+                $validated['default_country_id'] ?? null
             );
 
-            return back()->with([
+            // Redirect with import summary data
+            return redirect()->route('dashboard.contacts.imports.index')->with([
                 'import_summary' => [
                     'import_id' => $import->id,
                     'total' => $results['total'],
                     'valid' => $results['valid'],
                     'invalid' => $results['invalid'],
                     'duplicates' => $results['duplicates'],
+                    'phone_normalized' => $results['phone_normalized'],
                     'errors' => $results['errors'],
                 ],
-                'success' => trans('imports.messages.completed_successfully'),
             ]);
 
         } catch (\Exception $e) {
@@ -156,5 +160,26 @@ class ContactImportController extends Controller
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', 'attachment; filename="contacts_template.csv"');
+    }
+
+    /**
+     * Get import progress (for polling)
+     */
+    public function progress(Request $request, ContactImport $import)
+    {
+        $this->authorize('view', $import);
+
+        $progressService = app(\App\Services\ImportProgressService::class);
+        $progress = $progressService->getProgress($import->id);
+
+        return response()->json($progress ?? [
+            'total' => 0,
+            'processed' => 0,
+            'valid' => 0,
+            'invalid' => 0,
+            'duplicates' => 0,
+            'current_row' => 0,
+            'status' => 'unknown',
+        ]);
     }
 }
