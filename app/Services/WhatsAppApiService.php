@@ -19,6 +19,27 @@ class WhatsAppApiService
     }
 
     /**
+     * Send a simple text message
+     * @throws Exception
+     */
+    public function sendMessage(User $user, string $sessionId, string $to, string $message): array
+    {
+        return $this->makeRequest('post', "/api/v1/sessions/{$sessionId}/send", $user, [
+            'to' => $to,
+            'message' => $message,
+        ]);
+    }
+
+    /**
+     * Send advanced message (with media support)
+     * @throws Exception
+     */
+    public function sendAdvancedMessage(User $user, string $sessionId, array $payload): array
+    {
+        return $this->makeRequest('post', "/api/v1/sessions/{$sessionId}/send-advanced", $user, $payload);
+    }
+
+    /**
      * Create a new WhatsApp session
      * @throws Exception
      */
@@ -27,49 +48,6 @@ class WhatsAppApiService
         return $this->makeRequest('post', '/api/v1/sessions', $user, [
             'session_name' => $sessionName,
         ]);
-    }
-
-    /**
-     * Make authenticated request to WhatsApp Go API
-     * @throws Exception
-     */
-    private function makeRequest(string $method, string $endpoint, User $user, array $data = [])
-    {
-        $token = $this->generateToken($user);
-
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => "Bearer {$token}",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-            ])->$method("{$this->baseUrl}{$endpoint}", $data);
-
-            if (!$response->successful()) {
-                Log::error('WhatsApp API Error', [
-                    'endpoint' => $endpoint,
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-            }
-
-            return $response->json();
-        } catch (Exception $e) {
-
-            Log::error('WhatsApp API Exception', [
-                'endpoint' => $endpoint,
-                'error' => $e->getMessage(),
-            ]);
-
-            throw $e;
-        }
-    }
-
-    /**
-     * Generate JWT token for API authentication
-     */
-    private function generateToken(User $user): string
-    {
-        return $user->generateJWT();
     }
 
     /**
@@ -145,5 +123,47 @@ class WhatsAppApiService
         $token = $this->generateToken($user);
         $wsUrl = str_replace(['http://', 'https://'], ['ws://', 'wss://'], $this->baseUrl);
         return "{$wsUrl}/api/v1/sessions/{$sessionId}/events?token={$token}";
+    }
+
+    /**
+     * Make authenticated request to WhatsApp Go API
+     * @throws Exception
+     */
+    public function makeRequest(string $method, string $endpoint, User $user, array $data = [])
+    {
+        $token = $this->generateToken($user);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => "Bearer {$token}",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->$method("{$this->baseUrl}{$endpoint}", $data);
+
+            if (!$response->successful()) {
+                Log::error('WhatsApp API Error', [
+                    'endpoint' => $endpoint,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            Log::error('WhatsApp API Exception', [
+                'endpoint' => $endpoint,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Generate JWT token for API authentication
+     */
+    private function generateToken(User $user): string
+    {
+        return $user->generateJWT();
     }
 }

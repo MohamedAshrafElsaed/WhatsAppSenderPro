@@ -288,4 +288,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ContactImport::class);
     }
+
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
+    }
 }

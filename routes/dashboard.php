@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactImportController;
 use App\Http\Controllers\ContactTagController;
@@ -16,7 +17,6 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')
     // Dashboard Home
     Route::get('/', [DashboardController::class, 'index'])->name('index');
 
-    Route::resource('templates', TemplateController::class)->names('templates');
 
     // ==================== WHATSAPP ====================
     Route::prefix('whatsapp')->name('whatsapp.')->group(function () {
@@ -59,18 +59,46 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')
 
         // Bulk Actions
         Route::post('bulk-validate', [ContactController::class, 'bulkValidate'])->name('bulk-validate');
+
+
+
     });
+
+    // ==================== TEMPLATES  ====================
+    Route::resource('templates', TemplateController::class)->names('templates');
 
     // ==================== CONTACT TAGS ====================
     Route::resource('contact-tags', ContactTagController::class)
         ->except(['show'])
         ->names('contact-tags');
 
-    // ==================== CAMPAIGNS ====================
-    // TODO: Add campaign routes when ready
-    // Route::resource('campaigns', CampaignController::class);
 
-    // ==================== TEMPLATES ====================
-    // TODO: Add template routes when ready
-    // Route::resource('templates', TemplateController::class);
+    // ==================== CAMPAIGNS ====================
+    Route::prefix('campaigns')->name('campaigns.')->group(function () {
+        Route::get('/', [CampaignController::class, 'index'])->name('index');
+        Route::get('create', [CampaignController::class, 'create'])->name('create');
+        Route::post('/', [CampaignController::class, 'store'])->name('store');
+        Route::get('{campaign}', [CampaignController::class, 'show'])->name('show');
+        Route::get('{campaign}/edit', [CampaignController::class, 'edit'])->name('edit');
+        Route::put('{campaign}', [CampaignController::class, 'update'])->name('update');
+        Route::delete('{campaign}', [CampaignController::class, 'destroy'])->name('destroy');
+
+        // Campaign actions
+        Route::post('{campaign}/pause', [CampaignController::class, 'pause'])->name('pause');
+        Route::post('{campaign}/resume', [CampaignController::class, 'resume'])->name('resume');
+        Route::post('{campaign}/send', [CampaignController::class, 'send'])->name('send');
+
+        // Campaign results
+        Route::get('{campaign}/results', [CampaignController::class, 'results'])->name('results');
+        Route::get('{campaign}/export', [CampaignController::class, 'export'])->name('export');
+    });
+
+    // ==================== REPORTS & ANALYTICS ====================
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('contacts', [ReportController::class, 'contacts'])->name('contacts');
+        Route::get('campaigns', [ReportController::class, 'campaigns'])->name('campaigns');
+        Route::get('usage', [ReportController::class, 'usage'])->name('usage');
+        Route::get('export', [ReportController::class, 'export'])->name('export');
+    });
 });
