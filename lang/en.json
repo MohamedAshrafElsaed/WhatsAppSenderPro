@@ -17,8 +17,11 @@
         "contacts": "Contacts",
         "templates": "Templates",
         "subscription": "Subscription",
-        "settings": "Settings"
+        "settings": "Settings",
+        "reports": "Reports"
+
     },
+
     "whatsapp": {
         "title": "WhatsApp Connection",
         "subtitle": "Connect your WhatsApp numbers to start sending campaigns",
@@ -389,17 +392,29 @@
     },
     "reports": {
         "title": "Reports & Analytics",
-        "overview": "Overview",
-        "contacts_report": "Contacts Report",
-        "campaigns_report": "Campaigns Report",
-        "usage_report": "Usage Report",
-        "export": "Export Report",
-
-        "quick_metrics": "Quick Metrics",
-        "total_contacts": "Total Contacts",
+        "description": "Comprehensive analytics and insights for your WhatsApp campaigns",
+        "date_range": "Date Range",
+        "start_date": "Start Date",
+        "end_date": "End Date",
         "total_campaigns": "Total Campaigns",
-        "messages_this_month": "Messages This Month",
-        "success_rate": "Overall Success Rate"
+        "total_messages": "Total Messages",
+        "total_contacts": "Total Contacts",
+        "average_success_rate": "Avg Success Rate",
+        "active": "active",
+        "completed": "completed",
+        "messages_sent": "Messages sent",
+        "in_database": "In your database",
+        "delivery_success": "Delivery success rate",
+        "campaign_performance": "Campaign Performance",
+        "recipients": "recipients",
+        "delivered": "delivered",
+        "failed": "failed",
+        "success": "Success",
+        "no_campaigns": "No campaigns in this period",
+        "message_trends": "Message Delivery Trends",
+        "no_data": "No data available for this period",
+        "contact_growth": "Contact Growth",
+        "new_contacts": "new contacts"
     },
     "onboarding": {
         "progress": "Step",
@@ -435,6 +450,7 @@
         }
     },
     "common": {
+        "apply": "Apply",
         "view": "View",
         "actions": "Actions",
         "select": "Select",

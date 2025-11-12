@@ -6,6 +6,7 @@ use App\Http\Controllers\ContactImportController;
 use App\Http\Controllers\ContactTagController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\WhatsAppSessionController;
 use Illuminate\Support\Facades\Route;

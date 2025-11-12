@@ -17,6 +17,7 @@
         "contacts": "جهات الاتصال",
         "templates": "القوالب",
         "subscription": "الاشتراك",
+        "reports": "التقارير",
         "settings": "الإعدادات"
     },
     "whatsapp": {
@@ -330,7 +331,30 @@
         "analytics": "التحليلات"
     },
     "reports": {
-        "title": "التقارير"
+        "title": "التقارير والتحليلات",
+        "description": "تحليلات ورؤى شاملة لحملات واتساب الخاصة بك",
+        "date_range": "نطاق التاريخ",
+        "start_date": "تاريخ البداية",
+        "end_date": "تاريخ النهاية",
+        "total_campaigns": "إجمالي الحملات",
+        "total_messages": "إجمالي الرسائل",
+        "total_contacts": "إجمالي جهات الاتصال",
+        "average_success_rate": "متوسط ​​معدل النجاح",
+        "active": "نشط",
+        "completed": "مكتمل",
+        "messages_sent": "الرسائل المرسلة",
+        "in_database": "في قاعدة البيانات الخاصة بك",
+        "delivery_success": "معدل نجاح التسليم",
+        "campaign_performance": "أداء الحملة",
+        "recipients": "المستلمون",
+        "delivered": "تم التسليم",
+        "failed": "فشل",
+        "success": "النجاح",
+        "no_campaigns": "لا توجد حملات في هذه الفترة",
+        "message_trends": "اتجاهات تسليم الرسائل",
+        "no_data": "لا توجد بيانات متاحة لهذه الفترة",
+        "contact_growth": "نمو جهات الاتصال",
+        "new_contacts": "جهات اتصال جديدة"
     },
     "feature_requests": {
         "title": "طلبات الميزات",
@@ -482,6 +506,7 @@
         }
     },
     "common": {
+        "apply": "تطبيق",
         "view": "عرض",
         "actions": "الإجراءات",
         "select": "اختر",

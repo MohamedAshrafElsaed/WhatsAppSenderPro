@@ -17,6 +17,8 @@ import { index as dashboard } from '@/routes/dashboard';
 import { index as contactsIndex } from '@/routes/dashboard/contacts';
 import { index as templatesIndex } from '@/routes/dashboard/templates';
 import { edit as settingsProfile } from '@/routes/dashboard/settings/profile';
+import { index as campaignsIndex } from '@/routes/dashboard/campaigns';
+import { index as reportsIndex } from '@/routes/dashboard/reports';
 import { index as subscriptionIndex } from '@/routes/subscription';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
@@ -26,6 +28,7 @@ import {
     LayoutGrid,
     MessageSquare,
     Settings,
+    BarChart3,
     Users,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
@@ -51,7 +54,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: t('nav.campaigns', 'Campaigns'),
-        href: '#',
+        href: campaignsIndex(),
         icon: MessageSquare,
     },
     {
@@ -63,6 +66,11 @@ const mainNavItems: NavItem[] = [
         title: t('nav.templates', 'Templates'),
         href: templatesIndex(),
         icon: FileText,
+    },
+    {
+        title: t('nav.reports', 'Reports'),
+        href: reportsIndex(),
+        icon: BarChart3,
     },
     {
         title: t('nav.subscription', 'Subscription'),
