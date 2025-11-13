@@ -79,6 +79,8 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')
         Route::get('/', [CampaignController::class, 'index'])->name('index');
         Route::get('create', [CampaignController::class, 'create'])->name('create');
         Route::post('/', [CampaignController::class, 'store'])->name('store');
+        Route::get('/contacts/search', [CampaignController::class, 'searchContacts'])->name('contacts.search');
+        Route::post('/contacts/select-all', [CampaignController::class, 'selectAllContacts'])->name('contacts.select-all');
         Route::get('{campaign}', [CampaignController::class, 'show'])->name('show');
         Route::get('{campaign}/edit', [CampaignController::class, 'edit'])->name('edit');
         Route::put('{campaign}', [CampaignController::class, 'update'])->name('update');

@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import CampaignProgressBar from '@/components/CampaignProgressBar.vue';
 import CampaignStatusBadge from '@/components/CampaignStatusBadge.vue';
 import Heading from '@/components/Heading.vue';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Dialog,
     DialogContent,
@@ -29,12 +27,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { create, destroy, edit, pause, resume, results, send, show } from '@/routes/dashboard/campaigns';
 import { index as dashboard } from '@/routes/dashboard';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import {
     AlertCircle,
     Eye,
@@ -95,8 +101,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const searchQuery = ref(props.filters.search || '');
-const statusFilter = ref(props.filters.status || '');
+const statusFilter = ref(props.filters.status || 'all');
 const confirmDelete = ref<Campaign | null>(null);
+const selectedCampaigns = ref<number[]>([]);
 
 const usagePercentage = computed(() => {
     if (props.usage.limit === 'unlimited' || props.usage.limit === 0) return 0;
@@ -110,19 +117,12 @@ const usageColor = computed(() => {
     return 'bg-[#25D366]';
 });
 
-const formatLimit = (limit: number | string): string => {
-    if (limit === 'unlimited' || limit === '∞') {
-        return t('subscription.unlimited', 'Unlimited');
-    }
-    return limit.toString();
-};
-
 const applyFilters = () => {
     router.get(
         location.pathname,
         {
             search: searchQuery.value || undefined,
-            status: statusFilter.value || undefined,
+            status: statusFilter.value === 'all' ? undefined : statusFilter.value,
         },
         {
             preserveState: true,
@@ -131,30 +131,51 @@ const applyFilters = () => {
     );
 };
 
+const clearFilters = () => {
+    searchQuery.value = '';
+    statusFilter.value = 'all';
+    applyFilters();
+};
+
+const toggleSelectAll = () => {
+    if (selectedCampaigns.value.length === props.campaigns.data.length) {
+        selectedCampaigns.value = [];
+    } else {
+        selectedCampaigns.value = props.campaigns.data.map((c) => c.id);
+    }
+};
+
+const toggleSelect = (campaignId: number) => {
+    const index = selectedCampaigns.value.indexOf(campaignId);
+    if (index > -1) {
+        selectedCampaigns.value.splice(index, 1);
+    } else {
+        selectedCampaigns.value.push(campaignId);
+    }
+};
+
+const isSelected = (campaignId: number) => selectedCampaigns.value.includes(campaignId);
+const allSelected = computed(
+    () =>
+        props.campaigns.data.length > 0 &&
+        selectedCampaigns.value.length === props.campaigns.data.length,
+);
+
 const handlePause = (campaign: Campaign) => {
     router.post(pause(campaign.id), {}, {
         preserveScroll: true,
-        onSuccess: () => {
-            // Toast will show from session flash
-        },
     });
 };
 
 const handleResume = (campaign: Campaign) => {
     router.post(resume(campaign.id), {}, {
         preserveScroll: true,
-        onSuccess: () => {
-            // Toast will show from session flash
-        },
     });
 };
 
 const handleSend = (campaign: Campaign) => {
     router.post(send(campaign.id), {}, {
         preserveScroll: true,
-        onSuccess: () => {
-            // Toast will show from session flash
-        },
     });
 };
 
@@ -174,6 +195,14 @@ const formatDate = (date: string) => {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
+    });
+};
+
+const formatDateTime = (date: string) => {
+    return new Date(date).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
     });
@@ -184,23 +213,16 @@ const formatDate = (date: string) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head :title="t('campaigns.title', 'Campaigns')" />
 
-        <div :class="isRTL() ? 'text-right' : 'text-left'" class="space-y-6">
+        <div :class="isRTL() ? 'text-right' : 'text-left'" class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
             <!-- Header -->
-            <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex items-center justify-between">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <Heading
                     :description="t('campaigns.description', 'Create and manage your WhatsApp bulk messaging campaigns')"
                     :title="t('campaigns.title', 'Campaigns')"
-                >
-                    <template #icon>
-                        <div class="flex items-center justify-center rounded-lg bg-[#25D366] p-2">
-                            <MessageSquare class="h-5 w-5 text-white" />
-                        </div>
-                    </template>
-                </Heading>
-
-                <Button as-child>
+                />
+                <Button class="bg-[#25D366] hover:bg-[#128C7E]" as-child>
                     <Link :href="create()">
-                        <Plus class="mr-2 h-4 w-4" />
+                        <Plus :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                         {{ t('campaigns.create', 'Create Campaign') }}
                     </Link>
                 </Button>
@@ -210,219 +232,279 @@ const formatDate = (date: string) => {
             <Alert v-if="usagePercentage >= 70" class="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
                 <AlertCircle class="h-4 w-4 text-yellow-600" />
                 <AlertDescription class="text-yellow-800 dark:text-yellow-200">
-                    {{ t('campaigns.usage_warning', "You've used {{percentage}}% of your monthly message quota.", { percentage: usagePercentage }) }}
-                    {{ t('campaigns.remaining_messages', '{{remaining}} messages remaining.', { remaining: usage.remaining }) }}
+                    <span>{{ t('campaigns.usage_warning', `You have used ${usagePercentage}% of your monthly message quota.`) }}</span>
+                    <span class="ml-1">{{ t('campaigns.remaining_messages', `${usage.remaining} messages remaining.`) }}</span>
                 </AlertDescription>
             </Alert>
 
             <!-- Filters -->
-            <Card>
-                <CardContent class="pt-6">
-                    <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex gap-4">
-                        <div class="relative flex-1">
-                            <Search
-                                :class="isRTL() ? 'right-3' : 'left-3'"
-                                class="absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                            />
-                            <Input
-                                v-model="searchQuery"
-                                :class="isRTL() ? 'pr-10' : 'pl-10'"
-                                :placeholder="t('campaigns.search', 'Search campaigns...')"
-                                @keyup.enter="applyFilters"
-                            />
-                        </div>
+            <div class="flex flex-col gap-4 lg:flex-row">
+                <!-- Search -->
+                <div class="relative flex-1">
+                    <Search
+                        :class="isRTL() ? 'right-3' : 'left-3'"
+                        class="absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <Input
+                        v-model="searchQuery"
+                        :class="isRTL() ? 'pr-10' : 'pl-10'"
+                        :placeholder="t('campaigns.search', 'Search campaigns...')"
+                        class="focus-visible:ring-[#25D366]"
+                        @keyup.enter="applyFilters"
+                    />
+                </div>
 
-                        <Select v-model="statusFilter" @update:model-value="applyFilters">
-                            <SelectTrigger class="w-48">
-                                <SelectValue :placeholder="t('campaigns.all_statuses', 'All Statuses')" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="">{{ t('campaigns.all_statuses', 'All Statuses') }}</SelectItem>
-                                <SelectItem value="draft">{{ t('campaigns.status.draft', 'Draft') }}</SelectItem>
-                                <SelectItem value="scheduled">{{ t('campaigns.status.scheduled', 'Scheduled') }}</SelectItem>
-                                <SelectItem value="running">{{ t('campaigns.status.running', 'Running') }}</SelectItem>
-                                <SelectItem value="paused">{{ t('campaigns.status.paused', 'Paused') }}</SelectItem>
-                                <SelectItem value="completed">{{ t('campaigns.status.completed', 'Completed') }}</SelectItem>
-                                <SelectItem value="failed">{{ t('campaigns.status.failed', 'Failed') }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </CardContent>
-            </Card>
+                <!-- Status Filter -->
+                <div class="flex flex-wrap gap-2">
+                    <Select v-model="statusFilter" @update:model-value="applyFilters">
+                        <SelectTrigger class="w-[180px]">
+                            <SelectValue :placeholder="t('campaigns.all_statuses', 'All Statuses')" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">{{ t('campaigns.all_statuses', 'All Statuses') }}</SelectItem>
+                            <SelectItem value="draft">{{ t('campaigns.status.draft', 'Draft') }}</SelectItem>
+                            <SelectItem value="scheduled">{{ t('campaigns.status.scheduled', 'Scheduled') }}</SelectItem>
+                            <SelectItem value="running">{{ t('campaigns.status.running', 'Running') }}</SelectItem>
+                            <SelectItem value="paused">{{ t('campaigns.status.paused', 'Paused') }}</SelectItem>
+                            <SelectItem value="completed">{{ t('campaigns.status.completed', 'Completed') }}</SelectItem>
+                            <SelectItem value="failed">{{ t('campaigns.status.failed', 'Failed') }}</SelectItem>
+                        </SelectContent>
+                    </Select>
 
-            <!-- Campaigns List -->
-            <div class="grid gap-4">
-                <Card
-                    v-for="campaign in campaigns.data"
-                    :key="campaign.id"
-                    class="transition-shadow hover:shadow-md"
-                >
-                    <CardHeader>
-                        <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex items-start justify-between">
-                            <div :class="isRTL() ? 'text-right' : 'text-left'" class="flex-1">
-                                <CardTitle class="text-lg">{{ campaign.name }}</CardTitle>
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    <CampaignStatusBadge :status="campaign.status" />
-                                    <Badge v-if="campaign.template" variant="outline">
+                    <Button size="sm" variant="ghost" @click="clearFilters">
+                        {{ t('common.clear', 'Clear') }}
+                    </Button>
+                </div>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div
+                v-if="selectedCampaigns.length > 0"
+                class="flex items-center justify-between rounded-lg bg-[#25D366]/10 border border-[#25D366]/20 p-4"
+            >
+                <span class="text-sm font-medium">
+                    {{ t('campaigns.selected', `${selectedCampaigns.length} campaigns selected`) }}
+                </span>
+                <div class="flex gap-2">
+                    <Button size="sm" variant="destructive">
+                        {{ t('campaigns.delete_selected', 'Delete Selected') }}
+                    </Button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="rounded-lg border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'" class="w-12">
+                                <input
+                                    :checked="allSelected"
+                                    class="rounded border-gray-300 text-[#25D366] focus:ring-[#25D366]"
+                                    type="checkbox"
+                                    @change="toggleSelectAll"
+                                />
+                            </TableHead>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                {{ t('campaigns.fields.name', 'Name') }}
+                            </TableHead>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                {{ t('campaigns.fields.status', 'Status') }}
+                            </TableHead>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                {{ t('campaigns.fields.recipients', 'Recipients') }}
+                            </TableHead>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                {{ t('campaigns.fields.progress', 'Progress') }}
+                            </TableHead>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                {{ t('campaigns.fields.success_rate', 'Success Rate') }}
+                            </TableHead>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                {{ t('campaigns.fields.date', 'Date') }}
+                            </TableHead>
+                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                {{ t('common.actions', 'Actions') }}
+                            </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <!-- Empty State -->
+                        <TableRow v-if="campaigns.data.length === 0">
+                            <TableCell class="py-12 text-center" colspan="8">
+                                <div class="flex flex-col items-center gap-2">
+                                    <MessageSquare class="h-12 w-12 text-muted-foreground" />
+                                    <h3 class="text-lg font-semibold">
+                                        {{ t('campaigns.no_campaigns', 'No campaigns yet') }}
+                                    </h3>
+                                    <p class="text-sm text-muted-foreground">
+                                        {{ t('campaigns.create_first', 'Get started by creating your first campaign') }}
+                                    </p>
+                                    <Button class="mt-4 bg-[#25D366] hover:bg-[#128C7E]" as-child>
+                                        <Link :href="create()">
+                                            <Plus :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            {{ t('campaigns.create', 'Create Campaign') }}
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+
+                        <!-- Campaign Rows -->
+                        <TableRow v-for="campaign in campaigns.data" :key="campaign.id">
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                                <input
+                                    :checked="isSelected(campaign.id)"
+                                    class="rounded border-gray-300 text-[#25D366] focus:ring-[#25D366]"
+                                    type="checkbox"
+                                    @change="toggleSelect(campaign.id)"
+                                />
+                            </TableCell>
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="font-medium">
+                                <div>
+                                    {{ campaign.name }}
+                                    <Badge v-if="campaign.template" variant="outline" class="ml-2">
                                         {{ campaign.template.name }}
                                     </Badge>
+                                </div>
+                            </TableCell>
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                                <CampaignStatusBadge :status="campaign.status" />
+                            </TableCell>
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                                <div class="flex items-center gap-2">
                                     <Badge variant="secondary">
-                                        {{ campaign.total_recipients }} {{ t('campaigns.recipients', 'recipients') }}
+                                        {{ campaign.total_recipients }}
                                     </Badge>
                                 </div>
-                            </div>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger as-child>
-                                    <Button variant="ghost" size="icon">
-                                        <MoreVertical class="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent :align="isRTL() ? 'end' : 'start'">
-                                    <DropdownMenuItem as-child>
-                                        <Link :href="show(campaign.id)">
-                                            <Eye class="mr-2 h-4 w-4" />
-                                            {{ t('common.view', 'View') }}
-                                        </Link>
-                                    </DropdownMenuItem>
-
-                                    <DropdownMenuItem v-if="campaign.status === 'draft'" as-child>
-                                        <Link :href="edit(campaign.id)">
-                                            {{ t('common.edit', 'Edit') }}
-                                        </Link>
-                                    </DropdownMenuItem>
-
-                                    <DropdownMenuItem
-                                        v-if="campaign.status === 'running'"
-                                        @click="handlePause(campaign)"
+                            </TableCell>
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                                <div class="flex items-center gap-2">
+                                    <Progress
+                                        :value="campaign.progress_percentage"
+                                        class="h-2 w-24"
+                                        :class="[
+                                            campaign.progress_percentage === 100 ? '[&>*]:bg-[#25D366]' :
+                                            campaign.progress_percentage > 0 ? '[&>*]:bg-yellow-500' :
+                                            '[&>*]:bg-gray-300'
+                                        ]"
+                                    />
+                                    <span class="text-sm text-muted-foreground">
+                                        {{ campaign.progress_percentage }}%
+                                    </span>
+                                </div>
+                            </TableCell>
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                                <div class="flex flex-col gap-1">
+                                    <Badge
+                                        :class="[
+                                            campaign.success_rate >= 80 ? 'bg-[#25D366]/10 text-[#25D366] border-[#25D366]/20' :
+                                            campaign.success_rate >= 60 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                        ]"
+                                        variant="outline"
                                     >
-                                        <Pause class="mr-2 h-4 w-4" />
-                                        {{ t('campaigns.actions.pause', 'Pause') }}
-                                    </DropdownMenuItem>
+                                        {{ campaign.success_rate }}%
+                                    </Badge>
+                                    <div class="text-xs text-muted-foreground">
+                                        <span class="text-[#25D366]">{{ campaign.messages_delivered }}</span> /
+                                        <span class="text-red-500">{{ campaign.messages_failed }}</span>
+                                    </div>
+                                </div>
+                            </TableCell>
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="text-sm text-muted-foreground">
+                                <div v-if="campaign.scheduled_at">
+                                    {{ t('campaigns.scheduled_for', 'Scheduled') }}<br>
+                                    {{ formatDateTime(campaign.scheduled_at) }}
+                                </div>
+                                <div v-else-if="campaign.started_at">
+                                    {{ t('campaigns.started_at', 'Started') }}<br>
+                                    {{ formatDateTime(campaign.started_at) }}
+                                </div>
+                                <div v-else>
+                                    {{ t('campaigns.created_at', 'Created') }}<br>
+                                    {{ formatDate(campaign.created_at) }}
+                                </div>
+                            </TableCell>
+                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger as-child>
+                                        <Button size="sm" variant="ghost">
+                                            <MoreVertical class="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent :align="isRTL() ? 'start' : 'end'">
+                                        <DropdownMenuItem as-child>
+                                            <Link :href="show(campaign.id)">
+                                                <Eye :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                                {{ t('common.view', 'View') }}
+                                            </Link>
+                                        </DropdownMenuItem>
 
-                                    <DropdownMenuItem
-                                        v-if="campaign.status === 'paused'"
-                                        @click="handleResume(campaign)"
-                                    >
-                                        <Play class="mr-2 h-4 w-4" />
-                                        {{ t('campaigns.actions.resume', 'Resume') }}
-                                    </DropdownMenuItem>
+                                        <DropdownMenuItem v-if="campaign.status === 'draft'" as-child>
+                                            <Link :href="edit(campaign.id)">
+                                                {{ t('common.edit', 'Edit') }}
+                                            </Link>
+                                        </DropdownMenuItem>
 
-                                    <DropdownMenuItem
-                                        v-if="['draft', 'scheduled', 'paused'].includes(campaign.status)"
-                                        @click="handleSend(campaign)"
-                                    >
-                                        <SendIcon class="mr-2 h-4 w-4" />
-                                        {{ t('campaigns.actions.send', 'Send Now') }}
-                                    </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            v-if="campaign.status === 'running'"
+                                            @click="handlePause(campaign)"
+                                        >
+                                            <Pause :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            {{ t('campaigns.actions.pause', 'Pause') }}
+                                        </DropdownMenuItem>
 
-                                    <DropdownMenuItem as-child>
-                                        <Link :href="results(campaign.id)">
-                                            {{ t('campaigns.actions.view_results', 'View Results') }}
-                                        </Link>
-                                    </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            v-if="campaign.status === 'paused'"
+                                            @click="handleResume(campaign)"
+                                        >
+                                            <Play :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            {{ t('campaigns.actions.resume', 'Resume') }}
+                                        </DropdownMenuItem>
 
-                                    <DropdownMenuItem
-                                        class="text-red-600"
-                                        @click="confirmDelete = campaign"
-                                    >
-                                        <Trash2 class="mr-2 h-4 w-4" />
-                                        {{ t('common.delete', 'Delete') }}
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </CardHeader>
+                                        <DropdownMenuItem
+                                            v-if="['draft', 'scheduled', 'paused'].includes(campaign.status)"
+                                            @click="handleSend(campaign)"
+                                        >
+                                            <SendIcon :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            {{ t('campaigns.actions.send', 'Send Now') }}
+                                        </DropdownMenuItem>
 
-                    <CardContent class="space-y-4">
-                        <!-- Progress -->
-                        <CampaignProgressBar
-                            :sent="campaign.messages_sent"
-                            :total="campaign.total_recipients"
-                        />
+                                        <DropdownMenuItem as-child>
+                                            <Link :href="results(campaign.id)">
+                                                {{ t('campaigns.actions.view_results', 'View Results') }}
+                                            </Link>
+                                        </DropdownMenuItem>
 
-                        <!-- Statistics -->
-                        <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-                            <div class="rounded-lg bg-muted p-3">
-                                <p class="text-xs text-muted-foreground">
-                                    {{ t('campaigns.stats.sent', 'Sent') }}
-                                </p>
-                                <p class="text-lg font-bold">{{ campaign.messages_sent }}</p>
-                            </div>
-
-                            <div class="rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-3">
-                                <p class="text-xs text-muted-foreground">
-                                    {{ t('campaigns.stats.delivered', 'Delivered') }}
-                                </p>
-                                <p class="text-lg font-bold text-[#25D366]">
-                                    {{ campaign.messages_delivered }}
-                                </p>
-                            </div>
-
-                            <div class="rounded-lg border border-red-200 bg-red-50 p-3 dark:bg-red-950">
-                                <p class="text-xs text-muted-foreground">
-                                    {{ t('campaigns.stats.failed', 'Failed') }}
-                                </p>
-                                <p class="text-lg font-bold text-red-600">
-                                    {{ campaign.messages_failed }}
-                                </p>
-                            </div>
-
-                            <div class="rounded-lg bg-muted p-3">
-                                <p class="text-xs text-muted-foreground">
-                                    {{ t('campaigns.stats.success_rate', 'Success Rate') }}
-                                </p>
-                                <p class="text-lg font-bold">{{ campaign.success_rate }}%</p>
-                            </div>
-                        </div>
-
-                        <!-- Dates -->
-                        <div :class="isRTL() ? 'text-right' : 'text-left'" class="text-sm text-muted-foreground">
-                            <span v-if="campaign.scheduled_at">
-                                {{ t('campaigns.scheduled_for', 'Scheduled for:') }} {{ formatDate(campaign.scheduled_at) }}
-                            </span>
-                            <span v-else-if="campaign.started_at">
-                                {{ t('campaigns.started_at', 'Started:') }} {{ formatDate(campaign.started_at) }}
-                            </span>
-                            <span v-else>
-                                {{ t('campaigns.created_at', 'Created:') }} {{ formatDate(campaign.created_at) }}
-                            </span>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <!-- Empty State -->
-                <Card v-if="campaigns.data.length === 0" class="py-12">
-                    <CardContent class="text-center">
-                        <MessageSquare class="mx-auto h-12 w-12 text-muted-foreground" />
-                        <h3 class="mt-4 text-lg font-semibold">
-                            {{ t('campaigns.no_campaigns', 'No campaigns yet') }}
-                        </h3>
-                        <p class="mt-2 text-sm text-muted-foreground">
-                            {{ t('campaigns.create_first', 'Get started by creating your first campaign') }}
-                        </p>
-                        <Button as-child class="mt-4">
-                            <Link :href="create()">
-                                <Plus class="mr-2 h-4 w-4" />
-                                {{ t('campaigns.create', 'Create Campaign') }}
-                            </Link>
-                        </Button>
-                    </CardContent>
-                </Card>
+                                        <DropdownMenuItem
+                                            class="text-destructive"
+                                            @click="confirmDelete = campaign"
+                                        >
+                                            <Trash2 :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            {{ t('common.delete', 'Delete') }}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
             </div>
 
             <!-- Pagination -->
-            <div v-if="campaigns.meta.last_page > 1" class="flex justify-center">
+            <div v-if="campaigns.meta && campaigns.meta.last_page > 1" class="flex justify-center">
                 <div class="flex gap-2">
                     <Button
                         v-for="link in campaigns.links"
                         :key="link.label"
                         :disabled="!link.url"
                         :variant="link.active ? 'default' : 'outline'"
+                        :class="link.active ? 'bg-[#25D366] hover:bg-[#128C7E]' : ''"
                         size="sm"
-                        @click="router.get(link.url)"
+                        @click="link.url && router.get(link.url)"
                     >
-                        {{ link.label }}
+                        <span v-html="link.label"></span>
                     </Button>
                 </div>
             </div>

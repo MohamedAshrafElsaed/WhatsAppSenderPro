@@ -332,6 +332,10 @@
         }
     },
     "campaigns": {
+        "placeholders_hint": "Use {first_name}, {last_name}, {phone} to personalize",
+        "contacts_selected": "contacts selected",
+        "search_contacts": "Search contacts...",
+        "no_contacts_found": "No contacts found",
         "title": "Campaigns",
         "create": "Create Campaign",
         "edit": "Edit Campaign",
@@ -354,7 +358,47 @@
             "completed": "Completed",
             "failed": "Failed"
         },
+        "step1_title": "Campaign Details",
+        "step2_title": "Select Recipients",
+        "step3_title": "Compose Message",
+        "step4_title": "Review & Confirm",
+        "create_description": "Create a new WhatsApp bulk messaging campaign",
+        "name_placeholder": "Enter campaign name",
+        "schedule_description": "Leave empty to send immediately",
+        "use_template": "Use Template",
+        "select_template_placeholder": "Select a template or write custom message",
+        "search_templates": "Search templates...",
+        "no_template_selected": "No template selected",
+        "select_message_type": "Select message type",
+        "search_type": "Search type...",
+        "message_placeholder": "Type your message here...",
+        "upload_media": "Upload Media",
+        "click_to_upload": "Click to upload",
+        "max_size": "Max size: 16MB",
+        "summary": "Campaign Summary",
+        "total_recipients": "Recipients",
+        "scheduled_for": "Scheduled",
+        "quota_usage": "Quota Usage",
+        "current_usage": "Current",
+        "after_campaign": "After Campaign",
+        "quota_exceeded": "This campaign exceeds your quota!",
+        "message_preview": "Message Preview",
+        "media_attached": "attached",
+        "create_campaign": "Create Campaign",
+        "search_contacts": "Search contacts...",
 
+        "type": {
+            "text": "Text Only",
+            "image": "Text + Image",
+            "video": "Text + Video",
+            "audio": "Audio",
+            "document": "Document"
+        },
+
+        "errors": {
+            "no_connected_session": "No Connected WhatsApp Session",
+            "no_connected_session_desc": "Please connect a WhatsApp session before creating a campaign."
+        },
         "actions": {
             "pause": "Pause Campaign",
             "resume": "Resume Campaign",
@@ -450,6 +494,8 @@
         }
     },
     "common": {
+        "select_all": "Select All",
+        "remove": "Remove",
         "apply": "Apply",
         "view": "View",
         "actions": "Actions",

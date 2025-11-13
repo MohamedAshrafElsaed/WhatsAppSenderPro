@@ -82,7 +82,7 @@ const createSession = async () => {
     creating.value = true;
 
     try {
-        const response = await fetch('/whatsapp/sessions', {
+        const response = await fetch('/dashboard/whatsapp/sessions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ const handleWebSocketMessage = (sessionId: string, message: any) => {
 const refreshSession = async (sessionId: string) => {
     try {
         const response = await fetch(
-            `/whatsapp/sessions/${sessionId}/refresh`,
+            `/dashboard/whatsapp/sessions/${sessionId}/refresh`,
             {
                 method: 'POST',
                 headers: {
@@ -221,7 +221,7 @@ const deleteSession = async (sessionId: string) => {
     }
 
     try {
-        const response = await fetch(`/whatsapp/sessions/${sessionId}`, {
+        const response = await fetch(`/dashboard/whatsapp/sessions/${sessionId}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN':

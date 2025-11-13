@@ -361,6 +361,72 @@
         "suggest_feature": "اقترح ميزة"
     },
     "campaigns": {
+        "placeholders_hint": "استخدم {first_name}, {last_name}, {phone} للتخصيص",
+        "contacts_selected": "جهات اتصال محددة",
+        "usage_warning": "لقد استخدمت {percentage}% من حصة الرسائل الشهرية الخاصة بك.",
+        "remaining_messages": "{count} رسالة متبقية.",
+        "search": "البحث في الحملات...",
+        "all_statuses": "جميع الحالات",
+        "delete_selected": "حذف المحدد",
+        "fields": {
+            "name": "الاسم",
+            "status": "الحالة",
+            "recipients": "المستلمون",
+            "progress": "التقدم",
+            "success_rate": "معدل النجاح",
+            "date": "التاريخ"
+        },
+        "scheduled_for": "مجدولة",
+        "created_at": "أنشئت",
+        "actions": {
+            "pause": "إيقاف مؤقت",
+            "resume": "استئناف",
+            "send": "إرسال الآن",
+            "view_results": "عرض النتائج"
+        },
+        "step1_title": "تفاصيل الحملة",
+        "step2_title": "اختر المستلمين",
+        "step3_title": "كتابة الرسالة",
+        "step4_title": "المراجعة والتأكيد",
+        "create_description": "إنشاء حملة رسائل واتساب جماعية جديدة",
+        "name_placeholder": "أدخل اسم الحملة",
+        "schedule_description": "اتركه فارغًا للإرسال الفوري",
+        "use_template": "استخدام قالب",
+        "select_template_placeholder": "اختر قالبًا أو اكتب رسالة مخصصة",
+        "search_templates": "البحث في القوالب...",
+        "no_template_selected": "لم يتم اختيار قالب",
+        "select_message_type": "اختر نوع الرسالة",
+        "search_type": "البحث عن النوع...",
+        "message_placeholder": "اكتب رسالتك هنا...",
+        "upload_media": "رفع الوسائط",
+        "click_to_upload": "انقر للرفع",
+        "max_size": "الحجم الأقصى: 16 ميجابايت",
+        "summary": "ملخص الحملة",
+        "total_recipients": "المستلمون",
+        "scheduled_for": "مجدولة",
+        "quota_usage": "استخدام الحصة",
+        "current_usage": "الحالي",
+        "after_campaign": "بعد الحملة",
+        "quota_exceeded": "هذه الحملة تتجاوز حصتك!",
+        "message_preview": "معاينة الرسالة",
+        "media_attached": "مرفقة",
+        "create_campaign": "إنشاء الحملة",
+        "search_contacts": "البحث في جهات الاتصال...",
+
+        "type": {
+            "text": "نص فقط",
+            "image": "نص + صورة",
+            "video": "نص + فيديو",
+            "audio": "صوت",
+            "document": "مستند"
+        },
+
+        "errors": {
+            "no_connected_session": "لا توجد جلسة واتساب متصلة",
+            "no_connected_session_desc": "يرجى توصيل جلسة واتساب قبل إنشاء حملة."
+        },
+        "delete_confirm_title": "حذف الحملة؟",
+        "delete_confirm_description": "هل أنت متأكد من أنك تريد حذف هذه الحملة؟ لا يمكن التراجع عن هذا الإجراء.",
         "delay_between_messages": "الفاصل الزمني بين الرسائل",
         "recipient_source": "مصدر المستلمين",
         "message_content": "محتوى الرسالة",
@@ -506,6 +572,8 @@
         }
     },
     "common": {
+        "select_all": "تحديد الكل",
+        "remove": "إزالة",
         "apply": "تطبيق",
         "view": "عرض",
         "actions": "الإجراءات",

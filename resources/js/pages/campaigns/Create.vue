@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import RecipientSelector from '@/components/RecipientSelector.vue';
+import RecipientSelectorLazy from '@/components/RecipientSelectorLazy.vue';
+import SearchableSelect from '@/components/SearchableSelect.vue';
 import SessionSelector from '@/components/SessionSelector.vue';
 import Heading from '@/components/Heading.vue';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -8,13 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -34,14 +28,10 @@ import {
     Upload,
     Users,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 
-interface Contact {
-    id: number;
-    first_name: string;
-    last_name: string | null;
-    phone_number: string;
-}
+// Define the primary brand color - Update this to your main brand color
+const PRIMARY_COLOR = '#25D366'; // Change this to your brand color
 
 interface Template {
     id: number;
@@ -66,7 +56,7 @@ interface UsageStats {
 }
 
 interface Props {
-    contacts: Contact[];
+    totalContactsCount: number;
     templates: Template[];
     sessions: WhatsAppSession[];
     usage: UsageStats;
@@ -96,6 +86,21 @@ const form = useForm({
     media: null as File | null,
 });
 
+// Template options for SearchableSelect
+const templateOptions = computed(() => props.templates.map(template => ({
+    value: template.id.toString(),
+    label: template.name
+})));
+
+// Message type options for SearchableSelect
+const messageTypeOptions = computed(() => [
+    { value: 'text', label: t('campaigns.type.text', 'Text Only') },
+    { value: 'image', label: t('campaigns.type.image', 'Text + Image') },
+    { value: 'video', label: t('campaigns.type.video', 'Text + Video') },
+    { value: 'audio', label: t('campaigns.type.audio', 'Audio') },
+    { value: 'document', label: t('campaigns.type.document', 'Document') },
+]);
+
 const usagePercentage = computed(() => {
     if (props.usage.limit === 'unlimited' || props.usage.limit === 0) return 0;
     return Math.round((props.usage.used / (props.usage.limit as number)) * 100);
@@ -105,7 +110,7 @@ const usageColor = computed(() => {
     const pct = usagePercentage.value;
     if (pct >= 90) return 'text-red-600';
     if (pct >= 70) return 'text-yellow-600';
-    return 'text-[#25D366]';
+    return 'text-green-600';
 });
 
 const estimatedUsage = computed(() => {
@@ -143,8 +148,13 @@ const canProceedStep3 = computed(() => {
     );
 });
 
-const handleTemplateSelect = (templateId: string) => {
-    const template = props.templates.find(t => t.id === parseInt(templateId));
+const handleTemplateSelect = (templateId: string | number | null) => {
+    if (!templateId) {
+        form.template_id = null;
+        return;
+    }
+
+    const template = props.templates.find(t => t.id === parseInt(templateId.toString()));
     if (template) {
         form.template_id = template.id;
         form.message_type = template.type === 'text' ? 'text' : template.type.replace('text_', '') as any;
@@ -218,6 +228,11 @@ const steps = computed(() => [
         completed: false,
     },
 ]);
+
+// Debug
+onMounted(() => {
+    console.log('Total contacts count:', props.totalContactsCount);
+});
 </script>
 
 <template>
@@ -231,7 +246,8 @@ const steps = computed(() => [
                 :title="t('campaigns.create', 'Create Campaign')"
             >
                 <template #icon>
-                    <div class="flex items-center justify-center rounded-lg bg-[#25D366] p-2">
+                    <div :class="`flex items-center justify-center rounded-lg p-2`"
+                         :style="`background-color: ${PRIMARY_COLOR}`">
                         <MessageSquare class="h-5 w-5 text-white" />
                     </div>
                 </template>
@@ -251,11 +267,12 @@ const steps = computed(() => [
                         :class="[
                             'flex h-10 w-10 items-center justify-center rounded-full transition-colors',
                             currentStep === step.number
-                                ? 'bg-[#25D366] text-white'
+                                ? 'text-white'
                                 : step.completed
-                                  ? 'bg-[#25D366]/20 text-[#25D366]'
+                                  ? 'text-white'
                                   : 'bg-muted text-muted-foreground',
                         ]"
+                        :style="currentStep === step.number || step.completed ? `background-color: ${PRIMARY_COLOR}` : ''"
                     >
                         <component :is="step.icon" v-if="!step.completed" class="h-5 w-5" />
                         <CheckCircle v-else class="h-5 w-5" />
@@ -267,18 +284,21 @@ const steps = computed(() => [
             <!-- Step 1: Campaign Details -->
             <Card v-show="currentStep === 1">
                 <CardHeader>
-                    <CardTitle>{{ t('campaigns.step1_title', 'Campaign Details') }}</CardTitle>
+                    <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
+                        {{ t('campaigns.step1_title', 'Campaign Details') }}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <!-- Campaign Name -->
                     <div>
-                        <Label :for="'name'">
+                        <Label :for="'name'" :class="isRTL() ? 'text-right block' : 'text-left block'">
                             {{ t('campaigns.name', 'Campaign Name') }}
                         </Label>
                         <Input
                             id="name"
                             v-model="form.name"
                             :placeholder="t('campaigns.name_placeholder', 'Enter campaign name')"
+                            :dir="isRTL() ? 'rtl' : 'ltr'"
                         />
                         <p v-if="form.errors.name" class="mt-1 text-sm text-red-500">
                             {{ form.errors.name }}
@@ -287,7 +307,7 @@ const steps = computed(() => [
 
                     <!-- Schedule -->
                     <div>
-                        <Label :for="'scheduled_at'">
+                        <Label :for="'scheduled_at'" :class="isRTL() ? 'text-right block' : 'text-left block'">
                             {{ t('campaigns.schedule_at', 'Schedule For') }}
                             <span class="text-xs text-muted-foreground">{{ t('common.optional', '(optional)') }}</span>
                         </Label>
@@ -297,7 +317,7 @@ const steps = computed(() => [
                             type="datetime-local"
                             :min="new Date().toISOString().slice(0, 16)"
                         />
-                        <p class="mt-1 text-xs text-muted-foreground">
+                        <p :class="isRTL() ? 'text-right' : 'text-left'" class="mt-1 text-xs text-muted-foreground">
                             {{ t('campaigns.schedule_description', 'Leave empty to send immediately') }}
                         </p>
                     </div>
@@ -307,13 +327,25 @@ const steps = computed(() => [
             <!-- Step 2: Select Recipients -->
             <Card v-show="currentStep === 2">
                 <CardHeader>
-                    <CardTitle>{{ t('campaigns.step2_title', 'Select Recipients') }}</CardTitle>
+                    <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
+                        {{ t('campaigns.step2_title', 'Select Recipients') }}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <RecipientSelector
+                    <!-- Check if contacts exist -->
+                    <div v-if="totalContactsCount === 0" class="mb-4 p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
+                        <p class="text-yellow-800">
+                            {{ t('campaigns.no_contacts_available', 'No contacts available. Please import contacts first.') }}
+                        </p>
+                    </div>
+
+                    <!-- Use lazy loading recipient selector -->
+                    <RecipientSelectorLazy
+                        v-else
                         v-model="form.recipient_ids"
-                        :contacts="contacts"
+                        :total-contacts-count="totalContactsCount"
                     />
+
                     <p v-if="form.errors.recipient_ids" class="mt-2 text-sm text-red-500">
                         {{ form.errors.recipient_ids }}
                     </p>
@@ -323,7 +355,9 @@ const steps = computed(() => [
             <!-- Step 3: Compose Message -->
             <Card v-show="currentStep === 3">
                 <CardHeader>
-                    <CardTitle>{{ t('campaigns.step3_title', 'Compose Message') }}</CardTitle>
+                    <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
+                        {{ t('campaigns.step3_title', 'Compose Message') }}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <!-- WhatsApp Session -->
@@ -333,55 +367,49 @@ const steps = computed(() => [
                         :error="form.errors.session_id"
                     />
 
-                    <!-- Use Template -->
-                    <div>
-                        <Label>{{ t('campaigns.use_template', 'Use Template') }} ({{ t('common.optional', 'optional') }})</Label>
-                        <Select @update:model-value="handleTemplateSelect">
-                            <SelectTrigger>
-                                <SelectValue :placeholder="t('campaigns.select_template', 'Select a template or write custom message')" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem
-                                    v-for="template in templates"
-                                    :key="template.id"
-                                    :value="template.id.toString()"
-                                >
-                                    {{ template.name }}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
+                    <!-- Use Template - Only show if templates exist -->
+                    <div v-if="templates && templates.length > 0">
+                        <Label :class="isRTL() ? 'text-right block' : 'text-left block'">
+                            {{ t('campaigns.use_template', 'Use Template') }} ({{ t('common.optional', 'optional') }})
+                        </Label>
+                        <SearchableSelect
+                            :options="templateOptions"
+                            :model-value="form.template_id?.toString()"
+                            :placeholder="t('campaigns.select_template_placeholder', 'Select a template or write custom message')"
+                            :search-placeholder="t('campaigns.search_templates', 'Search templates...')"
+                            @update:model-value="handleTemplateSelect"
+                        />
                     </div>
 
                     <!-- Message Type -->
                     <div>
-                        <Label>{{ t('campaigns.message_type', 'Message Type') }}</Label>
-                        <Select v-model="form.message_type">
-                            <SelectTrigger>
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="text">{{ t('campaigns.type.text', 'Text Only') }}</SelectItem>
-                                <SelectItem value="image">{{ t('campaigns.type.image', 'Text + Image') }}</SelectItem>
-                                <SelectItem value="video">{{ t('campaigns.type.video', 'Text + Video') }}</SelectItem>
-                                <SelectItem value="audio">{{ t('campaigns.type.audio', 'Audio') }}</SelectItem>
-                                <SelectItem value="document">{{ t('campaigns.type.document', 'Document') }}</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Label :class="isRTL() ? 'text-right block' : 'text-left block'">
+                            {{ t('campaigns.message_type', 'Message Type') }}
+                        </Label>
+                        <SearchableSelect
+                            v-model="form.message_type"
+                            :options="messageTypeOptions"
+                            :placeholder="t('campaigns.select_message_type', 'Select message type')"
+                            :search-placeholder="t('campaigns.search_type', 'Search type...')"
+                        />
                     </div>
 
                     <!-- Message Content -->
                     <div>
-                        <Label :for="'message_content'">
-                            {{ form.message_type === 'text' ? t('campaigns.message_content', 'Message Content') : t('campaigns.message_caption', 'Caption') }}
+                        <Label :for="'message_content'" :class="isRTL() ? 'text-right block' : 'text-left block'">
+                            {{ form.message_type === 'text'
+                            ? t('campaigns.message_content', 'Message Content')
+                            : t('campaigns.message_caption', 'Caption') }}
                         </Label>
                         <Textarea
                             id="message_content"
                             v-model="form.message_content"
                             :placeholder="t('campaigns.message_placeholder', 'Type your message here...')"
+                            :dir="isRTL() ? 'rtl' : 'ltr'"
                             rows="6"
                         />
-                        <p class="mt-1 text-xs text-muted-foreground">
-                            {{ t('campaigns.placeholders_hint', 'Use {{first_name}}, {{last_name}}, {{phone}} to personalize') }}
+                        <p :class="isRTL() ? 'text-right' : 'text-left'" class="mt-1 text-xs text-muted-foreground">
+                            {{ t('campaigns.placeholders_hint', 'Use {first_name}, {last_name}, {phone} to personalize') }}
                         </p>
                         <p v-if="form.errors.message_content" class="mt-1 text-sm text-red-500">
                             {{ form.errors.message_content }}
@@ -390,11 +418,13 @@ const steps = computed(() => [
 
                     <!-- Media Upload -->
                     <div v-if="form.message_type !== 'text'">
-                        <Label>{{ t('campaigns.upload_media', 'Upload Media') }}</Label>
+                        <Label :class="isRTL() ? 'text-right block' : 'text-left block'">
+                            {{ t('campaigns.upload_media', 'Upload Media') }}
+                        </Label>
 
                         <div v-if="!form.media" class="mt-2">
                             <label
-                                class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 transition-colors hover:border-[#25D366] hover:bg-[#25D366]/5"
+                                class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 transition-colors hover:border-primary hover:bg-primary/5"
                             >
                                 <Upload class="mb-2 h-8 w-8 text-muted-foreground" />
                                 <span class="text-sm font-medium">
@@ -441,12 +471,16 @@ const steps = computed(() => [
             <!-- Step 4: Review & Confirm -->
             <Card v-show="currentStep === 4">
                 <CardHeader>
-                    <CardTitle>{{ t('campaigns.step4_title', 'Review & Confirm') }}</CardTitle>
+                    <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
+                        {{ t('campaigns.step4_title', 'Review & Confirm') }}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-6">
                     <!-- Campaign Summary -->
                     <div class="rounded-lg bg-muted p-4">
-                        <h3 class="mb-3 font-semibold">{{ t('campaigns.summary', 'Campaign Summary') }}</h3>
+                        <h3 :class="isRTL() ? 'text-right' : 'text-left'" class="mb-3 font-semibold">
+                            {{ t('campaigns.summary', 'Campaign Summary') }}
+                        </h3>
                         <div class="space-y-2 text-sm">
                             <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex justify-between">
                                 <span class="text-muted-foreground">{{ t('campaigns.name', 'Name') }}:</span>
@@ -454,7 +488,7 @@ const steps = computed(() => [
                             </div>
                             <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex justify-between">
                                 <span class="text-muted-foreground">{{ t('campaigns.total_recipients', 'Recipients') }}:</span>
-                                <span class="font-medium">{{ form.recipient_ids.length }}</span>
+                                <span class="font-medium">{{ form.recipient_ids.length.toLocaleString() }}</span>
                             </div>
                             <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex justify-between">
                                 <span class="text-muted-foreground">{{ t('campaigns.message_type', 'Type') }}:</span>
@@ -468,8 +502,13 @@ const steps = computed(() => [
                     </div>
 
                     <!-- Quota Usage -->
-                    <Alert :class="willExceedQuota ? 'border-red-500 bg-red-50 dark:bg-red-950' : 'border-[#25D366]/20 bg-[#25D366]/10'">
-                        <AlertCircle :class="willExceedQuota ? 'text-red-600' : 'text-[#25D366]'" class="h-4 w-4" />
+                    <Alert
+                        :class="willExceedQuota ? 'border-red-500 bg-red-50 dark:bg-red-950' : 'border-green-200 bg-green-50 dark:bg-green-950'"
+                    >
+                        <AlertCircle
+                            :class="willExceedQuota ? 'text-red-600' : 'text-green-600'"
+                            class="h-4 w-4"
+                        />
                         <AlertDescription :class="willExceedQuota ? 'text-red-900 dark:text-red-100' : ''">
                             <div class="space-y-2">
                                 <div>
@@ -477,15 +516,15 @@ const steps = computed(() => [
                                 </div>
                                 <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex justify-between text-sm">
                                     <span>{{ t('campaigns.current_usage', 'Current') }}:</span>
-                                    <span :class="usageColor">{{ usage.used }} / {{ usage.limit }}</span>
+                                    <span :class="usageColor">{{ usage.used.toLocaleString() }} / {{ usage.limit === 'unlimited' ? '∞' : usage.limit.toLocaleString() }}</span>
                                 </div>
                                 <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex justify-between text-sm">
                                     <span>{{ t('campaigns.after_campaign', 'After Campaign') }}:</span>
-                                    <span :class="willExceedQuota ? 'text-red-600' : 'text-[#25D366]'">
-                                        {{ estimatedUsage }} / {{ usage.limit }}
+                                    <span :class="willExceedQuota ? 'text-red-600' : 'text-green-600'">
+                                        {{ estimatedUsage.toLocaleString() }} / {{ usage.limit === 'unlimited' ? '∞' : usage.limit.toLocaleString() }}
                                     </span>
                                 </div>
-                                <div v-if="willExceedQuota" class="mt-2 font-medium text-red-600">
+                                <div v-if="willExceedQuota" :class="isRTL() ? 'text-right' : 'text-left'" class="mt-2 font-medium text-red-600">
                                     {{ t('campaigns.quota_exceeded', 'This campaign exceeds your quota!') }}
                                 </div>
                             </div>
@@ -494,11 +533,17 @@ const steps = computed(() => [
 
                     <!-- Message Preview -->
                     <div>
-                        <h3 class="mb-2 font-semibold">{{ t('campaigns.message_preview', 'Message Preview') }}</h3>
-                        <div class="rounded-lg border bg-muted p-4">
+                        <h3 :class="isRTL() ? 'text-right' : 'text-left'" class="mb-2 font-semibold">
+                            {{ t('campaigns.message_preview', 'Message Preview') }}
+                        </h3>
+                        <div :dir="isRTL() ? 'rtl' : 'ltr'" class="rounded-lg border bg-muted p-4">
                             <p class="whitespace-pre-wrap text-sm">{{ form.message_content }}</p>
                             <div v-if="form.media" class="mt-2">
-                                <Badge>{{ form.message_type }} {{ t('campaigns.media_attached', 'attached') }}</Badge>
+                                <Badge
+                                    :style="`background-color: ${PRIMARY_COLOR}; color: white;`"
+                                >
+                                    {{ form.message_type }} {{ t('campaigns.media_attached', 'attached') }}
+                                </Badge>
                             </div>
                         </div>
                     </div>
@@ -511,13 +556,15 @@ const steps = computed(() => [
                     v-if="currentStep > 1"
                     variant="outline"
                     @click="prevStep"
+                    :class="isRTL() ? 'flex-row-reverse' : ''"
                 >
-                    <ArrowLeft :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                    <ArrowLeft v-if="!isRTL()" class="mr-2 h-4 w-4" />
                     {{ t('common.previous', 'Previous') }}
+                    <ArrowRight v-if="isRTL()" class="ml-2 h-4 w-4" />
                 </Button>
                 <div v-else></div>
 
-                <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex gap-2">
+                <div :class="isRTL() ? 'flex-row-reverse gap-2' : 'gap-2'" class="flex">
                     <Button variant="outline" as-child>
                         <Link :href="index()">
                             {{ t('common.cancel', 'Cancel') }}
@@ -532,15 +579,20 @@ const steps = computed(() => [
                             (currentStep === 3 && !canProceedStep3)
                         "
                         @click="nextStep"
+                        :class="isRTL() ? 'flex-row-reverse' : ''"
+                        :style="`background-color: ${PRIMARY_COLOR}; color: white;`"
+                        class="hover:opacity-90"
                     >
+                        <ArrowLeft v-if="isRTL()" class="mr-2 h-4 w-4" />
                         {{ t('common.next', 'Next') }}
-                        <ArrowRight :class="isRTL() ? 'mr-2' : 'ml-2'" class="h-4 w-4" />
+                        <ArrowRight v-if="!isRTL()" class="ml-2 h-4 w-4" />
                     </Button>
 
                     <Button
                         v-else
                         :disabled="form.processing || willExceedQuota"
-                        class="bg-[#25D366] hover:bg-[#25D366]/90"
+                        :style="`background-color: ${PRIMARY_COLOR}; color: white;`"
+                        class="hover:opacity-90"
                         @click="submit"
                     >
                         {{ form.processing ? t('common.creating', 'Creating...') : t('campaigns.create_campaign', 'Create Campaign') }}
@@ -550,3 +602,21 @@ const steps = computed(() => [
         </div>
     </AppLayout>
 </template>
+
+<style scoped>
+/* RTL Button fixes */
+.flex-row-reverse button {
+    display: flex;
+    align-items: center;
+}
+
+.flex-row-reverse button svg:first-child {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+.flex-row-reverse button svg:last-child {
+    margin-left: 0;
+    margin-right: 0.5rem;
+}
+</style>

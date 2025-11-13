@@ -100,7 +100,7 @@ const selectedCount = computed(() => selectedIds.value.length);
         <!-- Selected Count Badge -->
         <div :class="isRTL() ? 'justify-end' : 'justify-start'" class="flex">
             <Badge class="bg-[#25D366] text-white">
-                {{ t('campaigns.contacts_selected', '{{count}} contacts selected', { count: selectedCount }) }}
+                {{ t('campaigns.contacts_selected', '{count} contacts selected').replace('{count}', selectedCount.toString()) }}
             </Badge>
         </div>
 

@@ -30,12 +30,14 @@ class CampaignController extends Controller
         $user = $request->user();
 
         $query = Campaign::forUser($user)
-            ->with(['template:id,name', 'recipients'])
-            ->withCount(['recipients', 'recipients as sent_count' => function ($q) {
-                $q->whereIn('status', ['sent', 'delivered']);
-            }, 'recipients as failed_count' => function ($q) {
-                $q->where('status', 'failed');
-            }])
+            ->with(['template:id,name'])
+            ->select([
+                'campaigns.*',
+                \DB::raw('(SELECT COUNT(*) FROM campaign_recipients WHERE campaign_id = campaigns.id) as total_recipients'),
+                \DB::raw('(SELECT COUNT(*) FROM campaign_recipients WHERE campaign_id = campaigns.id AND status IN ("sent", "delivered")) as messages_sent'),
+                \DB::raw('(SELECT COUNT(*) FROM campaign_recipients WHERE campaign_id = campaigns.id AND status = "delivered") as messages_delivered'),
+                \DB::raw('(SELECT COUNT(*) FROM campaign_recipients WHERE campaign_id = campaigns.id AND status = "failed") as messages_failed'),
+            ])
             ->search($request->input('search'))
             ->byStatus($request->input('status'));
 
@@ -46,23 +48,149 @@ class CampaignController extends Controller
 
         $campaigns = $query->paginate(20)->withQueryString();
 
+        // Add computed fields to each campaign
+        $campaigns->through(function ($campaign) {
+            $campaign->progress_percentage = $campaign->total_recipients > 0
+                ? round(($campaign->messages_sent / $campaign->total_recipients) * 100)
+                : 0;
+
+            $campaign->success_rate = $campaign->messages_sent > 0
+                ? round(($campaign->messages_delivered / $campaign->messages_sent) * 100)
+                : 0;
+
+            return $campaign;
+        });
+
         // Get usage stats
         $usageStats = $this->usageTracking->getCurrentUsageStats($user);
 
         return Inertia::render('campaigns/Index', [
-            'campaigns' => $campaigns,
+            'campaigns' => [
+                'data' => $campaigns->items(),
+                'links' => $campaigns->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $campaigns->currentPage(),
+                    'from' => $campaigns->firstItem(),
+                    'last_page' => $campaigns->lastPage(),
+                    'per_page' => $campaigns->perPage(),
+                    'to' => $campaigns->lastItem(),
+                    'total' => $campaigns->total(),
+                ],
+            ],
             'filters' => [
                 'search' => $request->input('search'),
                 'status' => $request->input('status'),
                 'sort_by' => $sortBy,
                 'sort_order' => $sortOrder,
             ],
-            'usage' => $usageStats['messages'],
+            'usage' => $usageStats['messages'] ?? [
+                    'used' => 0,
+                    'limit' => 'unlimited',
+                    'remaining' => 'unlimited',
+                ],
+        ]);
+    }
+
+
+    /**
+     * NEW: Search contacts endpoint for lazy loading
+     */
+    public function searchContacts(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:10|max:100',
+            'selected_ids' => 'nullable|array',
+            'selected_ids.*' => 'integer',
+        ]);
+
+        $perPage = $validated['per_page'] ?? 50;
+        $search = $validated['search'] ?? '';
+
+        $query = Contact::forUser($user)
+            ->select('id', 'first_name', 'last_name', 'phone_number');
+
+        // Apply search if provided
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Get paginated results
+        $contacts = $query->paginate($perPage);
+
+        // If there are selected IDs not in current page, fetch them separately
+        $selectedNotInPage = [];
+        if (!empty($validated['selected_ids'])) {
+            $currentPageIds = collect($contacts->items())->pluck('id')->toArray();
+            $missingIds = array_diff($validated['selected_ids'], $currentPageIds);
+
+            if (!empty($missingIds)) {
+                $selectedNotInPage = Contact::forUser($user)
+                    ->whereIn('id', $missingIds)
+                    ->select('id', 'first_name', 'last_name', 'phone_number')
+                    ->get();
+            }
+        }
+
+        return response()->json([
+            'contacts' => $contacts->items(),
+            'selected_not_in_page' => $selectedNotInPage,
+            'pagination' => [
+                'current_page' => $contacts->currentPage(),
+                'last_page' => $contacts->lastPage(),
+                'per_page' => $contacts->perPage(),
+                'total' => $contacts->total(),
+                'from' => $contacts->firstItem(),
+                'to' => $contacts->lastItem(),
+            ],
         ]);
     }
 
     /**
-     * Show create campaign form
+     * NEW: Select all contacts endpoint
+     */
+    public function selectAllContacts(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'search' => 'nullable|string|max:255',
+        ]);
+
+        $query = Contact::forUser($user);
+
+        // Apply search filter if provided
+        if (!empty($validated['search'])) {
+            $search = $validated['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Get only IDs for performance
+        $contactIds = $query->pluck('id')->toArray();
+
+        return response()->json([
+            'contact_ids' => $contactIds,
+            'total' => count($contactIds),
+        ]);
+    }
+
+
+    /**
+     * Show create campaign form - OPTIMIZED VERSION
+     * No longer loads all contacts upfront
      */
     public function create(Request $request): Response
     {
@@ -71,13 +199,11 @@ class CampaignController extends Controller
         // Check if user can create campaigns
         $this->authorize('create', Campaign::class);
 
-        // Get available contacts
-        $contacts = Contact::forUser($user)
-            ->validWhatsApp()
-            ->select('id', 'first_name', 'last_name', 'phone_number')
-            ->get();
+        // Don't load contacts here - they'll be loaded via AJAX
+        // Just get the total count for display
+        $totalContactsCount = Contact::forUser($user)->count();
 
-        // Get available templates
+        // Get available templates (these are usually fewer)
         $templates = Template::forUser($user)
             ->select('id', 'name', 'type', 'content', 'caption', 'media_url')
             ->get();
@@ -96,10 +222,14 @@ class CampaignController extends Controller
         $usageStats = $this->usageTracking->getCurrentUsageStats($user);
 
         return Inertia::render('campaigns/Create', [
-            'contacts' => $contacts,
+            'totalContactsCount' => $totalContactsCount,
             'templates' => $templates,
             'sessions' => $sessions,
-            'usage' => $usageStats['messages'],
+            'usage' => $usageStats['messages'] ?? [
+                    'used' => 0,
+                    'limit' => 'unlimited',
+                    'remaining' => 'unlimited',
+                ],
         ]);
     }
 
@@ -189,6 +319,24 @@ class CampaignController extends Controller
             'template:id,name',
             'recipients.contact:id,first_name,last_name,phone_number',
         ]);
+
+        // Add computed properties
+        $campaign->total_recipients = $campaign->recipients->count();
+        $campaign->messages_sent = $campaign->recipients->whereIn('status', ['sent', 'delivered'])->count();
+        $campaign->messages_delivered = $campaign->recipients->where('status', 'delivered')->count();
+        $campaign->messages_failed = $campaign->recipients->where('status', 'failed')->count();
+        $campaign->progress_percentage = $campaign->total_recipients > 0
+            ? round(($campaign->messages_sent / $campaign->total_recipients) * 100)
+            : 0;
+        $campaign->success_rate = $campaign->messages_sent > 0
+            ? round(($campaign->messages_delivered / $campaign->messages_sent) * 100)
+            : 0;
+
+        // Add permission flags
+        $campaign->can_be_paused = $campaign->status === 'running';
+        $campaign->can_be_resumed = $campaign->status === 'paused';
+        $campaign->can_be_edited = $campaign->status === 'draft';
+        $campaign->can_be_sent = in_array($campaign->status, ['draft', 'scheduled', 'paused']);
 
         return Inertia::render('campaigns/Show', [
             'campaign' => $campaign,
@@ -364,26 +512,48 @@ class CampaignController extends Controller
         $this->authorize('view', $campaign);
 
         // Get recipient statistics
-        $recipientsWithStats = $campaign->recipients()
+        $recipientsQuery = $campaign->recipients()
             ->with('contact:id,first_name,last_name,phone_number')
-            ->orderBy('created_at', 'desc')
-            ->paginate(50);
+            ->orderBy('created_at', 'desc');
+
+        $recipientsPaginated = $recipientsQuery->paginate(50);
 
         // Calculate statistics
         $stats = [
-            'total' => $campaign->total_recipients,
-            'sent' => $campaign->messages_sent,
-            'delivered' => $campaign->messages_delivered,
-            'failed' => $campaign->messages_failed,
-            'pending' => $campaign->total_recipients - $campaign->messages_sent,
-            'success_rate' => $campaign->success_rate,
-            'failure_rate' => $campaign->failure_rate,
-            'progress_percentage' => $campaign->progress_percentage,
+            'total' => $campaign->recipients()->count(),
+            'sent' => $campaign->recipients()->whereIn('status', ['sent', 'delivered'])->count(),
+            'delivered' => $campaign->recipients()->where('status', 'delivered')->count(),
+            'failed' => $campaign->recipients()->where('status', 'failed')->count(),
+            'pending' => $campaign->recipients()->where('status', 'pending')->count(),
+            'success_rate' => 0,
+            'failure_rate' => 0,
+            'progress_percentage' => 0,
         ];
 
+        // Calculate rates
+        if ($stats['sent'] > 0) {
+            $stats['success_rate'] = round(($stats['delivered'] / $stats['sent']) * 100);
+            $stats['failure_rate'] = round(($stats['failed'] / $stats['sent']) * 100);
+        }
+
+        if ($stats['total'] > 0) {
+            $stats['progress_percentage'] = round(($stats['sent'] / $stats['total']) * 100);
+        }
+
         return Inertia::render('campaigns/Results', [
-            'campaign' => $campaign,
-            'recipients' => $recipientsWithStats,
+            'campaign' => $campaign->only(['id', 'name', 'status', 'message_type', 'created_at']),
+            'recipients' => [
+                'data' => $recipientsPaginated->items(),
+                'links' => $recipientsPaginated->linkCollection()->toArray(),
+                'meta' => [
+                    'current_page' => $recipientsPaginated->currentPage(),
+                    'from' => $recipientsPaginated->firstItem(),
+                    'last_page' => $recipientsPaginated->lastPage(),
+                    'per_page' => $recipientsPaginated->perPage(),
+                    'to' => $recipientsPaginated->lastItem(),
+                    'total' => $recipientsPaginated->total(),
+                ],
+            ],
             'stats' => $stats,
         ]);
     }
