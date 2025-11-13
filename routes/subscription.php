@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\Settings\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {

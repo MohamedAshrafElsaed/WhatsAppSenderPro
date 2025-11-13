@@ -18,9 +18,33 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        $user->load(['country', 'industry', 'subscription.package']);
+
         return Inertia::render('settings/Profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'user' => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'mobile_number' => $user->mobile_number,
+                'country' => $user->country ? [
+                    'id' => $user->country->id,
+                    'name' => $user->country->name,
+                    'phone_code' => $user->country->phone_code,
+                ] : null,
+                'industry' => $user->industry ? [
+                    'id' => $user->industry->id,
+                    'name' => $user->industry->name,
+                ] : null,
+                'locale' => $user->locale,
+                'email_verified_at' => $user->email_verified_at?->toISOString(),
+                'mobile_verified_at' => $user->mobile_verified_at?->toISOString(),
+                'created_at' => $user->created_at->toISOString(),
+                'subscription_status' => $user->subscription_status,
+            ],
         ]);
     }
 
@@ -29,15 +53,24 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $validated = $request->validated();
+
+        // Update locale if provided
+        if (isset($validated['locale'])) {
+            session()->put('locale', $validated['locale']);
         }
 
-        $request->user()->save();
+        $user->fill($validated);
 
-        return to_route('profile.edit');
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return back()->with('success', __('settings.saved'));
     }
 
     /**

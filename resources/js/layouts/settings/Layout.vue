@@ -6,15 +6,15 @@ import { useTranslation } from '@/composables/useTranslation';
 import { toUrl, urlIsActive } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/dashboard/settings/appearance';
 import { edit as editProfile } from '@/routes/dashboard/settings/profile';
+import { index as subscription } from '@/routes/dashboard/settings/subscription';
 import { show } from '@/routes/dashboard/settings/two-factor';
 import { edit as editPassword } from '@/routes/dashboard/settings/password';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { User, Lock, Shield, Palette } from 'lucide-vue-next';
+import { User, Lock, Shield, Palette, CreditCard } from 'lucide-vue-next';
 
 const { t, isRTL } = useTranslation();
-const page = usePage();
 
 const sidebarNavItems = computed<NavItem[]>(() => [
     {
@@ -28,9 +28,9 @@ const sidebarNavItems = computed<NavItem[]>(() => [
         icon: Lock,
     },
     {
-        title: t('settings.two_factor', 'Two-Factor Auth'),
-        href: show(),
-        icon: Shield,
+        title: t('settings.subscription', 'Subscription'),
+        href: subscription(),
+        icon: CreditCard,
     },
     {
         title: t('settings.appearance', 'Appearance'),
@@ -63,7 +63,7 @@ const currentPath =
             "
             class="flex flex-col lg:flex-row"
         >
-            <aside class="w-full max-w-xl lg:w-48">
+            <aside class="w-full max-w-xl lg:w-56">
                 <nav class="flex flex-col space-y-1 space-x-0">
                     <Button
                         v-for="item in sidebarNavItems"
@@ -98,8 +98,8 @@ const currentPath =
                 class="my-6 lg:hidden bg-border/50"
             />
 
-            <div class="flex-1 md:max-w-2xl">
-                <section class="max-w-xl space-y-12">
+            <div class="flex-1 md:max-w-4xl">
+                <section class="space-y-8">
                     <slot />
                 </section>
             </div>

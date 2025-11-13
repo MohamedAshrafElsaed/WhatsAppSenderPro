@@ -34,5 +34,19 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'paymob' => [
+        'api_secret' => env('PAYMOB_API_SECRET'),
+        'public_key' => env('PAYMOB_PUBLIC_KEY'),
+        'integration_id' => [
+            'card' => env('PAYMOB_INTEGRATION_ID_CARD'),
+            'wallet' => env('PAYMOB_INTEGRATION_ID_WALLET'),
+            'instapay' => env('PAYMOB_INTEGRATION_ID_INSTAPAY'),
+        ],
+        'hmac_secret' => env('PAYMOB_HMAC_SECRET'),
+        'api_url' => env('PAYMOB_API_URL', 'https://accept.paymob.com'),
+        'fee_percentage' => env('PAYMOB_FEE_PERCENTAGE', 2),
+        'callback_url' => env('APP_URL') . '/paymob/callback',
+        'success_url' => env('APP_URL') . '/paymob/success',
+        'failed_url' => env('APP_URL') . '/paymob/failed',
+    ],
 ];

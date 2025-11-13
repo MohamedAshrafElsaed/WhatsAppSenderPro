@@ -47,14 +47,10 @@ class SubscriptionService
         });
     }
 
-    /**
-     * Upgrade a user's subscription to a new package
-     * @throws Throwable
-     */
     public function upgradeSubscription(User $user, Package $package, Transaction $transaction): UserSubscription
     {
         return DB::transaction(function () use ($user, $package, $transaction) {
-            // Cancel current subscription
+            // Cancel current subscription if exists
             $currentSubscription = $user->activeSubscription();
             if ($currentSubscription) {
                 $currentSubscription->update([
@@ -63,28 +59,29 @@ class SubscriptionService
                 ]);
             }
 
-            // Create new active subscription
+            // Create new subscription
             $startsAt = now();
             $endsAt = $startsAt->copy()->addMonth();
 
-            return UserSubscription::create([
+            $newSubscription = UserSubscription::create([
                 'user_id' => $user->id,
                 'package_id' => $package->id,
                 'status' => 'active',
-                'trial_ends_at' => null,
                 'starts_at' => $startsAt,
                 'ends_at' => $endsAt,
                 'auto_renew' => true,
             ]);
+
+            // Mark transaction as completed
+            $transaction->markAsCompleted();
+
+            return $newSubscription;
         });
     }
 
-    /**
-     * Cancel a subscription
-     */
-    public function cancelSubscription(UserSubscription $subscription): bool
+    public function cancelSubscription(UserSubscription $subscription): void
     {
-        return $subscription->update([
+        $subscription->update([
             'status' => 'cancelled',
             'cancelled_at' => now(),
             'auto_renew' => false,

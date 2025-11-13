@@ -2,12 +2,11 @@
 
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\SubscriptionController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// ==================== SETTINGS ROUTES ====================
-// All settings routes under /dashboard/settings prefix
 Route::middleware(['auth', 'verified'])->prefix('dashboard/settings')->name('dashboard.settings.')->group(function () {
 
     // Redirect /dashboard/settings to /dashboard/settings/profile
@@ -24,6 +23,16 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard/settings')->name('das
         ->middleware('throttle:6,1')
         ->name('password.update');
 
+    // Subscription Settings
+    Route::prefix('subscription')->name('subscription.')->group(function () {
+        Route::get('/', [SubscriptionController::class, 'index'])->name('index');
+        Route::get('/upgrade', [SubscriptionController::class, 'upgrade'])->name('upgrade');
+        Route::post('/select-package', [SubscriptionController::class, 'selectPackage'])->name('selectPackage');
+        Route::get('/payment/{packageSlug}', [SubscriptionController::class, 'payment'])->name('payment');
+        Route::post('/process-payment', [SubscriptionController::class, 'processPayment'])->name('processPayment');
+        Route::post('/cancel', [SubscriptionController::class, 'cancel'])->name('cancel');
+    });
+
     // Appearance Settings
     Route::get('appearance', function () {
         return Inertia::render('settings/Appearance');
@@ -32,14 +41,4 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard/settings')->name('das
     // Two-Factor Authentication
     Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
-});
-
-// ==================== LEGACY ROUTES (Keep for backward compatibility) ====================
-// These will redirect to new routes for a smooth transition
-Route::middleware('auth')->group(function () {
-    Route::redirect('settings', '/dashboard/settings/profile');
-    Route::redirect('settings/profile', '/dashboard/settings/profile');
-    Route::redirect('settings/password', '/dashboard/settings/password');
-    Route::redirect('settings/appearance', '/dashboard/settings/appearance');
-    Route::redirect('settings/two-factor', '/dashboard/settings/two-factor');
 });
