@@ -29,12 +29,30 @@ class Template extends Model
     ];
 
     // Relationships
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($template) {
+            $template->deleteMedia();
+        });
+    }
+
+    // Scopes
+
+    public function deleteMedia(): void
+    {
+        if ($this->media_path && Storage::exists($this->media_path)) {
+            Storage::delete($this->media_path);
+        }
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    // Scopes
     public function scopeForUser($query, User $user)
     {
         return $query->where('user_id', $user->id);
@@ -59,6 +77,8 @@ class Template extends Model
         return $query;
     }
 
+    // Accessors
+
     public function scopeRecentlyUsed($query)
     {
         return $query->whereNotNull('last_used_at')
@@ -71,7 +91,8 @@ class Template extends Model
             ->orderBy('usage_count', 'desc');
     }
 
-    // Accessors
+    // Methods
+
     public function getContentPreviewAttribute(): string
     {
         return mb_substr($this->content, 0, 100) . (mb_strlen($this->content) > 100 ? '...' : '');
@@ -82,7 +103,6 @@ class Template extends Model
         return !is_null($this->media_path);
     }
 
-    // Methods
     public function incrementUsage(): void
     {
         $this->update([
@@ -91,12 +111,22 @@ class Template extends Model
         ]);
     }
 
-    public function deleteMedia(): void
+    /**
+     * Get sample preview with placeholder replacements
+     */
+    public function getSamplePreview(): string
     {
-        if ($this->media_path && Storage::exists($this->media_path)) {
-            Storage::delete($this->media_path);
-        }
+        return $this->mergePlaceholders([
+            'first_name' => 'Ahmed',
+            'last_name' => 'Mohamed',
+            'phone' => '+201234567890',
+            'custom_field_1' => 'Sample data',
+            'custom_field_2' => 'Sample data',
+            'custom_field_3' => 'Sample data',
+        ]);
     }
+
+    // Boot method
 
     /**
      * Replace placeholders with actual values
@@ -119,30 +149,5 @@ class Template extends Model
         }
 
         return $content;
-    }
-
-    /**
-     * Get sample preview with placeholder replacements
-     */
-    public function getSamplePreview(): string
-    {
-        return $this->mergePlaceholders([
-            'first_name' => 'Ahmed',
-            'last_name' => 'Mohamed',
-            'phone' => '+201234567890',
-            'custom_field_1' => 'Sample data',
-            'custom_field_2' => 'Sample data',
-            'custom_field_3' => 'Sample data',
-        ]);
-    }
-
-    // Boot method
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($template) {
-            $template->deleteMedia();
-        });
     }
 }

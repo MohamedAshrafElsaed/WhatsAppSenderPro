@@ -3,14 +3,20 @@
 namespace App\Models;
 
 use App\Services\JWTService;
+use Database\Factories\UserFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -20,8 +26,8 @@ use Illuminate\Notifications\Notifiable;
  * @property string $mobile_number
  * @property int $country_id
  * @property int|null $industry_id
- * @property \Illuminate\Support\Carbon|null $email_verified_at
- * @property \Illuminate\Support\Carbon|null $mobile_verified_at
+ * @property Carbon|null $email_verified_at
+ * @property Carbon|null $mobile_verified_at
  * @property string $password
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
@@ -29,38 +35,38 @@ use Illuminate\Notifications\Notifiable;
  * @property string $locale
  * @property array<array-key, mixed>|null $onboarding_data
  * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ContactImport> $contactImports
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Collection<int, ContactImport> $contactImports
  * @property-read int|null $contact_imports_count
  * @property-read bool|null $contact_imports_exists
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ContactTag> $contactTags
+ * @property-read Collection<int, ContactTag> $contactTags
  * @property-read int|null $contact_tags_count
  * @property-read bool|null $contact_tags_exists
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contact> $contacts
+ * @property-read Collection<int, Contact> $contacts
  * @property-read int|null $contacts_count
  * @property-read bool|null $contacts_exists
- * @property-read \App\Models\Country $country
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserDevice> $devices
+ * @property-read Country $country
+ * @property-read Collection<int, UserDevice> $devices
  * @property-read int|null $devices_count
  * @property-read bool|null $devices_exists
  * @property-read string $formatted_mobile
  * @property-read string $full_name
  * @property-read string $subscription_status
- * @property-read \App\Models\Industry|null $industry
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read Industry|null $industry
+ * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read bool|null $notifications_exists
- * @property-read \App\Models\UserSubscription|null $subscription
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserSubscription> $subscriptions
+ * @property-read UserSubscription|null $subscription
+ * @property-read Collection<int, UserSubscription> $subscriptions
  * @property-read int|null $subscriptions_count
  * @property-read bool|null $subscriptions_exists
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Transaction> $transactions
+ * @property-read Collection<int, Transaction> $transactions
  * @property-read int|null $transactions_count
  * @property-read bool|null $transactions_exists
- * @property-read \App\Models\UserUsage|null $usage
- * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @property-read UserUsage|null $usage
+ * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User fromCountry($countryCode)
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
@@ -88,7 +94,7 @@ use Illuminate\Notifications\Notifiable;
  * @method static Builder<static>|User whereUpdatedAt($value)
  * @method static Builder<static>|User withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|User withoutTrashed()
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class User extends Authenticatable
 {

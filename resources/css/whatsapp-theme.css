@@ -1,0 +1,55 @@
+/* WhatsApp Theme Colors */
+:root {
+    --whatsapp-green: #25D366;
+    --whatsapp-dark-green: #128C7E;
+    --whatsapp-light-green: #DCF8C6;
+    --whatsapp-blue: #34B7F1;
+}
+
+/* Custom button styles with WhatsApp colors */
+.btn-whatsapp {
+    @apply bg-[#25D366] hover:bg-[#128C7E] text-white;
+}
+
+.btn-whatsapp-outline {
+    @apply border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white;
+}
+
+/* Active state for navigation */
+.nav-active {
+    @apply bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border-[#25D366];
+}
+
+/* Success states */
+.text-success {
+    @apply text-[#25D366];
+}
+
+.bg-success {
+    @apply bg-[#25D366];
+}
+
+.border-success {
+    @apply border-[#25D366];
+}
+
+/* RTL specific adjustments */
+[dir="rtl"] .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .rtl\:flex-row-reverse {
+    flex-direction: row-reverse;
+}
+
+/* Form input focus states */
+input:focus,
+textarea:focus,
+select:focus {
+    @apply ring-2 ring-[#25D366]/20 border-[#25D366];
+}
+
+/* Transitions */
+.transition-whatsapp {
+    @apply transition-all duration-300 ease-in-out;
+}

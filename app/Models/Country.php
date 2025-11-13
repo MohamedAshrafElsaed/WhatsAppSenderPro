@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -12,26 +16,26 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name_en
  * @property string $name_ar
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read mixed $name
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  * @property-read bool|null $users_exists
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereIso3Code($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereIsoCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereNameAr($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereNameEn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country wherePhoneCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @method static Builder<static>|Country active()
+ * @method static Builder<static>|Country newModelQuery()
+ * @method static Builder<static>|Country newQuery()
+ * @method static Builder<static>|Country query()
+ * @method static Builder<static>|Country whereCreatedAt($value)
+ * @method static Builder<static>|Country whereId($value)
+ * @method static Builder<static>|Country whereIsActive($value)
+ * @method static Builder<static>|Country whereIso3Code($value)
+ * @method static Builder<static>|Country whereIsoCode($value)
+ * @method static Builder<static>|Country whereNameAr($value)
+ * @method static Builder<static>|Country whereNameEn($value)
+ * @method static Builder<static>|Country wherePhoneCode($value)
+ * @method static Builder<static>|Country whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class Country extends Model
 {

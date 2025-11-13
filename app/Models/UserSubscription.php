@@ -2,46 +2,49 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $user_id
  * @property int $package_id
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $trial_ends_at
- * @property \Illuminate\Support\Carbon $starts_at
- * @property \Illuminate\Support\Carbon $ends_at
- * @property \Illuminate\Support\Carbon|null $cancelled_at
+ * @property Carbon|null $trial_ends_at
+ * @property Carbon $starts_at
+ * @property Carbon $ends_at
+ * @property Carbon|null $cancelled_at
  * @property bool $auto_renew
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\Package $package
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription expired()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription trial()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereAutoRenew($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereCancelledAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereEndsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription wherePackageId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereStartsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereTrialEndsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSubscription withoutTrashed()
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Package $package
+ * @property-read User $user
+ * @method static Builder<static>|UserSubscription active()
+ * @method static Builder<static>|UserSubscription expired()
+ * @method static Builder<static>|UserSubscription newModelQuery()
+ * @method static Builder<static>|UserSubscription newQuery()
+ * @method static Builder<static>|UserSubscription onlyTrashed()
+ * @method static Builder<static>|UserSubscription query()
+ * @method static Builder<static>|UserSubscription trial()
+ * @method static Builder<static>|UserSubscription whereAutoRenew($value)
+ * @method static Builder<static>|UserSubscription whereCancelledAt($value)
+ * @method static Builder<static>|UserSubscription whereCreatedAt($value)
+ * @method static Builder<static>|UserSubscription whereDeletedAt($value)
+ * @method static Builder<static>|UserSubscription whereEndsAt($value)
+ * @method static Builder<static>|UserSubscription whereId($value)
+ * @method static Builder<static>|UserSubscription wherePackageId($value)
+ * @method static Builder<static>|UserSubscription whereStartsAt($value)
+ * @method static Builder<static>|UserSubscription whereStatus($value)
+ * @method static Builder<static>|UserSubscription whereTrialEndsAt($value)
+ * @method static Builder<static>|UserSubscription whereUpdatedAt($value)
+ * @method static Builder<static>|UserSubscription whereUserId($value)
+ * @method static Builder<static>|UserSubscription withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|UserSubscription withoutTrashed()
+ * @mixin Eloquent
  */
 class UserSubscription extends Model
 {
@@ -100,22 +103,6 @@ class UserSubscription extends Model
     }
 
     // Methods
-    public function isActive(): bool
-    {
-        return $this->status === 'active' && $this->ends_at->isFuture();
-    }
-
-    public function isTrial(): bool
-    {
-        return $this->status === 'trial' &&
-            $this->trial_ends_at &&
-            $this->trial_ends_at->isFuture();
-    }
-
-    public function isExpired(): bool
-    {
-        return $this->status === 'expired' || $this->ends_at->isPast();
-    }
 
     public function daysRemaining(): int
     {
@@ -126,6 +113,11 @@ class UserSubscription extends Model
         return now()->diffInDays($this->ends_at, false);
     }
 
+    public function isExpired(): bool
+    {
+        return $this->status === 'expired' || $this->ends_at->isPast();
+    }
+
     public function canUseFeature(string $feature): bool
     {
         if (!$this->isActive() && !$this->isTrial()) {
@@ -133,6 +125,18 @@ class UserSubscription extends Model
         }
 
         return $this->package->hasFeature($feature);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active' && $this->ends_at->isFuture();
+    }
+
+    public function isTrial(): bool
+    {
+        return $this->status === 'trial' &&
+            $this->trial_ends_at &&
+            $this->trial_ends_at->isFuture();
     }
 
     public function hasReachedLimit(string $limit, int $currentUsage): bool

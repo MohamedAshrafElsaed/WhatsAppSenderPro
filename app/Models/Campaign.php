@@ -93,7 +93,7 @@ class Campaign extends Model
         if ($this->total_recipients === 0) {
             return 0;
         }
-        return (int) round(($this->messages_sent / $this->total_recipients) * 100);
+        return (int)round(($this->messages_sent / $this->total_recipients) * 100);
     }
 
     public function getSuccessRateAttribute(): float

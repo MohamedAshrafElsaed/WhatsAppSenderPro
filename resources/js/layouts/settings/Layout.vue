@@ -11,28 +11,31 @@ import { edit as editPassword } from '@/routes/dashboard/settings/password';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { User, Lock, Shield, Palette } from 'lucide-vue-next';
 
-const { t } = useTranslation();
+const { t, isRTL } = useTranslation();
 const page = usePage();
-const locale = computed(() => page.props.locale || 'en');
-const isRTL = computed(() => locale.value === 'ar');
 
 const sidebarNavItems = computed<NavItem[]>(() => [
     {
         title: t('settings.profile', 'Profile'),
         href: editProfile(),
+        icon: User,
     },
     {
         title: t('settings.password', 'Password'),
         href: editPassword(),
+        icon: Lock,
     },
     {
         title: t('settings.two_factor', 'Two-Factor Auth'),
         href: show(),
+        icon: Shield,
     },
     {
         title: t('settings.appearance', 'Appearance'),
         href: editAppearance(),
+        icon: Palette,
     },
 ]);
 
@@ -41,12 +44,12 @@ const currentPath =
 </script>
 
 <template>
-    <div :class="isRTL ? 'text-right' : 'text-left'" class="px-4 py-6">
+    <div :class="isRTL() ? 'text-right' : 'text-left'" class="px-4 py-6">
         <Heading
             :description="
                 t(
                     'settings.description',
-                    'Manage your profile and account settings',
+                    'Manage your profile and account settings'
                 )
             "
             :title="t('settings.title', 'Settings')"
@@ -54,7 +57,7 @@ const currentPath =
 
         <div
             :class="
-                isRTL
+                isRTL()
                     ? 'lg:flex-row-reverse lg:space-x-12 lg:space-x-reverse'
                     : 'lg:space-x-12'
             "
@@ -67,21 +70,33 @@ const currentPath =
                         :key="toUrl(item.href)"
                         :class="[
                             'w-full',
-                            isRTL ? 'justify-end' : 'justify-start',
-                            { 'bg-muted': urlIsActive(item.href, currentPath) },
+                            isRTL() ? 'justify-end' : 'justify-start',
+                            urlIsActive(item.href, currentPath)
+                                ? 'bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border-[#25D366]'
+                                : 'hover:bg-muted hover:text-[#25D366]',
                         ]"
                         as-child
                         variant="ghost"
                     >
-                        <Link :href="item.href">
-                            <component :is="item.icon" class="h-4 w-4" />
-                            {{ item.title }}
+                        <Link :href="item.href" class="flex items-center gap-2">
+                            <component
+                                :is="item.icon"
+                                :class="[
+                                    'h-4 w-4',
+                                    isRTL() ? 'order-2' : 'order-1'
+                                ]"
+                            />
+                            <span :class="isRTL() ? 'order-1' : 'order-2'">
+                                {{ item.title }}
+                            </span>
                         </Link>
                     </Button>
                 </nav>
             </aside>
 
-            <Separator class="my-6 lg:hidden" />
+            <Separator
+                class="my-6 lg:hidden bg-border/50"
+            />
 
             <div class="flex-1 md:max-w-2xl">
                 <section class="max-w-xl space-y-12">

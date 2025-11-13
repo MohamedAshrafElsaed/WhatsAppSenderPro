@@ -4,17 +4,29 @@ import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit } from '@/routes/dashboard/settings/password';
+import { index as dashboard } from '@/routes/dashboard';
 import { Form, Head } from '@inertiajs/vue3';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/composables/useTranslation';
 import { type BreadcrumbItem } from '@/types';
+
+const { t, isRTL } = useTranslation();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Password settings',
+        title: t('dashboard.title', 'Dashboard'),
+        href: dashboard().url,
+    },
+    {
+        title: t('settings.title', 'Settings'),
+        href: edit().url,
+    },
+    {
+        title: t('settings.password', 'Password'),
         href: edit().url,
     },
 ];
@@ -22,13 +34,13 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Password settings" />
+        <Head :title="t('settings.password_settings', 'Password Settings')" />
 
         <SettingsLayout>
-            <div class="space-y-6">
+            <div :dir="isRTL() ? 'rtl' : 'ltr'" class="space-y-6">
                 <HeadingSmall
-                    description="Ensure your account is using a long, random password to stay secure"
-                    title="Update password"
+                    :description="t('settings.update_password_desc', 'Ensure your account is using a long, random password to stay secure')"
+                    :title="t('settings.update_password', 'Update password')"
                 />
 
                 <Form
@@ -46,51 +58,63 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     v-bind="PasswordController.update.form()"
                 >
                     <div class="grid gap-2">
-                        <Label for="current_password">Current password</Label>
+                        <Label :class="isRTL() ? 'text-right' : 'text-left'" for="current_password">
+                            {{ t('settings.current_password', 'Current password') }}
+                        </Label>
                         <Input
                             id="current_password"
                             autocomplete="current-password"
                             class="mt-1 block w-full"
                             name="current_password"
-                            placeholder="Current password"
+                            :placeholder="t('settings.current_password', 'Current password')"
                             type="password"
+                            dir="ltr"
                         />
                         <InputError :message="errors.current_password" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password">New password</Label>
+                        <Label :class="isRTL() ? 'text-right' : 'text-left'" for="password">
+                            {{ t('settings.new_password', 'New password') }}
+                        </Label>
                         <Input
                             id="password"
                             autocomplete="new-password"
                             class="mt-1 block w-full"
                             name="password"
-                            placeholder="New password"
+                            :placeholder="t('settings.new_password', 'New password')"
                             type="password"
+                            dir="ltr"
                         />
                         <InputError :message="errors.password" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="password_confirmation"
-                            >Confirm password</Label
-                        >
+                        <Label :class="isRTL() ? 'text-right' : 'text-left'" for="password_confirmation">
+                            {{ t('settings.confirm_password', 'Confirm password') }}
+                        </Label>
                         <Input
                             id="password_confirmation"
                             autocomplete="new-password"
                             class="mt-1 block w-full"
                             name="password_confirmation"
-                            placeholder="Confirm password"
+                            :placeholder="t('settings.confirm_password', 'Confirm password')"
                             type="password"
+                            dir="ltr"
                         />
                         <InputError :message="errors.password_confirmation" />
                     </div>
 
-                    <div class="flex items-center gap-4">
+                    <div :class="[
+                        'flex items-center gap-4',
+                        isRTL() ? 'flex-row-reverse' : 'flex-row'
+                    ]">
                         <Button
                             :disabled="processing"
                             data-test="update-password-button"
-                            >Save password
+                            class="bg-[#25D366] hover:bg-[#128C7E] text-white"
+                        >
+                            {{ t('settings.save_password', 'Save password') }}
                         </Button>
 
                         <Transition
@@ -101,9 +125,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-[#25D366]"
                             >
-                                Saved.
+                                {{ t('settings.saved', 'Saved.') }}
                             </p>
                         </Transition>
                     </div>

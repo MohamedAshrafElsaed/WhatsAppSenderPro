@@ -21,7 +21,6 @@
         "reports": "Reports"
 
     },
-
     "whatsapp": {
         "title": "WhatsApp Connection",
         "subtitle": "Connect your WhatsApp numbers to start sending campaigns",
@@ -1194,5 +1193,39 @@
             "updated_successfully": "Template updated successfully!",
             "deleted_successfully": "Template deleted successfully!"
         }
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your profile and account settings",
+        "profile": "Profile",
+        "password": "Password",
+        "two_factor": "Two-Factor Auth",
+        "appearance": "Appearance",
+        "profile_settings": "Profile Settings",
+        "password_settings": "Password Settings",
+        "appearance_settings": "Appearance Settings",
+        "two_factor_settings": "Two-Factor Authentication",
+        "profile_information": "Profile Information",
+        "update_profile_info": "Update your name and email address",
+        "update_password": "Update Password",
+        "update_password_desc": "Ensure your account is using a long, random password to stay secure",
+        "update_appearance": "Update Appearance",
+        "update_appearance_desc": "Customize the look and feel of your account",
+        "current_password": "Current Password",
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password",
+        "save": "Save",
+        "save_password": "Save Password",
+        "saved": "Saved",
+        "name": "Name",
+        "full_name": "Full Name",
+        "email": "Email Address",
+        "email_unverified": "Your email address is unverified.",
+        "resend_verification": "Click here to resend the verification email.",
+        "verification_sent": "A new verification link has been sent to your email address.",
+        "delete_account": "Delete Account",
+        "delete_account_desc": "Once your account is deleted, all of its resources and data will be permanently deleted.",
+        "delete_confirm": "Are you sure you want to delete your account?",
+        "delete_warning": "This action cannot be undone."
     }
 }

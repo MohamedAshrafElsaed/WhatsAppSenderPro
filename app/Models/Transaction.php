@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,42 +19,42 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $status
  * @property string|null $payment_gateway
  * @property array<array-key, mixed>|null $gateway_response
- * @property \Illuminate\Support\Carbon|null $paid_at
- * @property \Illuminate\Support\Carbon|null $refunded_at
+ * @property Carbon|null $paid_at
+ * @property Carbon|null $refunded_at
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\Package $package
- * @property-read \App\Models\PaymentMethod|null $paymentMethod
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction completed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction failed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction pending()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction refunded()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereCurrency($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereGatewayResponse($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction wherePackageId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction wherePaidAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction wherePaymentGateway($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction wherePaymentMethodId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereRefundedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereTransactionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Transaction withoutTrashed()
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Package $package
+ * @property-read PaymentMethod|null $paymentMethod
+ * @property-read User $user
+ * @method static Builder<static>|Transaction completed()
+ * @method static Builder<static>|Transaction failed()
+ * @method static Builder<static>|Transaction newModelQuery()
+ * @method static Builder<static>|Transaction newQuery()
+ * @method static Builder<static>|Transaction onlyTrashed()
+ * @method static Builder<static>|Transaction pending()
+ * @method static Builder<static>|Transaction query()
+ * @method static Builder<static>|Transaction refunded()
+ * @method static Builder<static>|Transaction whereAmount($value)
+ * @method static Builder<static>|Transaction whereCreatedAt($value)
+ * @method static Builder<static>|Transaction whereCurrency($value)
+ * @method static Builder<static>|Transaction whereDeletedAt($value)
+ * @method static Builder<static>|Transaction whereGatewayResponse($value)
+ * @method static Builder<static>|Transaction whereId($value)
+ * @method static Builder<static>|Transaction whereNotes($value)
+ * @method static Builder<static>|Transaction wherePackageId($value)
+ * @method static Builder<static>|Transaction wherePaidAt($value)
+ * @method static Builder<static>|Transaction wherePaymentGateway($value)
+ * @method static Builder<static>|Transaction wherePaymentMethodId($value)
+ * @method static Builder<static>|Transaction whereRefundedAt($value)
+ * @method static Builder<static>|Transaction whereStatus($value)
+ * @method static Builder<static>|Transaction whereTransactionId($value)
+ * @method static Builder<static>|Transaction whereUpdatedAt($value)
+ * @method static Builder<static>|Transaction whereUserId($value)
+ * @method static Builder<static>|Transaction withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Transaction withoutTrashed()
+ * @mixin Eloquent
  */
 class Transaction extends Model
 {

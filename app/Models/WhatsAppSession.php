@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -15,66 +19,66 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $status
  * @property string|null $qr_code
  * @property string|null $qr_code_base64
- * @property \Illuminate\Support\Carbon|null $qr_generated_at
- * @property \Illuminate\Support\Carbon|null $qr_expires_at
+ * @property Carbon|null $qr_generated_at
+ * @property Carbon|null $qr_expires_at
  * @property int $qr_retry_count
- * @property \Illuminate\Support\Carbon|null $connected_at
- * @property \Illuminate\Support\Carbon|null $disconnected_at
- * @property \Illuminate\Support\Carbon|null $last_seen
+ * @property Carbon|null $connected_at
+ * @property Carbon|null $disconnected_at
+ * @property Carbon|null $last_seen
  * @property array<array-key, mixed>|null $device_info
  * @property string|null $push_name
  * @property string|null $platform
  * @property bool $is_business_account
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WhatsAppContact> $contacts
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Collection<int, WhatsAppContact> $contacts
  * @property-read int|null $contacts_count
  * @property-read bool|null $contacts_exists
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WhatsAppEvent> $events
+ * @property-read Collection<int, WhatsAppEvent> $events
  * @property-read int|null $events_count
  * @property-read bool|null $events_exists
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WhatsAppGroup> $groups
+ * @property-read Collection<int, WhatsAppGroup> $groups
  * @property-read int|null $groups_count
  * @property-read bool|null $groups_exists
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WhatsAppMessage> $messages
+ * @property-read Collection<int, WhatsAppMessage> $messages
  * @property-read int|null $messages_count
  * @property-read bool|null $messages_exists
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession connected()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession disconnected()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession recent()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereConnectedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereDeviceInfo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereDisconnectedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereIsBusinessAccount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereJId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereLastSeen($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession wherePhoneNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession wherePlatform($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession wherePushName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereQrCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereQrCodeBase64($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereQrExpiresAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereQrGeneratedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereQrRetryCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereSessionName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WhatsAppSession withoutTrashed()
- * @mixin \Eloquent
+ * @property-read User $user
+ * @method static Builder<static>|WhatsAppSession active()
+ * @method static Builder<static>|WhatsAppSession connected()
+ * @method static Builder<static>|WhatsAppSession disconnected()
+ * @method static Builder<static>|WhatsAppSession newModelQuery()
+ * @method static Builder<static>|WhatsAppSession newQuery()
+ * @method static Builder<static>|WhatsAppSession onlyTrashed()
+ * @method static Builder<static>|WhatsAppSession query()
+ * @method static Builder<static>|WhatsAppSession recent()
+ * @method static Builder<static>|WhatsAppSession whereConnectedAt($value)
+ * @method static Builder<static>|WhatsAppSession whereCreatedAt($value)
+ * @method static Builder<static>|WhatsAppSession whereDeletedAt($value)
+ * @method static Builder<static>|WhatsAppSession whereDeviceInfo($value)
+ * @method static Builder<static>|WhatsAppSession whereDisconnectedAt($value)
+ * @method static Builder<static>|WhatsAppSession whereId($value)
+ * @method static Builder<static>|WhatsAppSession whereIsActive($value)
+ * @method static Builder<static>|WhatsAppSession whereIsBusinessAccount($value)
+ * @method static Builder<static>|WhatsAppSession whereJId($value)
+ * @method static Builder<static>|WhatsAppSession whereLastSeen($value)
+ * @method static Builder<static>|WhatsAppSession wherePhoneNumber($value)
+ * @method static Builder<static>|WhatsAppSession wherePlatform($value)
+ * @method static Builder<static>|WhatsAppSession wherePushName($value)
+ * @method static Builder<static>|WhatsAppSession whereQrCode($value)
+ * @method static Builder<static>|WhatsAppSession whereQrCodeBase64($value)
+ * @method static Builder<static>|WhatsAppSession whereQrExpiresAt($value)
+ * @method static Builder<static>|WhatsAppSession whereQrGeneratedAt($value)
+ * @method static Builder<static>|WhatsAppSession whereQrRetryCount($value)
+ * @method static Builder<static>|WhatsAppSession whereSessionName($value)
+ * @method static Builder<static>|WhatsAppSession whereStatus($value)
+ * @method static Builder<static>|WhatsAppSession whereUpdatedAt($value)
+ * @method static Builder<static>|WhatsAppSession whereUserId($value)
+ * @method static Builder<static>|WhatsAppSession withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|WhatsAppSession withoutTrashed()
+ * @mixin Eloquent
  */
 class WhatsAppSession extends Model
 {

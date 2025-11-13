@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -11,26 +15,26 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name_ar
  * @property bool $is_active
  * @property int $sort_order
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read mixed $name
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  * @property-read bool|null $users_exists
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry sorted()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereNameAr($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereNameEn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereSortOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Industry whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @method static Builder<static>|Industry active()
+ * @method static Builder<static>|Industry newModelQuery()
+ * @method static Builder<static>|Industry newQuery()
+ * @method static Builder<static>|Industry query()
+ * @method static Builder<static>|Industry sorted()
+ * @method static Builder<static>|Industry whereCreatedAt($value)
+ * @method static Builder<static>|Industry whereId($value)
+ * @method static Builder<static>|Industry whereIsActive($value)
+ * @method static Builder<static>|Industry whereNameAr($value)
+ * @method static Builder<static>|Industry whereNameEn($value)
+ * @method static Builder<static>|Industry whereSlug($value)
+ * @method static Builder<static>|Industry whereSortOrder($value)
+ * @method static Builder<static>|Industry whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class Industry extends Model
 {

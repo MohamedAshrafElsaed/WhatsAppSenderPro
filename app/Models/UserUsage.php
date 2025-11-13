@@ -2,34 +2,37 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $user_id
- * @property \Illuminate\Support\Carbon $period_start
- * @property \Illuminate\Support\Carbon $period_end
+ * @property Carbon $period_start
+ * @property Carbon $period_end
  * @property int $messages_sent
  * @property int $contacts_validated
  * @property int $connected_numbers_count
  * @property int $templates_created
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereConnectedNumbersCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereContactsValidated($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereMessagesSent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage wherePeriodEnd($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage wherePeriodStart($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereTemplatesCreated($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserUsage whereUserId($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ * @method static Builder<static>|UserUsage newModelQuery()
+ * @method static Builder<static>|UserUsage newQuery()
+ * @method static Builder<static>|UserUsage query()
+ * @method static Builder<static>|UserUsage whereConnectedNumbersCount($value)
+ * @method static Builder<static>|UserUsage whereContactsValidated($value)
+ * @method static Builder<static>|UserUsage whereCreatedAt($value)
+ * @method static Builder<static>|UserUsage whereId($value)
+ * @method static Builder<static>|UserUsage whereMessagesSent($value)
+ * @method static Builder<static>|UserUsage wherePeriodEnd($value)
+ * @method static Builder<static>|UserUsage wherePeriodStart($value)
+ * @method static Builder<static>|UserUsage whereTemplatesCreated($value)
+ * @method static Builder<static>|UserUsage whereUpdatedAt($value)
+ * @method static Builder<static>|UserUsage whereUserId($value)
+ * @mixin Eloquent
  */
 class UserUsage extends Model
 {
@@ -55,12 +58,15 @@ class UserUsage extends Model
     ];
 
     // Relationships
-    public function user()
+
+    public static function incrementMessagesSent(User $user, int $count = 1): void
     {
-        return $this->belongsTo(User::class);
+        $usage = self::getCurrentPeriodUsage($user);
+        $usage->increment('messages_sent', $count);
     }
 
     // Static Methods
+
     public static function getCurrentPeriodUsage(User $user): ?self
     {
         $periodStart = now()->startOfMonth();
@@ -81,12 +87,6 @@ class UserUsage extends Model
         );
     }
 
-    public static function incrementMessagesSent(User $user, int $count = 1): void
-    {
-        $usage = self::getCurrentPeriodUsage($user);
-        $usage->increment('messages_sent', $count);
-    }
-
     public static function incrementContactsValidated(User $user, int $count = 1): void
     {
         $usage = self::getCurrentPeriodUsage($user);
@@ -105,7 +105,13 @@ class UserUsage extends Model
         $usage->increment('templates_created', $count);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // Instance Methods
+
     public function resetUsage(): void
     {
         $this->update([

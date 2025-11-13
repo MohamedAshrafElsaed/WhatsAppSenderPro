@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -32,52 +35,52 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $cf_threat_score
  * @property string $user_agent
  * @property string|null $accept_language
- * @property \Illuminate\Support\Carbon $last_seen_at
+ * @property Carbon $last_seen_at
  * @property bool $is_trusted
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice desktop()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice mobile()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice recentlyActive($days = 30)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice trusted()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereAcceptLanguage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereBrowser($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereBrowserVersion($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereCfConnectingIp($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereCfIsTor($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereCfRay($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereCfThreatScore($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereCity($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereConnectionType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereCountryCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereDeviceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereDeviceName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereDeviceType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereIpAddress($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereIsRobot($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereIsTrusted($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereIsp($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereLastSeenAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereLatitude($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereLongitude($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice wherePlatform($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice wherePlatformVersion($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice wherePostalCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereRegion($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereTimezone($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereUserAgent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserDevice whereUserId($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ * @method static Builder<static>|UserDevice active()
+ * @method static Builder<static>|UserDevice desktop()
+ * @method static Builder<static>|UserDevice mobile()
+ * @method static Builder<static>|UserDevice newModelQuery()
+ * @method static Builder<static>|UserDevice newQuery()
+ * @method static Builder<static>|UserDevice query()
+ * @method static Builder<static>|UserDevice recentlyActive($days = 30)
+ * @method static Builder<static>|UserDevice trusted()
+ * @method static Builder<static>|UserDevice whereAcceptLanguage($value)
+ * @method static Builder<static>|UserDevice whereBrowser($value)
+ * @method static Builder<static>|UserDevice whereBrowserVersion($value)
+ * @method static Builder<static>|UserDevice whereCfConnectingIp($value)
+ * @method static Builder<static>|UserDevice whereCfIsTor($value)
+ * @method static Builder<static>|UserDevice whereCfRay($value)
+ * @method static Builder<static>|UserDevice whereCfThreatScore($value)
+ * @method static Builder<static>|UserDevice whereCity($value)
+ * @method static Builder<static>|UserDevice whereConnectionType($value)
+ * @method static Builder<static>|UserDevice whereCountryCode($value)
+ * @method static Builder<static>|UserDevice whereCreatedAt($value)
+ * @method static Builder<static>|UserDevice whereDeviceId($value)
+ * @method static Builder<static>|UserDevice whereDeviceName($value)
+ * @method static Builder<static>|UserDevice whereDeviceType($value)
+ * @method static Builder<static>|UserDevice whereId($value)
+ * @method static Builder<static>|UserDevice whereIpAddress($value)
+ * @method static Builder<static>|UserDevice whereIsActive($value)
+ * @method static Builder<static>|UserDevice whereIsRobot($value)
+ * @method static Builder<static>|UserDevice whereIsTrusted($value)
+ * @method static Builder<static>|UserDevice whereIsp($value)
+ * @method static Builder<static>|UserDevice whereLastSeenAt($value)
+ * @method static Builder<static>|UserDevice whereLatitude($value)
+ * @method static Builder<static>|UserDevice whereLongitude($value)
+ * @method static Builder<static>|UserDevice wherePlatform($value)
+ * @method static Builder<static>|UserDevice wherePlatformVersion($value)
+ * @method static Builder<static>|UserDevice wherePostalCode($value)
+ * @method static Builder<static>|UserDevice whereRegion($value)
+ * @method static Builder<static>|UserDevice whereTimezone($value)
+ * @method static Builder<static>|UserDevice whereUpdatedAt($value)
+ * @method static Builder<static>|UserDevice whereUserAgent($value)
+ * @method static Builder<static>|UserDevice whereUserId($value)
+ * @mixin Eloquent
  */
 class UserDevice extends Model
 {

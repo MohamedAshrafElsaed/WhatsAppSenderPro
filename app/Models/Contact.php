@@ -2,33 +2,36 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property-read \App\Models\Country|null $country
+ * @property-read Country|null $country
  * @property-read string $full_name
- * @property-read \App\Models\ContactImport|null $import
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ContactTag> $tags
+ * @property-read ContactImport|null $import
+ * @property-read Collection<int, ContactTag> $tags
  * @property-read int|null $tags_count
  * @property-read bool|null $tags_exists
- * @property-read \App\Models\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact byCountry(?int $countryId)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact bySource(?string $source)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact forUser(\App\Models\User $user)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact invalidWhatsApp()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact search(?string $search)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact validWhatsApp()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact withTag(?int $tagId)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Contact withoutTrashed()
- * @mixin \Eloquent
+ * @property-read User|null $user
+ * @method static Builder<static>|Contact byCountry(?int $countryId)
+ * @method static Builder<static>|Contact bySource(?string $source)
+ * @method static Builder<static>|Contact forUser(User $user)
+ * @method static Builder<static>|Contact invalidWhatsApp()
+ * @method static Builder<static>|Contact newModelQuery()
+ * @method static Builder<static>|Contact newQuery()
+ * @method static Builder<static>|Contact onlyTrashed()
+ * @method static Builder<static>|Contact query()
+ * @method static Builder<static>|Contact search(?string $search)
+ * @method static Builder<static>|Contact validWhatsApp()
+ * @method static Builder<static>|Contact withTag(?int $tagId)
+ * @method static Builder<static>|Contact withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Contact withoutTrashed()
+ * @mixin Eloquent
  */
 class Contact extends Model
 {
