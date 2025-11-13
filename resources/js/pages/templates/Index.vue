@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import Heading from '@/components/Heading.vue';
 import TemplateUsageIndicator from '@/components/TemplateUsageIndicator.vue';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -36,7 +36,13 @@ import {
 } from '@/components/ui/table';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { create, destroy, edit, index, show } from '@/routes/dashboard/templates';
+import {
+    create,
+    destroy,
+    edit,
+    index,
+    show,
+} from '@/routes/dashboard/templates';
 import type { Template, TemplateFilters } from '@/types/template';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
@@ -109,7 +115,7 @@ const applyFilters = () => {
         {
             preserveState: true,
             preserveScroll: true,
-        }
+        },
     );
 };
 
@@ -172,11 +178,14 @@ const formatDate = (dateString: string | null) => {
 
     const date = new Date(dateString);
     const now = new Date();
-    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    const diffInDays = Math.floor(
+        (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
+    );
 
     if (diffInDays === 0) return t('common.today', 'Today');
     if (diffInDays === 1) return t('common.yesterday', 'Yesterday');
-    if (diffInDays < 7) return `${diffInDays} ${t('common.days_ago', 'days ago')}`;
+    if (diffInDays < 7)
+        return `${diffInDays} ${t('common.days_ago', 'days ago')}`;
 
     return date.toLocaleDateString();
 };
@@ -197,10 +206,12 @@ const formatDate = (dateString: string | null) => {
             >
                 <CheckCircle2 class="h-4 w-4 text-[#25D366]" />
                 <AlertDescription class="flex items-center justify-between">
-                    <span class="text-[#25D366] font-medium">{{ successMessage }}</span>
+                    <span class="font-medium text-[#25D366]">{{
+                        successMessage
+                    }}</span>
                     <button
-                        @click="showSuccessAlert = false"
                         class="text-[#25D366] hover:text-[#128C7E]"
+                        @click="showSuccessAlert = false"
                     >
                         <X class="h-4 w-4" />
                     </button>
@@ -208,9 +219,17 @@ const formatDate = (dateString: string | null) => {
             </Alert>
 
             <!-- Header -->
-            <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div
+                :class="isRTL() ? 'flex-row-reverse' : ''"
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
                 <Heading
-                    :description="t('templates.description', 'Manage your message templates')"
+                    :description="
+                        t(
+                            'templates.description',
+                            'Manage your message templates',
+                        )
+                    "
                     :title="t('templates.title', 'Templates')"
                 />
                 <Button
@@ -219,15 +238,14 @@ const formatDate = (dateString: string | null) => {
                     class="bg-[#25D366] hover:bg-[#128C7E]"
                 >
                     <Link :href="create()">
-                        <Plus :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                        <Plus
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4"
+                        />
                         {{ t('templates.create_template', 'Create Template') }}
                     </Link>
                 </Button>
-                <Button
-                    v-else
-                    disabled
-                    variant="outline"
-                >
+                <Button v-else disabled variant="outline">
                     <Plus :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                     {{ t('templates.create_template', 'Create Template') }}
                 </Button>
@@ -247,7 +265,9 @@ const formatDate = (dateString: string | null) => {
                     <Input
                         v-model="searchQuery"
                         :class="isRTL() ? 'pr-10' : 'pl-10'"
-                        :placeholder="t('templates.search', 'Search templates...')"
+                        :placeholder="
+                            t('templates.search', 'Search templates...')
+                        "
                         class="focus-visible:ring-[#25D366]"
                         @keyup.enter="applyFilters"
                     />
@@ -256,10 +276,15 @@ const formatDate = (dateString: string | null) => {
                 <!-- Filter Controls -->
                 <div class="flex flex-wrap gap-2">
                     <!-- Type Filter -->
-                    <Select v-model="selectedType" @update:model-value="applyFilters">
+                    <Select
+                        v-model="selectedType"
+                        @update:model-value="applyFilters"
+                    >
                         <SelectTrigger class="w-[180px]">
                             <SelectValue
-                                :placeholder="t('templates.all_types', 'All Types')"
+                                :placeholder="
+                                    t('templates.all_types', 'All Types')
+                                "
                             />
                         </SelectTrigger>
                         <SelectContent>
@@ -276,7 +301,12 @@ const formatDate = (dateString: string | null) => {
                                 {{ t('templates.text_video', 'Text + Video') }}
                             </SelectItem>
                             <SelectItem value="text_document">
-                                {{ t('templates.text_document', 'Text + Document') }}
+                                {{
+                                    t(
+                                        'templates.text_document',
+                                        'Text + Document',
+                                    )
+                                }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -297,7 +327,12 @@ const formatDate = (dateString: string | null) => {
                                 {{ t('templates.sort.most_used', 'Most Used') }}
                             </SelectItem>
                             <SelectItem value="last_used">
-                                {{ t('templates.sort.recently_used', 'Recently Used') }}
+                                {{
+                                    t(
+                                        'templates.sort.recently_used',
+                                        'Recently Used',
+                                    )
+                                }}
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -313,22 +348,42 @@ const formatDate = (dateString: string | null) => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
-                                {{ t('templates.template_name', 'Template Name') }}
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
+                                {{
+                                    t(
+                                        'templates.template_name',
+                                        'Template Name',
+                                    )
+                                }}
                             </TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 {{ t('templates.template_type', 'Type') }}
                             </TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'" class="hidden md:table-cell">
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="hidden md:table-cell"
+                            >
                                 {{ t('templates.template_content', 'Content') }}
                             </TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'" class="hidden lg:table-cell">
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="hidden lg:table-cell"
+                            >
                                 {{ t('templates.usage_count', 'Usage') }}
                             </TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'" class="hidden lg:table-cell">
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="hidden lg:table-cell"
+                            >
                                 {{ t('templates.last_used', 'Last Used') }}
                             </TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 {{ t('common.actions', 'Actions') }}
                             </TableHead>
                         </TableRow>
@@ -338,14 +393,28 @@ const formatDate = (dateString: string | null) => {
                         <TableRow v-if="!hasTemplates">
                             <TableCell class="py-12 text-center" colspan="6">
                                 <div class="flex flex-col items-center gap-2">
-                                    <div class="flex items-center justify-center rounded-full bg-[#25D366]/10 p-4 mb-2">
-                                        <MessageSquare class="h-12 w-12 text-[#25D366]" />
+                                    <div
+                                        class="mb-2 flex items-center justify-center rounded-full bg-[#25D366]/10 p-4"
+                                    >
+                                        <MessageSquare
+                                            class="h-12 w-12 text-[#25D366]"
+                                        />
                                     </div>
                                     <p class="font-medium">
-                                        {{ t('templates.no_templates', 'No templates found') }}
+                                        {{
+                                            t(
+                                                'templates.no_templates',
+                                                'No templates found',
+                                            )
+                                        }}
                                     </p>
                                     <p class="text-sm text-muted-foreground">
-                                        {{ t('templates.create_first_template', 'Create your first template to get started') }}
+                                        {{
+                                            t(
+                                                'templates.create_first_template',
+                                                'Create your first template to get started',
+                                            )
+                                        }}
                                     </p>
                                 </div>
                             </TableCell>
@@ -358,7 +427,10 @@ const formatDate = (dateString: string | null) => {
                             class="hover:bg-muted/50"
                         >
                             <!-- Name -->
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="font-medium">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="font-medium"
+                            >
                                 <div class="flex items-center gap-2">
                                     <component
                                         :is="getTypeIcon(template.type)"
@@ -369,35 +441,53 @@ const formatDate = (dateString: string | null) => {
                             </TableCell>
 
                             <!-- Type -->
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
-                                <Badge :class="getTypeBadgeColor(template.type)" class="text-white text-xs">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
+                                <Badge
+                                    :class="getTypeBadgeColor(template.type)"
+                                    class="text-xs text-white"
+                                >
                                     {{ getTypeLabel(template.type) }}
                                 </Badge>
                             </TableCell>
 
                             <!-- Content Preview -->
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="hidden md:table-cell">
-                                <p class="text-sm text-muted-foreground line-clamp-2 max-w-md">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="hidden md:table-cell"
+                            >
+                                <p
+                                    class="line-clamp-2 max-w-md text-sm text-muted-foreground"
+                                >
                                     {{ template.content }}
                                 </p>
                             </TableCell>
 
                             <!-- Usage Count -->
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="hidden lg:table-cell">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="hidden lg:table-cell"
+                            >
                                 <span class="font-semibold text-[#25D366]">
                                     {{ template.usage_count }}
                                 </span>
                             </TableCell>
 
                             <!-- Last Used -->
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="hidden lg:table-cell">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="hidden lg:table-cell"
+                            >
                                 <span class="text-sm text-muted-foreground">
                                     {{ formatDate(template.last_used_at) }}
                                 </span>
                             </TableCell>
 
                             <!-- Actions -->
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>
                                         <Button size="sm" variant="ghost">
@@ -406,22 +496,41 @@ const formatDate = (dateString: string | null) => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem
-                                            @click="router.visit(show(template.id))"
+                                            @click="
+                                                router.visit(show(template.id))
+                                            "
                                         >
-                                            <Eye :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            <Eye
+                                                :class="
+                                                    isRTL() ? 'ml-2' : 'mr-2'
+                                                "
+                                                class="h-4 w-4"
+                                            />
                                             {{ t('common.view', 'View') }}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
-                                            @click="router.visit(edit(template.id))"
+                                            @click="
+                                                router.visit(edit(template.id))
+                                            "
                                         >
-                                            <EditIcon :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            <EditIcon
+                                                :class="
+                                                    isRTL() ? 'ml-2' : 'mr-2'
+                                                "
+                                                class="h-4 w-4"
+                                            />
                                             {{ t('common.edit', 'Edit') }}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             class="text-destructive"
                                             @click="confirmDelete(template)"
                                         >
-                                            <Trash2 :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            <Trash2
+                                                :class="
+                                                    isRTL() ? 'ml-2' : 'mr-2'
+                                                "
+                                                class="h-4 w-4"
+                                            />
                                             {{ t('common.delete', 'Delete') }}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -433,12 +542,22 @@ const formatDate = (dateString: string | null) => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="hasTemplates && templates.total > templates.per_page" class="flex items-center justify-between">
+            <div
+                v-if="hasTemplates && templates.total > templates.per_page"
+                class="flex items-center justify-between"
+            >
                 <div class="text-sm text-muted-foreground">
                     {{ t('common.showing', 'Showing') }}
-                    <span class="font-medium">{{ ((templates.current_page - 1) * templates.per_page) + 1 }}</span>
+                    <span class="font-medium">{{
+                        (templates.current_page - 1) * templates.per_page + 1
+                    }}</span>
                     {{ t('common.to', 'to') }}
-                    <span class="font-medium">{{ Math.min(templates.current_page * templates.per_page, templates.total) }}</span>
+                    <span class="font-medium">{{
+                        Math.min(
+                            templates.current_page * templates.per_page,
+                            templates.total,
+                        )
+                    }}</span>
                     {{ t('common.of', 'of') }}
                     <span class="font-medium">{{ templates.total }}</span>
                     {{ t('common.results', 'results') }}
@@ -449,11 +568,11 @@ const formatDate = (dateString: string | null) => {
                         v-for="link in templates.links"
                         :key="link.label"
                         :class="[
-                            'px-3 py-2 rounded-md text-sm transition-colors',
+                            'rounded-md px-3 py-2 text-sm transition-colors',
                             link.active
                                 ? 'bg-[#25D366] text-white'
                                 : 'bg-background text-foreground hover:bg-muted',
-                            !link.url ? 'opacity-50 cursor-not-allowed' : '',
+                            !link.url ? 'cursor-not-allowed opacity-50' : '',
                         ]"
                         :href="link.url || '#'"
                         preserve-scroll
@@ -470,9 +589,21 @@ const formatDate = (dateString: string | null) => {
                     <DialogTitle :class="isRTL() ? 'text-right' : 'text-left'">
                         {{ t('templates.delete_template', 'Delete Template') }}
                     </DialogTitle>
-                    <DialogDescription :class="isRTL() ? 'text-right' : 'text-left'">
-                        {{ t('templates.delete_template_confirm', 'Are you sure you want to delete this template?') }}
-                        {{ t('common.cannot_undo', 'This action cannot be undone.') }}
+                    <DialogDescription
+                        :class="isRTL() ? 'text-right' : 'text-left'"
+                    >
+                        {{
+                            t(
+                                'templates.delete_template_confirm',
+                                'Are you sure you want to delete this template?',
+                            )
+                        }}
+                        {{
+                            t(
+                                'common.cannot_undo',
+                                'This action cannot be undone.',
+                            )
+                        }}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

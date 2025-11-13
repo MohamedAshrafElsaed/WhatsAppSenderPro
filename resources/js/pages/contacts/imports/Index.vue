@@ -5,6 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -22,12 +28,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import {
@@ -37,7 +37,9 @@ import {
     template,
     upload,
 } from '@/routes/dashboard/contacts/imports';
+import { Country } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 import {
     AlertCircle,
     Check,
@@ -48,9 +50,7 @@ import {
     Trash2,
     Upload,
 } from 'lucide-vue-next';
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
-import { Country } from '@/types';
-import axios from 'axios';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 interface Tag {
     id: number;
@@ -177,7 +177,10 @@ const startImport = () => {
             column_mapping: columnMapping.value,
             validate_whatsapp: validateWhatsApp.value,
             tag_id: selectedTagId.value !== 'none' ? selectedTagId.value : null,
-            default_country_id: defaultCountryId.value !== 'none' ? defaultCountryId.value : null,
+            default_country_id:
+                defaultCountryId.value !== 'none'
+                    ? defaultCountryId.value
+                    : null,
         },
         {
             onFinish: () => {
@@ -195,7 +198,9 @@ const startImport = () => {
 const startProgressPolling = (importId: number) => {
     progressInterval = window.setInterval(async () => {
         try {
-            const response = await axios.get(`/dashboard/contacts/imports/${importId}/progress`);
+            const response = await axios.get(
+                `/dashboard/contacts/imports/${importId}/progress`,
+            );
             importProgress.value = response.data;
 
             if (response.data.status === 'completed') {
@@ -279,7 +284,9 @@ const formatDate = (dateString: string) => {
 
 const progressPercentage = computed(() => {
     if (currentStep.value === 3 && importProgress.value) {
-        return Math.round((importProgress.value.processed / importProgress.value.total) * 100);
+        return Math.round(
+            (importProgress.value.processed / importProgress.value.total) * 100,
+        );
     }
     return (currentStep.value / 4) * 100;
 });
@@ -292,7 +299,7 @@ watch(
             currentStep.value = 2;
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 watch(
@@ -303,7 +310,7 @@ watch(
             currentStep.value = 4;
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 onMounted(() => {
@@ -328,13 +335,21 @@ onUnmounted(() => {
 
         <div
             v-if="isProcessing"
-            class="fixed inset-0 z-40 bg-black/50"
             aria-hidden="true"
+            class="fixed inset-0 z-40 bg-black/50"
         ></div>
 
-        <div class="mx-auto max-w-6xl space-y-6" :class="{ 'relative z-50': isProcessing }">
+        <div
+            :class="{ 'relative z-50': isProcessing }"
+            class="mx-auto max-w-6xl space-y-6"
+        >
             <Heading
-                :description="t('imports.description', 'Import contacts from CSV or Excel files')"
+                :description="
+                    t(
+                        'imports.description',
+                        'Import contacts from CSV or Excel files',
+                    )
+                "
                 :title="t('imports.title')"
             />
 
@@ -345,7 +360,9 @@ onUnmounted(() => {
                     :key="step"
                     :class="[
                         'flex items-center gap-2',
-                        currentStep >= step ? 'text-[#25D366]' : 'text-muted-foreground',
+                        currentStep >= step
+                            ? 'text-[#25D366]'
+                            : 'text-muted-foreground',
                     ]"
                 >
                     <div
@@ -364,16 +381,19 @@ onUnmounted(() => {
                             step === 1
                                 ? t('imports.upload_file')
                                 : step === 2
-                                    ? t('imports.map_columns')
-                                    : step === 3
-                                        ? t('imports.processing')
-                                        : t('imports.summary')
+                                  ? t('imports.map_columns')
+                                  : step === 3
+                                    ? t('imports.processing')
+                                    : t('imports.summary')
                         }}
                     </span>
                 </div>
             </div>
 
-            <Progress :model-value="progressPercentage" class="h-2 [&>div]:bg-[#25D366]" />
+            <Progress
+                :model-value="progressPercentage"
+                class="h-2 [&>div]:bg-[#25D366]"
+            />
 
             <!-- Step 1: Upload -->
             <Card v-show="currentStep === 1">
@@ -407,7 +427,10 @@ onUnmounted(() => {
 
                     <div class="mt-6 text-center">
                         <a :href="template()" download>
-                            <Button variant="outline" class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white">
+                            <Button
+                                class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
+                                variant="outline"
+                            >
                                 <Download
                                     :class="isRTL() ? 'ml-2' : 'mr-2'"
                                     class="h-4 w-4"
@@ -438,7 +461,9 @@ onUnmounted(() => {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead
-                                            v-for="(header, index) in parseResult.headers"
+                                            v-for="(
+                                                header, index
+                                            ) in parseResult.headers"
                                             :key="index"
                                         >
                                             {{ header }}
@@ -447,7 +472,9 @@ onUnmounted(() => {
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow
-                                        v-for="(row, rowIndex) in parseResult.preview.slice(0, 3)"
+                                        v-for="(
+                                            row, rowIndex
+                                        ) in parseResult.preview.slice(0, 3)"
                                         :key="rowIndex"
                                     >
                                         <TableCell
@@ -496,12 +523,19 @@ onUnmounted(() => {
                             <Select v-model="columnMapping[field.value]">
                                 <SelectTrigger>
                                     <SelectValue
-                                        :placeholder="t('imports.mapping.select_column', 'Select column')"
+                                        :placeholder="
+                                            t(
+                                                'imports.mapping.select_column',
+                                                'Select column',
+                                            )
+                                        "
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem
-                                        v-for="(header, index) in parseResult?.headers"
+                                        v-for="(
+                                            header, index
+                                        ) in parseResult?.headers"
                                         :key="index"
                                         :value="header"
                                     >
@@ -513,27 +547,46 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Phone Normalization Section -->
-                    <div class="space-y-4 border-t pt-6 mt-6">
+                    <div class="mt-6 space-y-4 border-t pt-6">
                         <div class="space-y-2">
                             <Label for="default_country">
-                                {{ t('imports.default_country', 'Default Country for Phone Normalization') }}
+                                {{
+                                    t(
+                                        'imports.default_country',
+                                        'Default Country for Phone Normalization',
+                                    )
+                                }}
                             </Label>
                             <Select v-model="defaultCountryId">
                                 <SelectTrigger>
                                     <SelectValue
-                                        :placeholder="t('imports.select_country', 'Select default country')"
+                                        :placeholder="
+                                            t(
+                                                'imports.select_country',
+                                                'Select default country',
+                                            )
+                                        "
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">
-                                        {{ t('imports.no_default_country', 'No default country') }}
+                                        {{
+                                            t(
+                                                'imports.no_default_country',
+                                                'No default country',
+                                            )
+                                        }}
                                     </SelectItem>
                                     <SelectItem
                                         v-for="country in countries"
                                         :key="country.id"
                                         :value="country.id.toString()"
                                     >
-                                        {{ isRTL() ? country.name_ar : country.name_en }}
+                                        {{
+                                            isRTL()
+                                                ? country.name_ar
+                                                : country.name_en
+                                        }}
                                         (+{{ country.phone_code }})
                                     </SelectItem>
                                 </SelectContent>
@@ -542,7 +595,7 @@ onUnmounted(() => {
                                 {{
                                     t(
                                         'imports.default_country_hint',
-                                        'Used to normalize phone numbers that don\'t include a country code'
+                                        "Used to normalize phone numbers that don't include a country code",
                                     )
                                 }}
                             </p>
@@ -551,11 +604,21 @@ onUnmounted(() => {
                         <Alert class="border-[#25D366]/20 bg-[#25D366]/5">
                             <AlertCircle class="h-4 w-4 text-[#25D366]" />
                             <AlertDescription>
-                                <p class="font-semibold mb-2 text-[#25D366]">
-                                    {{ t('imports.phone_normalization_info', 'Phone Number Normalization') }}
+                                <p class="mb-2 font-semibold text-[#25D366]">
+                                    {{
+                                        t(
+                                            'imports.phone_normalization_info',
+                                            'Phone Number Normalization',
+                                        )
+                                    }}
                                 </p>
-                                <p class="text-sm text-muted-foreground mb-2">
-                                    {{ t('imports.auto_country_detection', 'Country will be automatically detected from phone numbers') }}
+                                <p class="mb-2 text-sm text-muted-foreground">
+                                    {{
+                                        t(
+                                            'imports.auto_country_detection',
+                                            'Country will be automatically detected from phone numbers',
+                                        )
+                                    }}
                                 </p>
                             </AlertDescription>
                         </Alert>
@@ -571,7 +634,7 @@ onUnmounted(() => {
                             <Checkbox
                                 id="validate_whatsapp"
                                 v-model:checked="validateWhatsApp"
-                                class="data-[state=checked]:bg-[#25D366] data-[state=checked]:border-[#25D366]"
+                                class="data-[state=checked]:border-[#25D366] data-[state=checked]:bg-[#25D366]"
                             />
                             <Label
                                 class="cursor-pointer font-normal"
@@ -581,30 +644,39 @@ onUnmounted(() => {
                             </Label>
                         </div>
                         <p class="text-xs text-muted-foreground">
-                            {{ t('imports.whatsapp_validation_note', 'Only validates if you have a connected WhatsApp session') }}
+                            {{
+                                t(
+                                    'imports.whatsapp_validation_note',
+                                    'Only validates if you have a connected WhatsApp session',
+                                )
+                            }}
                         </p>
 
                         <div>
                             <Label for="tag">{{
-                                    t('imports.mapping.assign_tag')
-                                }}</Label>
+                                t('imports.mapping.assign_tag')
+                            }}</Label>
                             <Select v-model="selectedTagId">
                                 <SelectTrigger>
                                     <SelectValue
-                                        :placeholder="t('imports.mapping.select_tag')"
+                                        :placeholder="
+                                            t('imports.mapping.select_tag')
+                                        "
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">{{
-                                            t('common.none', 'None')
-                                        }}</SelectItem>
+                                    <SelectItem value="none"
+                                        >{{ t('common.none', 'None') }}
+                                    </SelectItem>
                                     <SelectItem
                                         v-for="tag in tags"
                                         :key="tag.id"
                                         :value="tag.id.toString()"
                                     >
                                         <Badge
-                                            :style="{ backgroundColor: tag.color }"
+                                            :style="{
+                                                backgroundColor: tag.color,
+                                            }"
                                             class="text-white"
                                         >
                                             {{ tag.name }}
@@ -621,7 +693,10 @@ onUnmounted(() => {
                             {{ t('common.cancel', 'Cancel') }}
                         </Button>
                         <Button
-                            :disabled="!columnMapping.first_name || !columnMapping.phone_number"
+                            :disabled="
+                                !columnMapping.first_name ||
+                                !columnMapping.phone_number
+                            "
                             class="bg-[#25D366] hover:bg-[#128C7E]"
                             @click="startImport"
                         >
@@ -635,7 +710,9 @@ onUnmounted(() => {
             <Card v-show="currentStep === 3" class="p-12 text-center">
                 <div class="space-y-6">
                     <div class="flex justify-center">
-                        <div class="h-16 w-16 animate-spin rounded-full border-4 border-[#25D366] border-t-transparent"></div>
+                        <div
+                            class="h-16 w-16 animate-spin rounded-full border-4 border-[#25D366] border-t-transparent"
+                        ></div>
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold">
@@ -659,26 +736,50 @@ onUnmounted(() => {
 
                         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <div class="rounded-lg bg-muted p-3">
-                                <p class="text-xs text-muted-foreground">Total</p>
-                                <p class="text-lg font-bold">{{ importProgress.total }}</p>
+                                <p class="text-xs text-muted-foreground">
+                                    Total
+                                </p>
+                                <p class="text-lg font-bold">
+                                    {{ importProgress.total }}
+                                </p>
                             </div>
-                            <div class="rounded-lg bg-[#25D366]/10 border border-[#25D366]/20 p-3">
-                                <p class="text-xs text-muted-foreground">Valid</p>
-                                <p class="text-lg font-bold text-[#25D366]">{{ importProgress.valid }}</p>
+                            <div
+                                class="rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-3"
+                            >
+                                <p class="text-xs text-muted-foreground">
+                                    Valid
+                                </p>
+                                <p class="text-lg font-bold text-[#25D366]">
+                                    {{ importProgress.valid }}
+                                </p>
                             </div>
-                            <div class="rounded-lg bg-red-50 border border-red-200 p-3 dark:bg-red-950">
-                                <p class="text-xs text-muted-foreground">Invalid</p>
-                                <p class="text-lg font-bold text-red-600">{{ importProgress.invalid }}</p>
+                            <div
+                                class="rounded-lg border border-red-200 bg-red-50 p-3 dark:bg-red-950"
+                            >
+                                <p class="text-xs text-muted-foreground">
+                                    Invalid
+                                </p>
+                                <p class="text-lg font-bold text-red-600">
+                                    {{ importProgress.invalid }}
+                                </p>
                             </div>
-                            <div class="rounded-lg bg-yellow-50 border border-yellow-200 p-3 dark:bg-yellow-950">
-                                <p class="text-xs text-muted-foreground">Duplicates</p>
-                                <p class="text-lg font-bold text-yellow-600">{{ importProgress.duplicates }}</p>
+                            <div
+                                class="rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:bg-yellow-950"
+                            >
+                                <p class="text-xs text-muted-foreground">
+                                    Duplicates
+                                </p>
+                                <p class="text-lg font-bold text-yellow-600">
+                                    {{ importProgress.duplicates }}
+                                </p>
                             </div>
                         </div>
 
                         <p class="text-sm text-muted-foreground">
-                            Processing row {{ importProgress.current_row }} of {{ importProgress.total }}
-                            ({{ progressPercentage }}%)
+                            Processing row {{ importProgress.current_row }} of
+                            {{ importProgress.total }} ({{
+                                progressPercentage
+                            }}%)
                         </p>
                     </div>
                 </div>
@@ -687,9 +788,9 @@ onUnmounted(() => {
             <!-- Step 4: Summary -->
             <Card v-if="importSummary" v-show="currentStep === 4">
                 <CardHeader>
-                    <CardTitle>{{
-                            t('imports.summary.title', 'Import Complete')
-                        }}</CardTitle>
+                    <CardTitle
+                        >{{ t('imports.summary.title', 'Import Complete') }}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-6">
                     <!-- Statistics Grid -->
@@ -703,7 +804,9 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <div class="rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-4">
+                        <div
+                            class="rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-4"
+                        >
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.valid_imported') }}
                             </p>
@@ -712,7 +815,9 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950">
+                        <div
+                            class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950"
+                        >
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.invalid_skipped') }}
                             </p>
@@ -721,7 +826,9 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:bg-yellow-950">
+                        <div
+                            class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:bg-yellow-950"
+                        >
                             <p class="text-sm text-muted-foreground">
                                 {{ t('imports.summary.duplicates') }}
                             </p>
@@ -730,9 +837,16 @@ onUnmounted(() => {
                             </p>
                         </div>
 
-                        <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:bg-blue-950">
+                        <div
+                            class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:bg-blue-950"
+                        >
                             <p class="text-sm text-muted-foreground">
-                                {{ t('imports.summary.phone_normalized', 'Phone Numbers Normalized') }}
+                                {{
+                                    t(
+                                        'imports.summary.phone_normalized',
+                                        'Phone Numbers Normalized',
+                                    )
+                                }}
                             </p>
                             <p class="text-2xl font-bold text-blue-600">
                                 {{ importSummary.phone_normalized || 0 }}
@@ -741,7 +855,12 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Errors Table -->
-                    <div v-if="importSummary.errors && importSummary.errors.length > 0">
+                    <div
+                        v-if="
+                            importSummary.errors &&
+                            importSummary.errors.length > 0
+                        "
+                    >
                         <Alert variant="destructive">
                             <AlertCircle class="h-4 w-4" />
                             <AlertDescription>
@@ -759,17 +878,26 @@ onUnmounted(() => {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>{{
+                                        <TableHead
+                                            >{{
                                                 t('imports.errors.row', 'Row')
-                                            }}</TableHead>
-                                        <TableHead>{{
-                                                t('imports.errors.error', 'Error')
-                                            }}</TableHead>
+                                            }}
+                                        </TableHead>
+                                        <TableHead
+                                            >{{
+                                                t(
+                                                    'imports.errors.error',
+                                                    'Error',
+                                                )
+                                            }}
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow
-                                        v-for="(error, index) in importSummary.errors.slice(0, 10)"
+                                        v-for="(
+                                            error, index
+                                        ) in importSummary.errors.slice(0, 10)"
                                         :key="index"
                                     >
                                         <TableCell>{{ error.row }}</TableCell>
@@ -779,8 +907,17 @@ onUnmounted(() => {
                             </Table>
                         </div>
 
-                        <p v-if="importSummary.errors.length > 10" class="mt-2 text-sm text-muted-foreground">
-                            {{ t('imports.showing_first_errors', 'Showing first 10 of {total} errors', { total: importSummary.errors.length }) }}
+                        <p
+                            v-if="importSummary.errors.length > 10"
+                            class="mt-2 text-sm text-muted-foreground"
+                        >
+                            {{
+                                t(
+                                    'imports.showing_first_errors',
+                                    'Showing first 10 of {total} errors',
+                                    { total: importSummary.errors.length },
+                                )
+                            }}
                         </p>
                     </div>
 
@@ -791,9 +928,14 @@ onUnmounted(() => {
                         </Button>
                         <div class="flex gap-2">
                             <Button variant="outline" @click="currentStep = 1">
-                                {{ t('imports.history.title', 'Import History') }}
+                                {{
+                                    t('imports.history.title', 'Import History')
+                                }}
                             </Button>
-                            <Button class="bg-[#25D366] hover:bg-[#128C7E]" @click="$inertia.visit(contactsIndex())">
+                            <Button
+                                class="bg-[#25D366] hover:bg-[#128C7E]"
+                                @click="$inertia.visit(contactsIndex())"
+                            >
                                 {{ t('imports.summary.view_contacts') }}
                             </Button>
                         </div>
@@ -818,27 +960,27 @@ onUnmounted(() => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>{{
-                                            t('imports.history.filename')
-                                        }}</TableHead>
-                                    <TableHead>{{
-                                            t('imports.history.date')
-                                        }}</TableHead>
-                                    <TableHead>{{
-                                            t('imports.history.total')
-                                        }}</TableHead>
-                                    <TableHead>{{
-                                            t('imports.history.valid')
-                                        }}</TableHead>
-                                    <TableHead>{{
-                                            t('imports.history.invalid')
-                                        }}</TableHead>
-                                    <TableHead>{{
-                                            t('imports.history.status')
-                                        }}</TableHead>
-                                    <TableHead>{{
-                                            t('common.actions', 'Actions')
-                                        }}</TableHead>
+                                    <TableHead
+                                        >{{ t('imports.history.filename') }}
+                                    </TableHead>
+                                    <TableHead
+                                        >{{ t('imports.history.date') }}
+                                    </TableHead>
+                                    <TableHead
+                                        >{{ t('imports.history.total') }}
+                                    </TableHead>
+                                    <TableHead
+                                        >{{ t('imports.history.valid') }}
+                                    </TableHead>
+                                    <TableHead
+                                        >{{ t('imports.history.invalid') }}
+                                    </TableHead>
+                                    <TableHead
+                                        >{{ t('imports.history.status') }}
+                                    </TableHead>
+                                    <TableHead
+                                        >{{ t('common.actions', 'Actions') }}
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -846,21 +988,25 @@ onUnmounted(() => {
                                     v-for="importRecord in imports.data"
                                     :key="importRecord.id"
                                 >
-                                    <TableCell class="font-medium">{{
-                                            importRecord.filename
-                                        }}</TableCell>
-                                    <TableCell>{{
+                                    <TableCell class="font-medium"
+                                        >{{ importRecord.filename }}
+                                    </TableCell>
+                                    <TableCell
+                                        >{{
                                             formatDate(importRecord.created_at)
-                                        }}</TableCell>
-                                    <TableCell>{{
-                                            importRecord.total_rows
-                                        }}</TableCell>
-                                    <TableCell class="text-[#25D366] font-semibold">{{
-                                            importRecord.valid_contacts
-                                        }}</TableCell>
-                                    <TableCell class="text-red-600 font-semibold">{{
-                                            importRecord.invalid_contacts
-                                        }}</TableCell>
+                                        }}
+                                    </TableCell>
+                                    <TableCell
+                                        >{{ importRecord.total_rows }}
+                                    </TableCell>
+                                    <TableCell
+                                        class="font-semibold text-[#25D366]"
+                                        >{{ importRecord.valid_contacts }}
+                                    </TableCell>
+                                    <TableCell
+                                        class="font-semibold text-red-600"
+                                        >{{ importRecord.invalid_contacts }}
+                                    </TableCell>
                                     <TableCell>
                                         <Badge
                                             :variant="
@@ -879,24 +1025,61 @@ onUnmounted(() => {
                                     <TableCell>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger as-child>
-                                                <Button size="sm" variant="ghost">
-                                                    <MoreVertical class="h-4 w-4" />
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                >
+                                                    <MoreVertical
+                                                        class="h-4 w-4"
+                                                    />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem
-                                                    v-if="importRecord.status === 'completed'"
-                                                    @click="viewImportDetails(importRecord)"
+                                                    v-if="
+                                                        importRecord.status ===
+                                                        'completed'
+                                                    "
+                                                    @click="
+                                                        viewImportDetails(
+                                                            importRecord,
+                                                        )
+                                                    "
                                                 >
-                                                    <Eye :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
-                                                    {{ t('common.view', 'View') }}
+                                                    <Eye
+                                                        :class="
+                                                            isRTL()
+                                                                ? 'ml-2'
+                                                                : 'mr-2'
+                                                        "
+                                                        class="h-4 w-4"
+                                                    />
+                                                    {{
+                                                        t('common.view', 'View')
+                                                    }}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     class="text-destructive"
-                                                    @click="deleteImportRecord(importRecord.id)"
+                                                    @click="
+                                                        deleteImportRecord(
+                                                            importRecord.id,
+                                                        )
+                                                    "
                                                 >
-                                                    <Trash2 :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
-                                                    {{ t('common.delete', 'Delete') }}
+                                                    <Trash2
+                                                        :class="
+                                                            isRTL()
+                                                                ? 'ml-2'
+                                                                : 'mr-2'
+                                                        "
+                                                        class="h-4 w-4"
+                                                    />
+                                                    {{
+                                                        t(
+                                                            'common.delete',
+                                                            'Delete',
+                                                        )
+                                                    }}
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

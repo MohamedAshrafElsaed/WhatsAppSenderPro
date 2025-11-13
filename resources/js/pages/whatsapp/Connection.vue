@@ -221,15 +221,18 @@ const deleteSession = async (sessionId: string) => {
     }
 
     try {
-        const response = await fetch(`/dashboard/whatsapp/sessions/${sessionId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN':
-                    document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute('content') || '',
+        const response = await fetch(
+            `/dashboard/whatsapp/sessions/${sessionId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || '',
+                },
             },
-        });
+        );
 
         const data = await response.json();
 

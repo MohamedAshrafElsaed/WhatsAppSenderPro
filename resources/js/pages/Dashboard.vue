@@ -21,8 +21,8 @@ import { Progress } from '@/components/ui/progress';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { index as dashboard } from '@/routes/dashboard';
-import { connection } from '@/routes/dashboard/whatsapp';
 import { index as importsIndex } from '@/routes/dashboard/contacts/imports';
+import { connection } from '@/routes/dashboard/whatsapp';
 import { index as subscriptionIndex, upgrade } from '@/routes/subscription';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/vue3';
@@ -151,19 +151,32 @@ const formatLimit = (limit: number | string): string => {
 // Quick Actions with completion tracking
 const quickActions = computed(() => [
     {
-        title: t('dashboard.quick_actions.connect_whatsapp', 'Connect WhatsApp'),
-        description: t('dashboard.quick_actions.connect_whatsapp_desc', 'Link your WhatsApp number'),
+        title: t(
+            'dashboard.quick_actions.connect_whatsapp',
+            'Connect WhatsApp',
+        ),
+        description: t(
+            'dashboard.quick_actions.connect_whatsapp_desc',
+            'Link your WhatsApp number',
+        ),
         icon: Phone,
         href: connection(),
         completed: props.onboarding.status.whatsapp_connected,
         repeatable: true,
-        completedText: props.whatsapp.connected > 0
-            ? t('dashboard.quick_actions.connected_count', `${props.whatsapp.connected} connected`)
-            : null,
+        completedText:
+            props.whatsapp.connected > 0
+                ? t(
+                      'dashboard.quick_actions.connected_count',
+                      `${props.whatsapp.connected} connected`,
+                  )
+                : null,
     },
     {
         title: t('dashboard.quick_actions.import_contacts', 'Import Contacts'),
-        description: t('dashboard.quick_actions.import_contacts_desc', 'Upload your contact list'),
+        description: t(
+            'dashboard.quick_actions.import_contacts_desc',
+            'Upload your contact list',
+        ),
         icon: Upload,
         href: importsIndex(),
         completed: props.onboarding.status.contacts_imported,
@@ -172,7 +185,10 @@ const quickActions = computed(() => [
     },
     {
         title: t('dashboard.quick_actions.create_template', 'Create Template'),
-        description: t('dashboard.quick_actions.create_template_desc', 'Design message templates'),
+        description: t(
+            'dashboard.quick_actions.create_template_desc',
+            'Design message templates',
+        ),
         icon: FileText,
         href: '#', // ✅ FIXED: Placeholder until route exists
         completed: props.onboarding.status.template_created,
@@ -181,7 +197,10 @@ const quickActions = computed(() => [
     },
     {
         title: t('dashboard.quick_actions.create_campaign', 'Create Campaign'),
-        description: t('dashboard.quick_actions.create_campaign_desc', 'Send bulk messages'),
+        description: t(
+            'dashboard.quick_actions.create_campaign_desc',
+            'Send bulk messages',
+        ),
         icon: MessageSquare,
         href: '#', // ✅ FIXED: Placeholder until route exists
         completed: props.onboarding.status.campaign_sent,
@@ -193,26 +212,41 @@ const quickActions = computed(() => [
 // Getting Started Steps with real completion status
 const gettingStartedSteps = computed(() => [
     {
-        title: t('dashboard.getting_started.step1', 'Connect your WhatsApp number'),
-        description: t('dashboard.getting_started.step1_desc', 'Scan QR code to link your WhatsApp'),
+        title: t(
+            'dashboard.getting_started.step1',
+            'Connect your WhatsApp number',
+        ),
+        description: t(
+            'dashboard.getting_started.step1_desc',
+            'Scan QR code to link your WhatsApp',
+        ),
         completed: props.onboarding.status.whatsapp_connected,
         href: connection(),
     },
     {
         title: t('dashboard.getting_started.step2', 'Import your contacts'),
-        description: t('dashboard.getting_started.step2_desc', 'Upload CSV or connect Google Sheets'),
+        description: t(
+            'dashboard.getting_started.step2_desc',
+            'Upload CSV or connect Google Sheets',
+        ),
         completed: props.onboarding.status.contacts_imported,
         href: importsIndex(),
     },
     {
         title: t('dashboard.getting_started.step3', 'Create message template'),
-        description: t('dashboard.getting_started.step3_desc', 'Design reusable message templates'),
+        description: t(
+            'dashboard.getting_started.step3_desc',
+            'Design reusable message templates',
+        ),
         completed: props.onboarding.status.template_created,
         href: '#', // ✅ FIXED: Placeholder until route exists
     },
     {
         title: t('dashboard.getting_started.step4', 'Send your first campaign'),
-        description: t('dashboard.getting_started.step4_desc', 'Launch your first bulk WhatsApp campaign'),
+        description: t(
+            'dashboard.getting_started.step4_desc',
+            'Launch your first bulk WhatsApp campaign',
+        ),
         completed: props.onboarding.status.campaign_sent,
         href: '#', // ✅ FIXED: Placeholder until route exists
     },

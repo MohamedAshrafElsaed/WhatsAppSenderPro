@@ -7,66 +7,17 @@ use App\Models\ContactTag;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use libphonenumber\PhoneNumberUtil;
-use libphonenumber\PhoneNumberFormat;
 use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 
 readonly class ContactService
 {
     public function __construct(
         private WhatsAppApiService   $whatsappApi,
         private UsageTrackingService $usageTracking
-    ) {}
-
-    /**
-     * Normalize phone number to E164 format (+201xxxxxxxxx)
-     */
-    public function normalizePhoneNumber(
-        string $phoneNumber,
-        ?int $countryId = null
-    ): ?string {
-        try {
-            $phoneUtil = PhoneNumberUtil::getInstance();
-
-            // Get country ISO code
-            $countryISO = $this->getCountryISOCode($countryId);
-
-            // Parse number with country context
-            $numberProto = $phoneUtil->parse($phoneNumber, $countryISO);
-
-            // Validate it's a valid number
-            if (!$phoneUtil->isValidNumber($numberProto)) {
-                Log::warning('Invalid phone number during normalization', [
-                    'phone' => $phoneNumber,
-                    'country_id' => $countryId,
-                ]);
-                return null;
-            }
-
-            // Return in E164 format (+201xxxxxxxxx)
-            return $phoneUtil->format($numberProto, PhoneNumberFormat::E164);
-
-        } catch (NumberParseException $e) {
-            Log::warning('Phone normalization failed', [
-                'phone' => $phoneNumber,
-                'country_id' => $countryId,
-                'error' => $e->getMessage()
-            ]);
-            return null;
-        }
-    }
-
-    /**
-     * Get country ISO code from country ID
-     */
-    private function getCountryISOCode(?int $countryId): string
+    )
     {
-        if (!$countryId) {
-            return 'EG'; // Default to Egypt
-        }
-
-        $country = \App\Models\Country::find($countryId);
-        return $country?->iso_code ?? 'EG';
     }
 
     /**
@@ -82,6 +33,19 @@ readonly class ContactService
         } catch (NumberParseException $e) {
             return false;
         }
+    }
+
+    /**
+     * Get country ISO code from country ID
+     */
+    private function getCountryISOCode(?int $countryId): string
+    {
+        if (!$countryId) {
+            return 'EG'; // Default to Egypt
+        }
+
+        $country = \App\Models\Country::find($countryId);
+        return $country?->iso_code ?? 'EG';
     }
 
     /**
@@ -131,90 +95,42 @@ readonly class ContactService
     }
 
     /**
-     * Update an existing contact
-     * @throws \Throwable
+     * Normalize phone number to E164 format (+201xxxxxxxxx)
      */
-    public function updateContact(Contact $contact, array $data): Contact
-    {
-        return DB::transaction(function () use ($contact, $data) {
-            // Normalize phone number if changed and not already normalized
-            if (!empty($data['phone_number']) &&
-                $data['phone_number'] !== $contact->phone_number &&
-                !str_starts_with($data['phone_number'], '+')) {
-
-                $normalized = $this->normalizePhoneNumber(
-                    $data['phone_number'],
-                    $data['country_id'] ?? $contact->country_id
-                );
-
-                if ($normalized) {
-                    $data['phone_number'] = $normalized;
-                }
-            }
-
-            $contact->update([
-                'first_name' => $data['first_name'] ?? $contact->first_name,
-                'last_name' => $data['last_name'] ?? $contact->last_name,
-                'phone_number' => $data['phone_number'] ?? $contact->phone_number,
-                'email' => $data['email'] ?? $contact->email,
-                'country_id' => $data['country_id'] ?? $contact->country_id,
-                'custom_fields' => $data['custom_fields'] ?? $contact->custom_fields,
-                'notes' => $data['notes'] ?? $contact->notes,
-            ]);
-
-            // Sync tags if provided
-            if (isset($data['tags'])) {
-                $this->syncTags($contact, $data['tags']);
-            }
-
-            // Validate WhatsApp if requested and phone changed
-            if (!empty($data['validate_whatsapp']) &&
-                $contact->wasChanged('phone_number')) {
-                $this->validateWhatsAppNumber($contact->user, $contact);
-            }
-
-            return $contact->load(['tags', 'country']);
-        });
-    }
-
-    /**
-     * Delete a contact
-     * @throws \Throwable
-     */
-    public function deleteContact(Contact $contact): bool
-    {
-        return DB::transaction(function () use ($contact) {
-            // Update tag counts
-            foreach ($contact->tags as $tag) {
-                $tag->updateContactsCount();
-            }
-
-            return $contact->delete();
-        });
-    }
-
-    /**
-     * Check if phone number is duplicate
-     */
-    public function isDuplicate(
-        User $user,
+    public function normalizePhoneNumber(
         string $phoneNumber,
-        ?int $excludeContactId = null
-    ): bool {
-        // Normalize the phone number for comparison
-        $normalized = $this->normalizePhoneNumber($phoneNumber);
-        if (!$normalized) {
-            $normalized = $phoneNumber;
+        ?int   $countryId = null
+    ): ?string
+    {
+        try {
+            $phoneUtil = PhoneNumberUtil::getInstance();
+
+            // Get country ISO code
+            $countryISO = $this->getCountryISOCode($countryId);
+
+            // Parse number with country context
+            $numberProto = $phoneUtil->parse($phoneNumber, $countryISO);
+
+            // Validate it's a valid number
+            if (!$phoneUtil->isValidNumber($numberProto)) {
+                Log::warning('Invalid phone number during normalization', [
+                    'phone' => $phoneNumber,
+                    'country_id' => $countryId,
+                ]);
+                return null;
+            }
+
+            // Return in E164 format (+201xxxxxxxxx)
+            return $phoneUtil->format($numberProto, PhoneNumberFormat::E164);
+
+        } catch (NumberParseException $e) {
+            Log::warning('Phone normalization failed', [
+                'phone' => $phoneNumber,
+                'country_id' => $countryId,
+                'error' => $e->getMessage()
+            ]);
+            return null;
         }
-
-        $query = Contact::forUser($user)
-            ->where('phone_number', $normalized);
-
-        if ($excludeContactId) {
-            $query->where('id', '!=', $excludeContactId);
-        }
-
-        return $query->exists();
     }
 
     /**
@@ -298,6 +214,94 @@ readonly class ContactService
 
             return false;
         }
+    }
+
+    /**
+     * Update an existing contact
+     * @throws \Throwable
+     */
+    public function updateContact(Contact $contact, array $data): Contact
+    {
+        return DB::transaction(function () use ($contact, $data) {
+            // Normalize phone number if changed and not already normalized
+            if (!empty($data['phone_number']) &&
+                $data['phone_number'] !== $contact->phone_number &&
+                !str_starts_with($data['phone_number'], '+')) {
+
+                $normalized = $this->normalizePhoneNumber(
+                    $data['phone_number'],
+                    $data['country_id'] ?? $contact->country_id
+                );
+
+                if ($normalized) {
+                    $data['phone_number'] = $normalized;
+                }
+            }
+
+            $contact->update([
+                'first_name' => $data['first_name'] ?? $contact->first_name,
+                'last_name' => $data['last_name'] ?? $contact->last_name,
+                'phone_number' => $data['phone_number'] ?? $contact->phone_number,
+                'email' => $data['email'] ?? $contact->email,
+                'country_id' => $data['country_id'] ?? $contact->country_id,
+                'custom_fields' => $data['custom_fields'] ?? $contact->custom_fields,
+                'notes' => $data['notes'] ?? $contact->notes,
+            ]);
+
+            // Sync tags if provided
+            if (isset($data['tags'])) {
+                $this->syncTags($contact, $data['tags']);
+            }
+
+            // Validate WhatsApp if requested and phone changed
+            if (!empty($data['validate_whatsapp']) &&
+                $contact->wasChanged('phone_number')) {
+                $this->validateWhatsAppNumber($contact->user, $contact);
+            }
+
+            return $contact->load(['tags', 'country']);
+        });
+    }
+
+    /**
+     * Delete a contact
+     * @throws \Throwable
+     */
+    public function deleteContact(Contact $contact): bool
+    {
+        return DB::transaction(function () use ($contact) {
+            // Update tag counts
+            foreach ($contact->tags as $tag) {
+                $tag->updateContactsCount();
+            }
+
+            return $contact->delete();
+        });
+    }
+
+    /**
+     * Check if phone number is duplicate
+     */
+    public function isDuplicate(
+        User   $user,
+        string $phoneNumber,
+        ?int   $excludeContactId = null
+    ): bool
+    {
+        // Normalize the phone number for comparison
+        $normalized = $this->normalizePhoneNumber($phoneNumber);
+        if (!$normalized) {
+            $normalized = $phoneNumber;
+        }
+
+        $query = Contact::forUser($user)
+            ->where('phone_number', $normalized);
+
+        if ($excludeContactId) {
+            $query->where('id', '!=', $excludeContactId);
+        }
+
+        return $query->exists();
     }
 
     /**

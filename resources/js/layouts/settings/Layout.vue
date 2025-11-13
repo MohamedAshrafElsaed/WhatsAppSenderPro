@@ -5,14 +5,13 @@ import { Separator } from '@/components/ui/separator';
 import { useTranslation } from '@/composables/useTranslation';
 import { toUrl, urlIsActive } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/dashboard/settings/appearance';
+import { edit as editPassword } from '@/routes/dashboard/settings/password';
 import { edit as editProfile } from '@/routes/dashboard/settings/profile';
 import { index as subscription } from '@/routes/dashboard/settings/subscription';
-import { show } from '@/routes/dashboard/settings/two-factor';
-import { edit as editPassword } from '@/routes/dashboard/settings/password';
 import { type NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import { CreditCard, Lock, Palette, User } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { User, Lock, Shield, Palette, CreditCard } from 'lucide-vue-next';
 
 const { t, isRTL } = useTranslation();
 
@@ -49,7 +48,7 @@ const currentPath =
             :description="
                 t(
                     'settings.description',
-                    'Manage your profile and account settings'
+                    'Manage your profile and account settings',
                 )
             "
             :title="t('settings.title', 'Settings')"
@@ -72,7 +71,7 @@ const currentPath =
                             'w-full',
                             isRTL() ? 'justify-end' : 'justify-start',
                             urlIsActive(item.href, currentPath)
-                                ? 'bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 border-[#25D366]'
+                                ? 'border-[#25D366] bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20'
                                 : 'hover:bg-muted hover:text-[#25D366]',
                         ]"
                         as-child
@@ -83,7 +82,7 @@ const currentPath =
                                 :is="item.icon"
                                 :class="[
                                     'h-4 w-4',
-                                    isRTL() ? 'order-2' : 'order-1'
+                                    isRTL() ? 'order-2' : 'order-1',
                                 ]"
                             />
                             <span :class="isRTL() ? 'order-1' : 'order-2'">
@@ -94,9 +93,7 @@ const currentPath =
                 </nav>
             </aside>
 
-            <Separator
-                class="my-6 lg:hidden bg-border/50"
-            />
+            <Separator class="my-6 bg-border/50 lg:hidden" />
 
             <div class="flex-1 md:max-w-4xl">
                 <section class="space-y-8">

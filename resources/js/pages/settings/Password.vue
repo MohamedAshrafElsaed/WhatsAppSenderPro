@@ -3,8 +3,8 @@ import PasswordController from '@/actions/App/Http/Controllers/Settings/Password
 import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { edit } from '@/routes/dashboard/settings/password';
 import { index as dashboard } from '@/routes/dashboard';
+import { edit } from '@/routes/dashboard/settings/password';
 import { Form, Head } from '@inertiajs/vue3';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -39,7 +39,12 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <SettingsLayout>
             <div :dir="isRTL() ? 'rtl' : 'ltr'" class="space-y-6">
                 <HeadingSmall
-                    :description="t('settings.update_password_desc', 'Ensure your account is using a long, random password to stay secure')"
+                    :description="
+                        t(
+                            'settings.update_password_desc',
+                            'Ensure your account is using a long, random password to stay secure',
+                        )
+                    "
                     :title="t('settings.update_password', 'Update password')"
                 />
 
@@ -58,61 +63,94 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     v-bind="PasswordController.update.form()"
                 >
                     <div class="grid gap-2">
-                        <Label :class="isRTL() ? 'text-right' : 'text-left'" for="current_password">
-                            {{ t('settings.current_password', 'Current password') }}
+                        <Label
+                            :class="isRTL() ? 'text-right' : 'text-left'"
+                            for="current_password"
+                        >
+                            {{
+                                t(
+                                    'settings.current_password',
+                                    'Current password',
+                                )
+                            }}
                         </Label>
                         <Input
                             id="current_password"
+                            :placeholder="
+                                t(
+                                    'settings.current_password',
+                                    'Current password',
+                                )
+                            "
                             autocomplete="current-password"
                             class="mt-1 block w-full"
-                            name="current_password"
-                            :placeholder="t('settings.current_password', 'Current password')"
-                            type="password"
                             dir="ltr"
+                            name="current_password"
+                            type="password"
                         />
                         <InputError :message="errors.current_password" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label :class="isRTL() ? 'text-right' : 'text-left'" for="password">
+                        <Label
+                            :class="isRTL() ? 'text-right' : 'text-left'"
+                            for="password"
+                        >
                             {{ t('settings.new_password', 'New password') }}
                         </Label>
                         <Input
                             id="password"
+                            :placeholder="
+                                t('settings.new_password', 'New password')
+                            "
                             autocomplete="new-password"
                             class="mt-1 block w-full"
-                            name="password"
-                            :placeholder="t('settings.new_password', 'New password')"
-                            type="password"
                             dir="ltr"
+                            name="password"
+                            type="password"
                         />
                         <InputError :message="errors.password" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label :class="isRTL() ? 'text-right' : 'text-left'" for="password_confirmation">
-                            {{ t('settings.confirm_password', 'Confirm password') }}
+                        <Label
+                            :class="isRTL() ? 'text-right' : 'text-left'"
+                            for="password_confirmation"
+                        >
+                            {{
+                                t(
+                                    'settings.confirm_password',
+                                    'Confirm password',
+                                )
+                            }}
                         </Label>
                         <Input
                             id="password_confirmation"
+                            :placeholder="
+                                t(
+                                    'settings.confirm_password',
+                                    'Confirm password',
+                                )
+                            "
                             autocomplete="new-password"
                             class="mt-1 block w-full"
-                            name="password_confirmation"
-                            :placeholder="t('settings.confirm_password', 'Confirm password')"
-                            type="password"
                             dir="ltr"
+                            name="password_confirmation"
+                            type="password"
                         />
                         <InputError :message="errors.password_confirmation" />
                     </div>
 
-                    <div :class="[
-                        'flex items-center gap-4',
-                        isRTL() ? 'flex-row-reverse' : 'flex-row'
-                    ]">
+                    <div
+                        :class="[
+                            'flex items-center gap-4',
+                            isRTL() ? 'flex-row-reverse' : 'flex-row',
+                        ]"
+                    >
                         <Button
                             :disabled="processing"
+                            class="bg-[#25D366] text-white hover:bg-[#128C7E]"
                             data-test="update-password-button"
-                            class="bg-[#25D366] hover:bg-[#128C7E] text-white"
                         >
                             {{ t('settings.save_password', 'Save password') }}
                         </Button>

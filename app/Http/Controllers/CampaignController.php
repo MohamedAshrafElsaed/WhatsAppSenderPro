@@ -13,7 +13,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,10 +20,12 @@ use Inertia\Response;
 class CampaignController extends Controller
 {
     public function __construct(
-        private readonly CampaignService $campaignService,
+        private readonly CampaignService      $campaignService,
         private readonly UsageTrackingService $usageTracking,
-        private readonly WhatsAppApiService $whatsappApi
-    ) {}
+        private readonly WhatsAppApiService   $whatsappApi
+    )
+    {
+    }
 
     /**
      * Display campaigns list

@@ -46,12 +46,33 @@ class SendCampaignMessageJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public Campaign $campaign,
+        public Campaign          $campaign,
         public CampaignRecipient $recipient,
-        public int $attempt = 1
-    ) {
+        public int               $attempt = 1
+    )
+    {
         // Set queue priority based on user's subscription tier
         $this->onQueue($this->getQueuePriority());
+    }
+
+    /**
+     * Get queue priority based on user's subscription tier
+     */
+    protected function getQueuePriority(): string
+    {
+        $user = $this->campaign->user;
+        $subscription = $user->activeSubscription ?? null;
+
+        if (!$subscription) {
+            return 'campaigns-low'; // Free tier
+        }
+
+        return match ($subscription->package->slug ?? 'basic') {
+            'golden' => 'campaigns-highest',
+            'pro' => 'campaigns-high',
+            'basic' => 'campaigns-medium',
+            default => 'campaigns-low',
+        };
     }
 
     /**
@@ -204,29 +225,6 @@ class SendCampaignMessageJob implements ShouldQueue
     }
 
     /**
-     * Handle successful message send
-     */
-    protected function handleSuccess(): void
-    {
-        DB::transaction(function () {
-            $this->recipient->update([
-                'status' => 'sent',
-                'sent_at' => now(),
-                'retry_count' => $this->attempt,
-                'error_message' => null,
-            ]);
-
-            // Update campaign sent count
-            $this->campaign->increment('messages_sent');
-        });
-
-        Log::info('Message sent successfully', [
-            'campaign_id' => $this->campaign->id,
-            'recipient_id' => $this->recipient->id,
-        ]);
-    }
-
-    /**
      * Handle failed message send
      */
     protected function handleFailure(string $error, string $errorType): void
@@ -337,23 +335,26 @@ class SendCampaignMessageJob implements ShouldQueue
     }
 
     /**
-     * Get queue priority based on user's subscription tier
+     * Handle successful message send
      */
-    protected function getQueuePriority(): string
+    protected function handleSuccess(): void
     {
-        $user = $this->campaign->user;
-        $subscription = $user->activeSubscription ?? null;
+        DB::transaction(function () {
+            $this->recipient->update([
+                'status' => 'sent',
+                'sent_at' => now(),
+                'retry_count' => $this->attempt,
+                'error_message' => null,
+            ]);
 
-        if (!$subscription) {
-            return 'campaigns-low'; // Free tier
-        }
+            // Update campaign sent count
+            $this->campaign->increment('messages_sent');
+        });
 
-        return match ($subscription->package->slug ?? 'basic') {
-            'golden' => 'campaigns-highest',
-            'pro' => 'campaigns-high',
-            'basic' => 'campaigns-medium',
-            default => 'campaigns-low',
-        };
+        Log::info('Message sent successfully', [
+            'campaign_id' => $this->campaign->id,
+            'recipient_id' => $this->recipient->id,
+        ]);
     }
 
     /**

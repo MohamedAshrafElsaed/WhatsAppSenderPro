@@ -143,13 +143,13 @@ onMounted(async () => {
                         <div class="flex-1 space-y-2">
                             <div class="flex items-center gap-2">
                                 <CheckCircle2 class="size-5 text-[#25D366]" />
-                                <CardTitle>{{
-                                    steps[currentStep].title
-                                }}</CardTitle>
+                                <CardTitle
+                                    >{{ steps[currentStep].title }}
+                                </CardTitle>
                             </div>
-                            <CardDescription>{{
-                                steps[currentStep].description
-                            }}</CardDescription>
+                            <CardDescription
+                                >{{ steps[currentStep].description }}
+                            </CardDescription>
                         </div>
                         <Button size="sm" variant="ghost" @click="skipTour">
                             <X class="size-4" />

@@ -30,7 +30,7 @@ import {
     Twitter,
     Upload,
     Users,
-    X, // ✅ ADDED: Import X icon
+    X,
     Zap,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
@@ -362,8 +362,8 @@ const getBadgeText = (pkg: Package) => {
                         <MessageCircle class="size-6 text-white" />
                     </div>
                     <span class="text-xl font-bold">{{
-                            t('landing.brand_name')
-                        }}</span>
+                        t('landing.brand_name')
+                    }}</span>
                 </div>
                 <nav class="hidden items-center gap-6 md:flex">
                     <a
@@ -389,8 +389,8 @@ const getBadgeText = (pkg: Package) => {
                     <!-- Language Toggle - NEW! -->
                     <LanguageToggle />
                     <Link
-                        href="/login"
                         class="hidden text-sm font-medium md:inline-flex"
+                        href="/login"
                     >
                         {{ t('landing.nav.login') }}
                     </Link>
@@ -522,7 +522,7 @@ const getBadgeText = (pkg: Package) => {
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-2xl text-center">
                     <Badge class="mb-4"
-                    >{{ t('landing.features.badge') }}
+                        >{{ t('landing.features.badge') }}
                     </Badge>
                     <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
                         {{ t('landing.features.title') }}
@@ -547,12 +547,12 @@ const getBadgeText = (pkg: Package) => {
                                 />
                             </div>
                             <CardTitle class="text-xl"
-                            >{{ feature.title }}
+                                >{{ feature.title }}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <CardDescription class="text-base"
-                            >{{ feature.description }}
+                                >{{ feature.description }}
                             </CardDescription>
                         </CardContent>
                     </Card>
@@ -565,7 +565,7 @@ const getBadgeText = (pkg: Package) => {
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-2xl text-center">
                     <Badge class="mb-4"
-                    >{{ t('landing.how_it_works.badge') }}
+                        >{{ t('landing.how_it_works.badge') }}
                     </Badge>
                     <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
                         {{ t('landing.how_it_works.title') }}
@@ -639,12 +639,12 @@ const getBadgeText = (pkg: Package) => {
                                     <Clock class="size-8 text-[#25D366]" />
                                     <div>
                                         <CardTitle class="text-2xl"
-                                        >{{
+                                            >{{
                                                 t('landing.pricing.free_trial')
                                             }}
                                         </CardTitle>
                                         <CardDescription class="text-base"
-                                        >{{
+                                            >{{
                                                 t(
                                                     'landing.pricing.free_trial_desc',
                                                 )
@@ -696,12 +696,12 @@ const getBadgeText = (pkg: Package) => {
                             "
                         >
                             <CardTitle class="text-2xl"
-                            >{{ pkg.name }}
+                                >{{ pkg.name }}
                             </CardTitle>
                             <div class="mt-4">
                                 <span class="text-4xl font-bold">{{
-                                        pkg.formatted_price
-                                    }}</span>
+                                    pkg.formatted_price
+                                }}</span>
                             </div>
                         </CardHeader>
 
@@ -754,8 +754,8 @@ const getBadgeText = (pkg: Package) => {
                             <div class="pt-4">
                                 <Link
                                     v-if="canRegister"
-                                    href="/register"
                                     class="block"
+                                    href="/register"
                                 >
                                     <Button
                                         :class="
@@ -865,8 +865,8 @@ const getBadgeText = (pkg: Package) => {
                                 <MessageCircle class="size-5 text-white" />
                             </div>
                             <span class="font-bold">{{
-                                    t('landing.brand_name')
-                                }}</span>
+                                t('landing.brand_name')
+                            }}</span>
                         </div>
                         <p class="text-sm text-muted-foreground">
                             {{ t('landing.footer.tagline') }}
@@ -881,21 +881,21 @@ const getBadgeText = (pkg: Package) => {
                                 <a
                                     class="hover:text-foreground"
                                     href="#features"
-                                >{{ t('landing.nav.features') }}</a
+                                    >{{ t('landing.nav.features') }}</a
                                 >
                             </li>
                             <li>
                                 <a
                                     class="hover:text-foreground"
                                     href="#pricing"
-                                >{{ t('landing.nav.pricing') }}</a
+                                    >{{ t('landing.nav.pricing') }}</a
                                 >
                             </li>
                             <li>
                                 <a
                                     class="hover:text-foreground"
                                     href="#how-it-works"
-                                >{{ t('landing.nav.how_it_works') }}</a
+                                    >{{ t('landing.nav.how_it_works') }}</a
                                 >
                             </li>
                         </ul>
@@ -909,28 +909,28 @@ const getBadgeText = (pkg: Package) => {
                                 <Link
                                     :href="about()"
                                     class="hover:text-foreground"
-                                >{{ t('static.about.link') }}
+                                    >{{ t('static.about.link') }}
                                 </Link>
                             </li>
                             <li>
                                 <Link
                                     :href="contact()"
                                     class="hover:text-foreground"
-                                >{{ t('static.contact.link') }}
+                                    >{{ t('static.contact.link') }}
                                 </Link>
                             </li>
                             <li>
                                 <Link
                                     :href="privacy()"
                                     class="hover:text-foreground"
-                                >{{ t('static.privacy.link') }}
+                                    >{{ t('static.privacy.link') }}
                                 </Link>
                             </li>
                             <li>
                                 <Link
                                     :href="terms()"
                                     class="hover:text-foreground"
-                                >{{ t('static.terms.link') }}
+                                    >{{ t('static.terms.link') }}
                                 </Link>
                             </li>
                         </ul>

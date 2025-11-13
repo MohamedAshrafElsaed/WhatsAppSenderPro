@@ -1,27 +1,32 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import CampaignController from '@/actions/App/Http/Controllers/CampaignController';
+import Heading from '@/components/Heading.vue';
 import RecipientSelectorLazy from '@/components/RecipientSelectorLazy.vue';
 import SearchableSelect from '@/components/SearchableSelect.vue';
 import SessionSelector from '@/components/SessionSelector.vue';
-import Heading from '@/components/Heading.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
-    TooltipTrigger
+    TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import CampaignController from '@/actions/App/Http/Controllers/CampaignController';
-import { index } from '@/routes/dashboard/campaigns';
 import { index as dashboard } from '@/routes/dashboard';
+import { index } from '@/routes/dashboard/campaigns';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import {
@@ -98,10 +103,10 @@ const form = useForm({
 
 // Template options for SearchableSelect
 const templateOptions = computed(() =>
-    props.templates.map(template => ({
+    props.templates.map((template) => ({
         value: template.id.toString(),
-        label: template.name
-    }))
+        label: template.name,
+    })),
 );
 
 // Message type options for SearchableSelect
@@ -131,7 +136,9 @@ const estimatedUsage = computed(() => {
 
 const estimatedPercentage = computed(() => {
     if (props.usage.limit === 'unlimited' || props.usage.limit === 0) return 0;
-    return Math.round((estimatedUsage.value / (props.usage.limit as number)) * 100);
+    return Math.round(
+        (estimatedUsage.value / (props.usage.limit as number)) * 100,
+    );
 });
 
 const willExceedQuota = computed(() => {
@@ -141,7 +148,7 @@ const willExceedQuota = computed(() => {
 
 const selectedTemplate = computed(() => {
     if (!form.template_id) return null;
-    return props.templates.find(t => t.id === form.template_id);
+    return props.templates.find((t) => t.id === form.template_id);
 });
 
 // Check if message content is from template (read-only mode)
@@ -158,31 +165,40 @@ const canProceedStep2 = computed(() => {
 const canProceedStep3 = computed(() => {
     const hasMessageContent = form.message_content.trim().length > 0;
     const hasSession = form.session_id.length > 0;
-    const hasMediaIfRequired = form.message_type === 'text' || form.media !== null || selectedTemplate.value?.media_url;
+    const hasMediaIfRequired =
+        form.message_type === 'text' ||
+        form.media !== null ||
+        selectedTemplate.value?.media_url;
 
     return hasMessageContent && hasSession && hasMediaIfRequired;
 });
 
 // Watch template selection
-watch(() => form.template_id, (newTemplateId) => {
-    if (!newTemplateId) {
-        // Template deselected - clear template data but keep custom message
-        return;
-    }
-
-    const template = props.templates.find(t => t.id === newTemplateId);
-    if (template) {
-        form.message_type = template.type === 'text' ? 'text' : template.type.replace('text_', '') as any;
-        form.message_content = template.content;
-        form.message_caption = template.caption || '';
-
-        // Clear media if switching to template
-        if (form.media) {
-            form.media = null;
-            mediaPreview.value = null;
+watch(
+    () => form.template_id,
+    (newTemplateId) => {
+        if (!newTemplateId) {
+            // Template deselected - clear template data but keep custom message
+            return;
         }
-    }
-});
+
+        const template = props.templates.find((t) => t.id === newTemplateId);
+        if (template) {
+            form.message_type =
+                template.type === 'text'
+                    ? 'text'
+                    : (template.type.replace('text_', '') as any);
+            form.message_content = template.content;
+            form.message_caption = template.caption || '';
+
+            // Clear media if switching to template
+            if (form.media) {
+                form.media = null;
+                mediaPreview.value = null;
+            }
+        }
+    },
+);
 
 const handleTemplateSelect = (templateId: string | number | null) => {
     if (!templateId || templateId === '') {
@@ -252,14 +268,20 @@ const steps = computed(() => [
     {
         number: 1,
         title: t('campaigns.step1_title', 'Campaign Details'),
-        description: t('campaigns.step1_desc', 'Name and schedule your campaign'),
+        description: t(
+            'campaigns.step1_desc',
+            'Name and schedule your campaign',
+        ),
         icon: FileText,
         completed: currentStep.value > 1,
     },
     {
         number: 2,
         title: t('campaigns.step2_title', 'Select Recipients'),
-        description: t('campaigns.step2_desc', 'Choose who will receive your message'),
+        description: t(
+            'campaigns.step2_desc',
+            'Choose who will receive your message',
+        ),
         icon: Users,
         completed: currentStep.value > 2,
     },
@@ -273,7 +295,10 @@ const steps = computed(() => [
     {
         number: 4,
         title: t('campaigns.step4_title', 'Review & Confirm'),
-        description: t('campaigns.step4_desc', 'Verify campaign before sending'),
+        description: t(
+            'campaigns.step4_desc',
+            'Verify campaign before sending',
+        ),
         icon: CheckCircle,
         completed: false,
     },
@@ -305,22 +330,29 @@ const templateVariables = computed(() => {
             class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6"
         >
             <!-- Header -->
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
                 <Heading
-                    :description="t('campaigns.create_description', 'Create a new WhatsApp bulk messaging campaign')"
+                    :description="
+                        t(
+                            'campaigns.create_description',
+                            'Create a new WhatsApp bulk messaging campaign',
+                        )
+                    "
                     :title="t('campaigns.create', 'Create Campaign')"
                 >
                     <template #icon>
                         <div
-                            class="flex items-center justify-center rounded-lg p-2"
                             :style="`background-color: ${PRIMARY_COLOR}`"
+                            class="flex items-center justify-center rounded-lg p-2"
                         >
                             <MessageSquare class="h-5 w-5 text-white" />
                         </div>
                     </template>
                 </Heading>
 
-                <Button variant="outline" as-child>
+                <Button as-child variant="outline">
                     <Link :href="index()">
                         <X :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                         {{ t('common.cancel', 'Cancel') }}
@@ -349,7 +381,11 @@ const templateVariables = computed(() => {
                                               : 'border-muted-foreground/30 bg-background text-muted-foreground',
                                     ]"
                                 >
-                                    <component :is="step.icon" v-if="!step.completed" class="h-5 w-5" />
+                                    <component
+                                        :is="step.icon"
+                                        v-if="!step.completed"
+                                        class="h-5 w-5"
+                                    />
                                     <CheckCircle v-else class="h-5 w-5" />
                                 </div>
 
@@ -358,14 +394,17 @@ const templateVariables = computed(() => {
                                     <p
                                         :class="[
                                             'text-sm font-medium',
-                                            currentStep === step.number || step.completed
+                                            currentStep === step.number ||
+                                            step.completed
                                                 ? 'text-[#25D366]'
-                                                : 'text-muted-foreground'
+                                                : 'text-muted-foreground',
                                         ]"
                                     >
                                         {{ step.title }}
                                     </p>
-                                    <p class="text-xs text-muted-foreground hidden md:block">
+                                    <p
+                                        class="hidden text-xs text-muted-foreground md:block"
+                                    >
                                         {{ step.description }}
                                     </p>
                                 </div>
@@ -376,7 +415,9 @@ const templateVariables = computed(() => {
                                 v-if="index < steps.length - 1"
                                 :class="[
                                     'mx-2 h-0.5 flex-1',
-                                    step.completed ? 'bg-[#25D366]' : 'bg-muted'
+                                    step.completed
+                                        ? 'bg-[#25D366]'
+                                        : 'bg-muted',
                                 ]"
                             ></div>
                         </div>
@@ -385,29 +426,46 @@ const templateVariables = computed(() => {
             </Card>
 
             <!-- Step 1: Campaign Details -->
-            <Card v-show="currentStep === 1" class="border-t-4 border-t-[#25D366]">
+            <Card
+                v-show="currentStep === 1"
+                class="border-t-4 border-t-[#25D366]"
+            >
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
                         <FileText class="h-5 w-5 text-[#25D366]" />
                         {{ t('campaigns.step1_title', 'Campaign Details') }}
                     </CardTitle>
                     <CardDescription>
-                        {{ t('campaigns.step1_full_desc', 'Give your campaign a name and optionally schedule it for later') }}
+                        {{
+                            t(
+                                'campaigns.step1_full_desc',
+                                'Give your campaign a name and optionally schedule it for later',
+                            )
+                        }}
                     </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-6">
                     <!-- Campaign Name -->
                     <div class="space-y-2">
-                        <Label for="name" class="flex items-center gap-2">
+                        <Label class="flex items-center gap-2" for="name">
                             {{ t('campaigns.name', 'Campaign Name') }}
                             <span class="text-red-500">*</span>
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger as-child>
-                                        <HelpCircle class="h-4 w-4 text-muted-foreground cursor-help" />
+                                        <HelpCircle
+                                            class="h-4 w-4 cursor-help text-muted-foreground"
+                                        />
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>{{ t('campaigns.name_hint', 'Choose a descriptive name to identify this campaign') }}</p>
+                                        <p>
+                                            {{
+                                                t(
+                                                    'campaigns.name_hint',
+                                                    'Choose a descriptive name to identify this campaign',
+                                                )
+                                            }}
+                                        </p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
@@ -415,12 +473,20 @@ const templateVariables = computed(() => {
                         <Input
                             id="name"
                             v-model="form.name"
-                            :placeholder="t('campaigns.name_placeholder', 'e.g., Summer Sale 2025')"
-                            :dir="isRTL() ? 'rtl' : 'ltr'"
                             :class="form.errors.name ? 'border-red-500' : ''"
+                            :dir="isRTL() ? 'rtl' : 'ltr'"
+                            :placeholder="
+                                t(
+                                    'campaigns.name_placeholder',
+                                    'e.g., Summer Sale 2025',
+                                )
+                            "
                             class="focus-visible:ring-[#25D366]"
                         />
-                        <p v-if="form.errors.name" class="text-sm text-red-500 flex items-center gap-1">
+                        <p
+                            v-if="form.errors.name"
+                            class="flex items-center gap-1 text-sm text-red-500"
+                        >
                             <AlertCircle class="h-4 w-4" />
                             {{ form.errors.name }}
                         </p>
@@ -428,50 +494,91 @@ const templateVariables = computed(() => {
 
                     <!-- Schedule -->
                     <div class="space-y-2">
-                        <Label for="scheduled_at" class="flex items-center gap-2">
+                        <Label
+                            class="flex items-center gap-2"
+                            for="scheduled_at"
+                        >
                             <Calendar class="h-4 w-4" />
                             {{ t('campaigns.schedule_at', 'Schedule For') }}
-                            <Badge variant="secondary" class="text-xs">
+                            <Badge class="text-xs" variant="secondary">
                                 {{ t('common.optional', 'Optional') }}
                             </Badge>
                         </Label>
                         <Input
                             id="scheduled_at"
                             v-model="form.scheduled_at"
-                            type="datetime-local"
                             :min="new Date().toISOString().slice(0, 16)"
                             class="focus-visible:ring-[#25D366]"
+                            type="datetime-local"
                         />
-                        <p class="text-xs text-muted-foreground flex items-center gap-1">
+                        <p
+                            class="flex items-center gap-1 text-xs text-muted-foreground"
+                        >
                             <Info class="h-3 w-3" />
-                            {{ t('campaigns.schedule_description', 'Leave empty to send immediately after review') }}
+                            {{
+                                t(
+                                    'campaigns.schedule_description',
+                                    'Leave empty to send immediately after review',
+                                )
+                            }}
                         </p>
                     </div>
                 </CardContent>
             </Card>
 
             <!-- Step 2: Select Recipients -->
-            <Card v-show="currentStep === 2" class="border-t-4 border-t-[#25D366]">
+            <Card
+                v-show="currentStep === 2"
+                class="border-t-4 border-t-[#25D366]"
+            >
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
                         <Users class="h-5 w-5 text-[#25D366]" />
                         {{ t('campaigns.step2_title', 'Select Recipients') }}
                     </CardTitle>
                     <CardDescription>
-                        {{ t('campaigns.step2_full_desc', 'Choose the contacts who will receive this campaign') }}
+                        {{
+                            t(
+                                'campaigns.step2_full_desc',
+                                'Choose the contacts who will receive this campaign',
+                            )
+                        }}
                     </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <!-- No Contacts Warning -->
-                    <Alert v-if="totalContactsCount === 0" variant="destructive">
+                    <Alert
+                        v-if="totalContactsCount === 0"
+                        variant="destructive"
+                    >
                         <AlertCircle class="h-4 w-4" />
-                        <AlertTitle>{{ t('campaigns.no_contacts_title', 'No Contacts Available') }}</AlertTitle>
+                        <AlertTitle>{{
+                            t(
+                                'campaigns.no_contacts_title',
+                                'No Contacts Available',
+                            )
+                        }}</AlertTitle>
                         <AlertDescription>
-                            {{ t('campaigns.no_contacts_available', 'No contacts available. Please import contacts first.') }}
-                            <Button variant="outline" size="sm" class="mt-2" as-child>
+                            {{
+                                t(
+                                    'campaigns.no_contacts_available',
+                                    'No contacts available. Please import contacts first.',
+                                )
+                            }}
+                            <Button
+                                as-child
+                                class="mt-2"
+                                size="sm"
+                                variant="outline"
+                            >
                                 <Link href="/dashboard/contacts/imports">
-                                    <Upload :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
-                                    {{ t('contacts.import', 'Import Contacts') }}
+                                    <Upload
+                                        :class="isRTL() ? 'ml-2' : 'mr-2'"
+                                        class="h-4 w-4"
+                                    />
+                                    {{
+                                        t('contacts.import', 'Import Contacts')
+                                    }}
                                 </Link>
                             </Button>
                         </AlertDescription>
@@ -485,15 +592,28 @@ const templateVariables = computed(() => {
                     />
 
                     <!-- Selection Summary -->
-                    <Alert v-if="form.recipient_ids.length > 0" class="border-[#25D366]/20 bg-[#25D366]/10">
+                    <Alert
+                        v-if="form.recipient_ids.length > 0"
+                        class="border-[#25D366]/20 bg-[#25D366]/10"
+                    >
                         <CheckCircle class="h-4 w-4 text-[#25D366]" />
                         <AlertDescription class="text-[#25D366]">
-                            <strong>{{ form.recipient_ids.length.toLocaleString() }}</strong>
-                            {{ t('campaigns.contacts_selected', 'contacts selected') }}
+                            <strong>{{
+                                form.recipient_ids.length.toLocaleString()
+                            }}</strong>
+                            {{
+                                t(
+                                    'campaigns.contacts_selected',
+                                    'contacts selected',
+                                )
+                            }}
                         </AlertDescription>
                     </Alert>
 
-                    <p v-if="form.errors.recipient_ids" class="text-sm text-red-500 flex items-center gap-1">
+                    <p
+                        v-if="form.errors.recipient_ids"
+                        class="flex items-center gap-1 text-sm text-red-500"
+                    >
                         <AlertCircle class="h-4 w-4" />
                         {{ form.errors.recipient_ids }}
                     </p>
@@ -501,69 +621,135 @@ const templateVariables = computed(() => {
             </Card>
 
             <!-- Step 3: Compose Message -->
-            <Card v-show="currentStep === 3" class="border-t-4 border-t-[#25D366]">
+            <Card
+                v-show="currentStep === 3"
+                class="border-t-4 border-t-[#25D366]"
+            >
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
                         <MessageSquare class="h-5 w-5 text-[#25D366]" />
                         {{ t('campaigns.step3_title', 'Compose Message') }}
                     </CardTitle>
                     <CardDescription>
-                        {{ t('campaigns.step3_full_desc', 'Select your WhatsApp session and create your message') }}
+                        {{
+                            t(
+                                'campaigns.step3_full_desc',
+                                'Select your WhatsApp session and create your message',
+                            )
+                        }}
                     </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-6">
                     <!-- WhatsApp Session -->
                     <div class="space-y-2">
                         <Label class="flex items-center gap-2">
-                            {{ t('campaigns.select_session', 'WhatsApp Session') }}
+                            {{
+                                t(
+                                    'campaigns.select_session',
+                                    'WhatsApp Session',
+                                )
+                            }}
                             <span class="text-red-500">*</span>
                         </Label>
                         <SessionSelector
                             v-model="form.session_id"
-                            :sessions="sessions"
                             :error="form.errors.session_id"
+                            :sessions="sessions"
                         />
-                        <p v-if="sessions.length === 0" class="text-sm text-yellow-600 flex items-center gap-1">
+                        <p
+                            v-if="sessions.length === 0"
+                            class="flex items-center gap-1 text-sm text-yellow-600"
+                        >
                             <AlertCircle class="h-4 w-4" />
-                            {{ t('campaigns.errors.no_connected_session_desc', 'Please connect a WhatsApp session before creating a campaign.') }}
+                            {{
+                                t(
+                                    'campaigns.errors.no_connected_session_desc',
+                                    'Please connect a WhatsApp session before creating a campaign.',
+                                )
+                            }}
                         </p>
                     </div>
 
                     <!-- Template Selection -->
-                    <div v-if="templates && templates.length > 0" class="space-y-2">
+                    <div
+                        v-if="templates && templates.length > 0"
+                        class="space-y-2"
+                    >
                         <Label class="flex items-center gap-2">
                             {{ t('campaigns.use_template', 'Use Template') }}
-                            <Badge variant="secondary" class="text-xs">
+                            <Badge class="text-xs" variant="secondary">
                                 {{ t('common.optional', 'Optional') }}
                             </Badge>
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger as-child>
-                                        <HelpCircle class="h-4 w-4 text-muted-foreground cursor-help" />
+                                        <HelpCircle
+                                            class="h-4 w-4 cursor-help text-muted-foreground"
+                                        />
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>{{ t('campaigns.template_hint', 'Select a pre-made template or write a custom message') }}</p>
+                                        <p>
+                                            {{
+                                                t(
+                                                    'campaigns.template_hint',
+                                                    'Select a pre-made template or write a custom message',
+                                                )
+                                            }}
+                                        </p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         </Label>
                         <SearchableSelect
-                            :options="templateOptions"
                             :model-value="form.template_id?.toString()"
-                            :placeholder="t('campaigns.select_template_placeholder', 'Select a template or write custom message')"
-                            :search-placeholder="t('campaigns.search_templates', 'Search templates...')"
+                            :options="templateOptions"
+                            :placeholder="
+                                t(
+                                    'campaigns.select_template_placeholder',
+                                    'Select a template or write custom message',
+                                )
+                            "
+                            :search-placeholder="
+                                t(
+                                    'campaigns.search_templates',
+                                    'Search templates...',
+                                )
+                            "
                             @update:model-value="handleTemplateSelect"
                         />
 
                         <!-- Template Mode Indicator -->
-                        <Alert v-if="isTemplateMode" class="border-blue-200 bg-blue-50 dark:bg-blue-950">
+                        <Alert
+                            v-if="isTemplateMode"
+                            class="border-blue-200 bg-blue-50 dark:bg-blue-950"
+                        >
                             <Info class="h-4 w-4 text-blue-600" />
-                            <AlertDescription class="text-blue-900 dark:text-blue-100">
-                                {{ t('campaigns.template_mode', 'Template mode active - Message content is read-only') }}
+                            <AlertDescription
+                                class="text-blue-900 dark:text-blue-100"
+                            >
+                                {{
+                                    t(
+                                        'campaigns.template_mode',
+                                        'Template mode active - Message content is read-only',
+                                    )
+                                }}
                                 <br />
-                                <span v-if="templateVariables.length > 0" class="text-sm">
-                                    {{ t('campaigns.template_variables', 'Variables:') }}
-                                    <Badge v-for="variable in templateVariables" :key="variable" variant="secondary" class="ml-1">
+                                <span
+                                    v-if="templateVariables.length > 0"
+                                    class="text-sm"
+                                >
+                                    {{
+                                        t(
+                                            'campaigns.template_variables',
+                                            'Variables:',
+                                        )
+                                    }}
+                                    <Badge
+                                        v-for="variable in templateVariables"
+                                        :key="variable"
+                                        class="ml-1"
+                                        variant="secondary"
+                                    >
                                         {{ '{' + variable + '}' }}
                                     </Badge>
                                 </span>
@@ -579,19 +765,34 @@ const templateVariables = computed(() => {
                         </Label>
                         <SearchableSelect
                             v-model="form.message_type"
-                            :options="messageTypeOptions"
-                            :placeholder="t('campaigns.select_message_type', 'Select message type')"
-                            :search-placeholder="t('campaigns.search_type', 'Search type...')"
                             :disabled="isTemplateMode"
+                            :options="messageTypeOptions"
+                            :placeholder="
+                                t(
+                                    'campaigns.select_message_type',
+                                    'Select message type',
+                                )
+                            "
+                            :search-placeholder="
+                                t('campaigns.search_type', 'Search type...')
+                            "
                         />
                     </div>
 
                     <!-- Message Content -->
                     <div class="space-y-2">
-                        <Label for="message_content" class="flex items-center gap-2">
-                            {{ form.message_type === 'text'
-                                ? t('campaigns.message_content', 'Message Content')
-                                : t('campaigns.message_caption', 'Caption') }}
+                        <Label
+                            class="flex items-center gap-2"
+                            for="message_content"
+                        >
+                            {{
+                                form.message_type === 'text'
+                                    ? t(
+                                          'campaigns.message_content',
+                                          'Message Content',
+                                      )
+                                    : t('campaigns.message_caption', 'Caption')
+                            }}
                             <span class="text-red-500">*</span>
                         </Label>
 
@@ -599,11 +800,11 @@ const templateVariables = computed(() => {
                         <div v-if="isTemplateMode" class="relative">
                             <Textarea
                                 id="message_content"
-                                :model-value="form.message_content"
                                 :dir="isRTL() ? 'rtl' : 'ltr'"
-                                rows="6"
+                                :model-value="form.message_content"
+                                class="cursor-not-allowed resize-none bg-muted"
                                 readonly
-                                class="bg-muted cursor-not-allowed resize-none"
+                                rows="6"
                             />
                             <div class="absolute top-2 right-2">
                                 <Badge variant="secondary">
@@ -617,18 +818,37 @@ const templateVariables = computed(() => {
                             v-else
                             id="message_content"
                             v-model="form.message_content"
-                            :placeholder="t('campaigns.message_placeholder', 'Type your message here...')"
+                            :class="
+                                form.errors.message_content
+                                    ? 'border-red-500'
+                                    : ''
+                            "
                             :dir="isRTL() ? 'rtl' : 'ltr'"
-                            rows="6"
-                            :class="form.errors.message_content ? 'border-red-500' : ''"
+                            :placeholder="
+                                t(
+                                    'campaigns.message_placeholder',
+                                    'Type your message here...',
+                                )
+                            "
                             class="focus-visible:ring-[#25D366]"
+                            rows="6"
                         />
 
-                        <p class="text-xs text-muted-foreground flex items-center gap-1">
+                        <p
+                            class="flex items-center gap-1 text-xs text-muted-foreground"
+                        >
                             <Info class="h-3 w-3" />
-                            {{ t('campaigns.placeholders_hint', 'Use {first_name}, {last_name}, {phone} to personalize') }}
+                            {{
+                                t(
+                                    'campaigns.placeholders_hint',
+                                    'Use {first_name}, {last_name}, {phone} to personalize',
+                                )
+                            }}
                         </p>
-                        <p v-if="form.errors.message_content" class="text-sm text-red-500 flex items-center gap-1">
+                        <p
+                            v-if="form.errors.message_content"
+                            class="flex items-center gap-1 text-sm text-red-500"
+                        >
                             <AlertCircle class="h-4 w-4" />
                             {{ form.errors.message_content }}
                         </p>
@@ -638,14 +858,28 @@ const templateVariables = computed(() => {
                     <div v-if="form.message_type !== 'text'" class="space-y-2">
                         <Label class="flex items-center gap-2">
                             {{ t('campaigns.upload_media', 'Upload Media') }}
-                            <span v-if="!selectedTemplate?.media_url" class="text-red-500">*</span>
+                            <span
+                                v-if="!selectedTemplate?.media_url"
+                                class="text-red-500"
+                                >*</span
+                            >
                         </Label>
 
                         <!-- Show template media if available -->
-                        <Alert v-if="selectedTemplate?.media_url" class="border-blue-200 bg-blue-50 dark:bg-blue-950">
+                        <Alert
+                            v-if="selectedTemplate?.media_url"
+                            class="border-blue-200 bg-blue-50 dark:bg-blue-950"
+                        >
                             <Info class="h-4 w-4 text-blue-600" />
-                            <AlertDescription class="text-blue-900 dark:text-blue-100">
-                                {{ t('campaigns.template_media', 'Media from template will be used') }}
+                            <AlertDescription
+                                class="text-blue-900 dark:text-blue-100"
+                            >
+                                {{
+                                    t(
+                                        'campaigns.template_media',
+                                        'Media from template will be used',
+                                    )
+                                }}
                             </AlertDescription>
                         </Alert>
 
@@ -654,49 +888,105 @@ const templateVariables = computed(() => {
                             <label
                                 class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 transition-colors hover:border-[#25D366] hover:bg-[#25D366]/5"
                             >
-                                <Upload class="mb-3 h-10 w-10 text-muted-foreground" />
+                                <Upload
+                                    class="mb-3 h-10 w-10 text-muted-foreground"
+                                />
                                 <span class="text-sm font-medium">
-                                    {{ t('campaigns.click_to_upload', 'Click to upload or drag and drop') }}
+                                    {{
+                                        t(
+                                            'campaigns.click_to_upload',
+                                            'Click to upload or drag and drop',
+                                        )
+                                    }}
                                 </span>
-                                <span class="mt-2 text-xs text-muted-foreground text-center">
-                                    {{ t('campaigns.max_size', 'Max size: 16MB') }}
+                                <span
+                                    class="mt-2 text-center text-xs text-muted-foreground"
+                                >
+                                    {{
+                                        t(
+                                            'campaigns.max_size',
+                                            'Max size: 16MB',
+                                        )
+                                    }}
                                     <br />
-                                    {{ t('campaigns.supported_formats', 'Supported formats based on message type') }}
+                                    {{
+                                        t(
+                                            'campaigns.supported_formats',
+                                            'Supported formats based on message type',
+                                        )
+                                    }}
                                 </span>
                                 <input
-                                    type="file"
+                                    :accept="
+                                        form.message_type === 'image'
+                                            ? 'image/*'
+                                            : form.message_type === 'video'
+                                              ? 'video/*'
+                                              : form.message_type === 'audio'
+                                                ? 'audio/*'
+                                                : '.pdf,.doc,.docx,.xls,.xlsx'
+                                    "
                                     class="hidden"
-                                    :accept="form.message_type === 'image' ? 'image/*' : form.message_type === 'video' ? 'video/*' : form.message_type === 'audio' ? 'audio/*' : '.pdf,.doc,.docx,.xls,.xlsx'"
+                                    type="file"
                                     @change="handleMediaUpload"
                                 />
                             </label>
                         </div>
 
                         <!-- Media Preview -->
-                        <div v-if="form.media" class="rounded-lg border bg-muted p-4 space-y-3">
+                        <div
+                            v-if="form.media"
+                            class="space-y-3 rounded-lg border bg-muted p-4"
+                        >
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="font-medium flex items-center gap-2">
+                                    <p
+                                        class="flex items-center gap-2 font-medium"
+                                    >
                                         <FileText class="h-4 w-4" />
                                         {{ form.media.name }}
                                     </p>
                                     <p class="text-sm text-muted-foreground">
-                                        {{ (form.media.size / 1024 / 1024).toFixed(2) }} MB
+                                        {{
+                                            (
+                                                form.media.size /
+                                                1024 /
+                                                1024
+                                            ).toFixed(2)
+                                        }}
+                                        MB
                                     </p>
                                 </div>
-                                <Button variant="destructive" size="sm" @click="removeMedia">
+                                <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    @click="removeMedia"
+                                >
                                     <X class="h-4 w-4" />
                                     {{ t('common.remove', 'Remove') }}
                                 </Button>
                             </div>
 
                             <!-- Image Preview -->
-                            <div v-if="mediaPreview && form.message_type === 'image'" class="mt-4">
-                                <img :src="mediaPreview" alt="Preview" class="max-h-64 rounded-lg w-full object-contain bg-black/5" />
+                            <div
+                                v-if="
+                                    mediaPreview &&
+                                    form.message_type === 'image'
+                                "
+                                class="mt-4"
+                            >
+                                <img
+                                    :src="mediaPreview"
+                                    alt="Preview"
+                                    class="max-h-64 w-full rounded-lg bg-black/5 object-contain"
+                                />
                             </div>
                         </div>
 
-                        <p v-if="form.errors.media" class="text-sm text-red-500 flex items-center gap-1">
+                        <p
+                            v-if="form.errors.media"
+                            class="flex items-center gap-1 text-sm text-red-500"
+                        >
                             <AlertCircle class="h-4 w-4" />
                             {{ form.errors.media }}
                         </p>
@@ -705,78 +995,191 @@ const templateVariables = computed(() => {
             </Card>
 
             <!-- Step 4: Review & Confirm -->
-            <Card v-show="currentStep === 4" class="border-t-4 border-t-[#25D366]">
+            <Card
+                v-show="currentStep === 4"
+                class="border-t-4 border-t-[#25D366]"
+            >
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2">
                         <CheckCircle class="h-5 w-5 text-[#25D366]" />
                         {{ t('campaigns.step4_title', 'Review & Confirm') }}
                     </CardTitle>
                     <CardDescription>
-                        {{ t('campaigns.step4_full_desc', 'Review your campaign details before sending') }}
+                        {{
+                            t(
+                                'campaigns.step4_full_desc',
+                                'Review your campaign details before sending',
+                            )
+                        }}
                     </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-6">
                     <!-- Campaign Summary -->
-                    <div class="rounded-lg border bg-muted/50 p-6 space-y-4">
-                        <h3 class="font-semibold text-lg flex items-center gap-2">
+                    <div class="space-y-4 rounded-lg border bg-muted/50 p-6">
+                        <h3
+                            class="flex items-center gap-2 text-lg font-semibold"
+                        >
                             <FileText class="h-5 w-5" />
                             {{ t('campaigns.summary', 'Campaign Summary') }}
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div class="flex justify-between py-2 border-b">
-                                <span class="text-muted-foreground">{{ t('campaigns.name', 'Name') }}:</span>
+                        <div
+                            class="grid grid-cols-1 gap-4 text-sm md:grid-cols-2"
+                        >
+                            <div class="flex justify-between border-b py-2">
+                                <span class="text-muted-foreground"
+                                    >{{ t('campaigns.name', 'Name') }}:</span
+                                >
                                 <span class="font-medium">{{ form.name }}</span>
                             </div>
-                            <div class="flex justify-between py-2 border-b">
-                                <span class="text-muted-foreground">{{ t('campaigns.total_recipients', 'Recipients') }}:</span>
+                            <div class="flex justify-between border-b py-2">
+                                <span class="text-muted-foreground"
+                                    >{{
+                                        t(
+                                            'campaigns.total_recipients',
+                                            'Recipients',
+                                        )
+                                    }}:</span
+                                >
                                 <Badge class="bg-[#25D366] hover:bg-[#128C7E]">
-                                    {{ form.recipient_ids.length.toLocaleString() }}
+                                    {{
+                                        form.recipient_ids.length.toLocaleString()
+                                    }}
                                 </Badge>
                             </div>
-                            <div class="flex justify-between py-2 border-b">
-                                <span class="text-muted-foreground">{{ t('campaigns.message_type', 'Type') }}:</span>
-                                <Badge variant="outline">{{ form.message_type }}</Badge>
+                            <div class="flex justify-between border-b py-2">
+                                <span class="text-muted-foreground"
+                                    >{{
+                                        t('campaigns.message_type', 'Type')
+                                    }}:</span
+                                >
+                                <Badge variant="outline">{{
+                                    form.message_type
+                                }}</Badge>
                             </div>
-                            <div v-if="form.scheduled_at" class="flex justify-between py-2 border-b">
-                                <span class="text-muted-foreground">{{ t('campaigns.scheduled_for', 'Scheduled') }}:</span>
-                                <span class="font-medium">{{ new Date(form.scheduled_at).toLocaleString() }}</span>
+                            <div
+                                v-if="form.scheduled_at"
+                                class="flex justify-between border-b py-2"
+                            >
+                                <span class="text-muted-foreground"
+                                    >{{
+                                        t(
+                                            'campaigns.scheduled_for',
+                                            'Scheduled',
+                                        )
+                                    }}:</span
+                                >
+                                <span class="font-medium">{{
+                                    new Date(form.scheduled_at).toLocaleString()
+                                }}</span>
                             </div>
-                            <div v-if="selectedTemplate" class="flex justify-between py-2 border-b">
-                                <span class="text-muted-foreground">{{ t('campaigns.template', 'Template') }}:</span>
-                                <span class="font-medium">{{ selectedTemplate.name }}</span>
+                            <div
+                                v-if="selectedTemplate"
+                                class="flex justify-between border-b py-2"
+                            >
+                                <span class="text-muted-foreground"
+                                    >{{
+                                        t('campaigns.template', 'Template')
+                                    }}:</span
+                                >
+                                <span class="font-medium">{{
+                                    selectedTemplate.name
+                                }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Quota Usage -->
                     <Alert
-                        :class="willExceedQuota ? 'border-red-500 bg-red-50 dark:bg-red-950' : 'border-green-200 bg-green-50 dark:bg-green-950'"
+                        :class="
+                            willExceedQuota
+                                ? 'border-red-500 bg-red-50 dark:bg-red-950'
+                                : 'border-green-200 bg-green-50 dark:bg-green-950'
+                        "
                     >
                         <AlertCircle
-                            :class="willExceedQuota ? 'text-red-600' : 'text-green-600'"
+                            :class="
+                                willExceedQuota
+                                    ? 'text-red-600'
+                                    : 'text-green-600'
+                            "
                             class="h-4 w-4"
                         />
-                        <AlertTitle>{{ t('campaigns.quota_usage', 'Quota Usage') }}</AlertTitle>
-                        <AlertDescription :class="willExceedQuota ? 'text-red-900 dark:text-red-100' : ''">
-                            <div class="space-y-3 mt-2">
+                        <AlertTitle>{{
+                            t('campaigns.quota_usage', 'Quota Usage')
+                        }}</AlertTitle>
+                        <AlertDescription
+                            :class="
+                                willExceedQuota
+                                    ? 'text-red-900 dark:text-red-100'
+                                    : ''
+                            "
+                        >
+                            <div class="mt-2 space-y-3">
                                 <div class="flex justify-between text-sm">
-                                    <span>{{ t('campaigns.current_usage', 'Current') }}:</span>
-                                    <span :class="usageColor" class="font-medium">
-                                        {{ usage.used.toLocaleString() }} / {{ usage.limit === 'unlimited' ? '∞' : usage.limit.toLocaleString() }}
+                                    <span
+                                        >{{
+                                            t(
+                                                'campaigns.current_usage',
+                                                'Current',
+                                            )
+                                        }}:</span
+                                    >
+                                    <span
+                                        :class="usageColor"
+                                        class="font-medium"
+                                    >
+                                        {{ usage.used.toLocaleString() }} /
+                                        {{
+                                            usage.limit === 'unlimited'
+                                                ? '∞'
+                                                : usage.limit.toLocaleString()
+                                        }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <span>{{ t('campaigns.after_campaign', 'After Campaign') }}:</span>
-                                    <span :class="willExceedQuota ? 'text-red-600 font-medium' : 'text-green-600 font-medium'">
-                                        {{ estimatedUsage.toLocaleString() }} / {{ usage.limit === 'unlimited' ? '∞' : usage.limit.toLocaleString() }}
+                                    <span
+                                        >{{
+                                            t(
+                                                'campaigns.after_campaign',
+                                                'After Campaign',
+                                            )
+                                        }}:</span
+                                    >
+                                    <span
+                                        :class="
+                                            willExceedQuota
+                                                ? 'font-medium text-red-600'
+                                                : 'font-medium text-green-600'
+                                        "
+                                    >
+                                        {{ estimatedUsage.toLocaleString() }} /
+                                        {{
+                                            usage.limit === 'unlimited'
+                                                ? '∞'
+                                                : usage.limit.toLocaleString()
+                                        }}
                                     </span>
                                 </div>
-                                <Alert v-if="willExceedQuota" variant="destructive" class="mt-2">
+                                <Alert
+                                    v-if="willExceedQuota"
+                                    class="mt-2"
+                                    variant="destructive"
+                                >
                                     <AlertCircle class="h-4 w-4" />
                                     <AlertDescription>
-                                        <strong>{{ t('campaigns.quota_exceeded', 'This campaign exceeds your quota!') }}</strong>
+                                        <strong>{{
+                                            t(
+                                                'campaigns.quota_exceeded',
+                                                'This campaign exceeds your quota!',
+                                            )
+                                        }}</strong>
                                         <br />
-                                        {{ t('campaigns.quota_exceeded_desc', 'Please upgrade your plan or reduce the number of recipients.') }}
+                                        {{
+                                            t(
+                                                'campaigns.quota_exceeded_desc',
+                                                'Please upgrade your plan or reduce the number of recipients.',
+                                            )
+                                        }}
                                     </AlertDescription>
                                 </Alert>
                             </div>
@@ -785,18 +1188,36 @@ const templateVariables = computed(() => {
 
                     <!-- Message Preview -->
                     <div class="space-y-3">
-                        <h3 class="font-semibold text-lg flex items-center gap-2">
+                        <h3
+                            class="flex items-center gap-2 text-lg font-semibold"
+                        >
                             <MessageSquare class="h-5 w-5" />
-                            {{ t('campaigns.message_preview', 'Message Preview') }}
+                            {{
+                                t(
+                                    'campaigns.message_preview',
+                                    'Message Preview',
+                                )
+                            }}
                         </h3>
                         <div
                             :dir="isRTL() ? 'rtl' : 'ltr'"
-                            class="rounded-lg border bg-white dark:bg-gray-900 p-4 shadow-sm"
+                            class="rounded-lg border bg-white p-4 shadow-sm dark:bg-gray-900"
                         >
-                            <p class="whitespace-pre-wrap text-sm">{{ form.message_content }}</p>
-                            <div v-if="form.media || selectedTemplate?.media_url" class="mt-3">
+                            <p class="text-sm whitespace-pre-wrap">
+                                {{ form.message_content }}
+                            </p>
+                            <div
+                                v-if="form.media || selectedTemplate?.media_url"
+                                class="mt-3"
+                            >
                                 <Badge class="bg-[#25D366] hover:bg-[#128C7E]">
-                                    {{ form.message_type }} {{ t('campaigns.media_attached', 'attached') }}
+                                    {{ form.message_type }}
+                                    {{
+                                        t(
+                                            'campaigns.media_attached',
+                                            'attached',
+                                        )
+                                    }}
                                 </Badge>
                             </div>
                         </div>
@@ -805,47 +1226,80 @@ const templateVariables = computed(() => {
             </Card>
 
             <!-- Navigation Buttons -->
-            <div class="flex justify-between items-center sticky bottom-0 bg-background p-4 border-t shadow-lg rounded-t-lg">
+            <div
+                class="sticky bottom-0 flex items-center justify-between rounded-t-lg border-t bg-background p-4 shadow-lg"
+            >
                 <Button
                     v-if="currentStep > 1"
-                    variant="outline"
-                    size="lg"
-                    @click="prevStep"
                     :disabled="isSubmitting"
+                    size="lg"
+                    variant="outline"
+                    @click="prevStep"
                 >
-                    <ArrowLeft v-if="!isRTL()" :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                    <ArrowLeft
+                        v-if="!isRTL()"
+                        :class="isRTL() ? 'ml-2' : 'mr-2'"
+                        class="h-4 w-4"
+                    />
                     {{ t('common.previous', 'Previous') }}
-                    <ArrowRight v-if="isRTL()" :class="isRTL() ? 'mr-2' : 'ml-2'" class="h-4 w-4" />
+                    <ArrowRight
+                        v-if="isRTL()"
+                        :class="isRTL() ? 'mr-2' : 'ml-2'"
+                        class="h-4 w-4"
+                    />
                 </Button>
                 <div v-else></div>
 
                 <div class="flex gap-3">
                     <Button
                         v-if="currentStep < 4"
-                        size="lg"
                         :disabled="
                             (currentStep === 1 && !canProceedStep1) ||
                             (currentStep === 2 && !canProceedStep2) ||
                             (currentStep === 3 && !canProceedStep3)
                         "
-                        @click="nextStep"
                         class="bg-[#25D366] hover:bg-[#128C7E]"
+                        size="lg"
+                        @click="nextStep"
                     >
-                        <ArrowLeft v-if="isRTL()" :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                        <ArrowLeft
+                            v-if="isRTL()"
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4"
+                        />
                         {{ t('common.next', 'Next') }}
-                        <ArrowRight v-if="!isRTL()" :class="isRTL() ? 'mr-2' : 'ml-2'" class="h-4 w-4" />
+                        <ArrowRight
+                            v-if="!isRTL()"
+                            :class="isRTL() ? 'mr-2' : 'ml-2'"
+                            class="h-4 w-4"
+                        />
                     </Button>
 
                     <Button
                         v-else
-                        size="lg"
                         :disabled="isSubmitting || willExceedQuota"
                         class="bg-[#25D366] hover:bg-[#128C7E]"
+                        size="lg"
                         @click="submit"
                     >
-                        <CheckCircle v-if="!isSubmitting" :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
-                        <div v-else class="animate-spin rounded-full h-4 w-4 border-b-2 border-white" :class="isRTL() ? 'ml-2' : 'mr-2'"></div>
-                        {{ isSubmitting ? t('common.creating', 'Creating...') : t('campaigns.create_campaign', 'Create Campaign') }}
+                        <CheckCircle
+                            v-if="!isSubmitting"
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4"
+                        />
+                        <div
+                            v-else
+                            :class="isRTL() ? 'ml-2' : 'mr-2'"
+                            class="h-4 w-4 animate-spin rounded-full border-b-2 border-white"
+                        ></div>
+                        {{
+                            isSubmitting
+                                ? t('common.creating', 'Creating...')
+                                : t(
+                                      'campaigns.create_campaign',
+                                      'Create Campaign',
+                                  )
+                        }}
                     </Button>
                 </div>
             </div>

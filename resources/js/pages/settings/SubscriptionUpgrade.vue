@@ -1,27 +1,29 @@
 <script lang="ts" setup>
-import { Head, router } from '@inertiajs/vue3';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { useTranslation } from '@/composables/useTranslation';
 import { index as dashboard } from '@/routes/dashboard';
-import { index as subscriptionIndex } from '@/routes/dashboard/settings/subscription';
-import { selectPackage } from '@/routes/dashboard/settings/subscription';
+import {
+    index as subscriptionIndex,
+    selectPackage,
+} from '@/routes/dashboard/settings/subscription';
 import { type BreadcrumbItem } from '@/types';
+import { Head, router } from '@inertiajs/vue3';
 import {
     AlertCircle,
-    Check,
-    Zap,
-    Star,
-    Crown,
     ArrowRight,
-    MessageSquare,
-    Users,
+    Check,
+    Crown,
     FileText,
-    Smartphone
+    MessageSquare,
+    Smartphone,
+    Star,
+    Users,
+    Zap,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -111,52 +113,76 @@ const getFeatureList = (pkg: Package) => {
     const messageLimit = pkg.limits?.messages_per_month;
     features.push({
         icon: MessageSquare,
-        text: messageLimit === 'unlimited' ?
-            t('packages.unlimited_messages', 'Unlimited messages') :
-            t('packages.messages_per_month', `${messageLimit} messages/month`)
+        text:
+            messageLimit === 'unlimited'
+                ? t('packages.unlimited_messages', 'Unlimited messages')
+                : t(
+                      'packages.messages_per_month',
+                      `${messageLimit} messages/month`,
+                  ),
     });
 
     // Contacts
     const contactLimit = pkg.limits?.contacts_validation_per_month;
     features.push({
         icon: Users,
-        text: contactLimit === 'unlimited' ?
-            t('packages.unlimited_contacts', 'Unlimited contact validation') :
-            t('packages.contacts_per_month', `${contactLimit} contacts validation/month`)
+        text:
+            contactLimit === 'unlimited'
+                ? t(
+                      'packages.unlimited_contacts',
+                      'Unlimited contact validation',
+                  )
+                : t(
+                      'packages.contacts_per_month',
+                      `${contactLimit} contacts validation/month`,
+                  ),
     });
 
     // WhatsApp Numbers
     const numberLimit = pkg.limits?.connected_numbers;
     features.push({
         icon: Smartphone,
-        text: t('packages.connected_numbers', `${numberLimit} WhatsApp number${numberLimit > 1 ? 's' : ''}`)
+        text: t(
+            'packages.connected_numbers',
+            `${numberLimit} WhatsApp number${numberLimit > 1 ? 's' : ''}`,
+        ),
     });
 
     // Templates
     const templateLimit = pkg.limits?.message_templates;
     features.push({
         icon: FileText,
-        text: templateLimit === 'unlimited' ?
-            t('packages.unlimited_templates', 'Unlimited message templates') :
-            t('packages.templates', `${templateLimit} message template${templateLimit > 1 ? 's' : ''}`)
+        text:
+            templateLimit === 'unlimited'
+                ? t(
+                      'packages.unlimited_templates',
+                      'Unlimited message templates',
+                  )
+                : t(
+                      'packages.templates',
+                      `${templateLimit} message template${templateLimit > 1 ? 's' : ''}`,
+                  ),
     });
 
     // Additional features based on package
     if (pkg.slug === 'pro' || pkg.slug === 'golden') {
         features.push({
             icon: Check,
-            text: t('packages.media_support', 'Media messages (images, videos, documents)')
+            text: t(
+                'packages.media_support',
+                'Media messages (images, videos, documents)',
+            ),
         });
     }
 
     if (pkg.slug === 'golden') {
         features.push({
             icon: Check,
-            text: t('packages.priority_support', 'Priority support')
+            text: t('packages.priority_support', 'Priority support'),
         });
         features.push({
             icon: Check,
-            text: t('packages.api_access', 'API access')
+            text: t('packages.api_access', 'API access'),
         });
     }
 
@@ -168,14 +194,18 @@ const handleSelectPackage = (packageId: number) => {
     selectedPackageId.value = packageId;
     isProcessing.value = true;
 
-    router.post(selectPackage(), {
-        package_id: packageId
-    }, {
-        preserveState: true,
-        onError: () => {
-            isProcessing.value = false;
-        }
-    });
+    router.post(
+        selectPackage(),
+        {
+            package_id: packageId,
+        },
+        {
+            preserveState: true,
+            onError: () => {
+                isProcessing.value = false;
+            },
+        },
+    );
 };
 </script>
 
@@ -187,17 +217,37 @@ const handleSelectPackage = (packageId: number) => {
             <div :dir="isRTL() ? 'rtl' : 'ltr'" class="space-y-8">
                 <!-- Header -->
                 <div class="text-center">
-                    <h2 class="text-3xl font-bold">{{ t('subscription.upgrade_title', 'Upgrade Your Plan') }}</h2>
+                    <h2 class="text-3xl font-bold">
+                        {{
+                            t('subscription.upgrade_title', 'Upgrade Your Plan')
+                        }}
+                    </h2>
                     <p class="mt-2 text-muted-foreground">
-                        {{ t('subscription.upgrade_description', 'Choose the perfect plan for your business needs') }}
+                        {{
+                            t(
+                                'subscription.upgrade_description',
+                                'Choose the perfect plan for your business needs',
+                            )
+                        }}
                     </p>
                 </div>
 
                 <!-- Trial Alert -->
-                <Alert v-if="currentSubscription.is_trial && currentSubscription.days_remaining" class="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
+                <Alert
+                    v-if="
+                        currentSubscription.is_trial &&
+                        currentSubscription.days_remaining
+                    "
+                    class="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
+                >
                     <AlertCircle class="h-4 w-4 text-yellow-600" />
                     <AlertDescription>
-                        {{ t('subscription.trial_ending_soon', `Your trial ends in ${currentSubscription.days_remaining} days. Upgrade now to keep access to all features.`) }}
+                        {{
+                            t(
+                                'subscription.trial_ending_soon',
+                                `Your trial ends in ${currentSubscription.days_remaining} days. Upgrade now to keep access to all features.`,
+                            )
+                        }}
                     </AlertDescription>
                 </Alert>
 
@@ -208,16 +258,22 @@ const handleSelectPackage = (packageId: number) => {
                         :key="pkg.id"
                         :class="[
                             'relative transition-all hover:shadow-lg',
-                            pkg.is_current ? 'border-2 border-muted-foreground' : '',
-                            pkg.is_popular ? 'border-2 border-[#25D366] shadow-lg transform scale-105' : '',
+                            pkg.is_current
+                                ? 'border-2 border-muted-foreground'
+                                : '',
+                            pkg.is_popular
+                                ? 'scale-105 transform border-2 border-[#25D366] shadow-lg'
+                                : '',
                         ]"
                     >
                         <!-- Badge -->
                         <Badge
                             v-if="getBadgeText(pkg)"
                             :class="[
-                                'absolute -top-3 left-1/2 transform -translate-x-1/2',
-                                pkg.is_current ? 'bg-muted-foreground' : 'bg-[#25D366]'
+                                'absolute -top-3 left-1/2 -translate-x-1/2 transform',
+                                pkg.is_current
+                                    ? 'bg-muted-foreground'
+                                    : 'bg-[#25D366]',
                             ]"
                         >
                             {{ getBadgeText(pkg) }}
@@ -225,15 +281,21 @@ const handleSelectPackage = (packageId: number) => {
 
                         <CardHeader class="text-center">
                             <!-- Package Icon -->
-                            <div :class="[
-                                'mx-auto p-3 rounded-full mb-4',
-                                pkg.color ? `bg-[${pkg.color}]/10` : 'bg-[#25D366]/10'
-                            ]">
+                            <div
+                                :class="[
+                                    'mx-auto mb-4 rounded-full p-3',
+                                    pkg.color
+                                        ? `bg-[${pkg.color}]/10`
+                                        : 'bg-[#25D366]/10',
+                                ]"
+                            >
                                 <component
                                     :is="getPackageIcon(pkg.slug)"
                                     :class="[
                                         'h-8 w-8',
-                                        pkg.color ? `text-[${pkg.color}]` : 'text-[#25D366]'
+                                        pkg.color
+                                            ? `text-[${pkg.color}]`
+                                            : 'text-[#25D366]',
                                     ]"
                                 />
                             </div>
@@ -245,8 +307,14 @@ const handleSelectPackage = (packageId: number) => {
 
                             <!-- Price -->
                             <div class="mt-4">
-                                <span class="text-4xl font-bold">{{ pkg.formatted_price }}</span>
-                                <span class="text-muted-foreground"> {{ t('common.currency', 'EGP') }}/{{ t('common.month', 'month') }}</span>
+                                <span class="text-4xl font-bold">{{
+                                    pkg.formatted_price
+                                }}</span>
+                                <span class="text-muted-foreground">
+                                    {{ t('common.currency', 'EGP') }}/{{
+                                        t('common.month', 'month')
+                                    }}</span
+                                >
                             </div>
                         </CardHeader>
 
@@ -254,47 +322,88 @@ const handleSelectPackage = (packageId: number) => {
                             <!-- Features List -->
                             <ul class="space-y-3">
                                 <li
-                                    v-for="(feature, index) in getFeatureList(pkg)"
+                                    v-for="(feature, index) in getFeatureList(
+                                        pkg,
+                                    )"
                                     :key="index"
                                     class="flex items-start gap-3"
                                 >
                                     <component
                                         :is="feature.icon"
-                                        class="h-5 w-5 text-[#25D366] shrink-0 mt-0.5"
+                                        class="mt-0.5 h-5 w-5 shrink-0 text-[#25D366]"
                                     />
-                                    <span class="text-sm">{{ feature.text }}</span>
+                                    <span class="text-sm">{{
+                                        feature.text
+                                    }}</span>
                                 </li>
                             </ul>
 
                             <!-- Action Button -->
                             <!-- Show select button if not current plan OR if current plan but on trial -->
                             <Button
-                                v-if="!pkg.is_current || (pkg.is_current && currentSubscription.is_trial)"
+                                v-if="
+                                    !pkg.is_current ||
+                                    (pkg.is_current &&
+                                        currentSubscription.is_trial)
+                                "
                                 :class="[
                                     'w-full',
-                                    pkg.is_popular || (pkg.is_current && currentSubscription.is_trial) ? 'bg-[#25D366] hover:bg-[#128C7E]' : ''
+                                    pkg.is_popular ||
+                                    (pkg.is_current &&
+                                        currentSubscription.is_trial)
+                                        ? 'bg-[#25D366] hover:bg-[#128C7E]'
+                                        : '',
                                 ]"
-                                :variant="pkg.is_popular || (pkg.is_current && currentSubscription.is_trial) ? 'default' : 'outline'"
                                 :disabled="isProcessing"
+                                :variant="
+                                    pkg.is_popular ||
+                                    (pkg.is_current &&
+                                        currentSubscription.is_trial)
+                                        ? 'default'
+                                        : 'outline'
+                                "
                                 @click="handleSelectPackage(pkg.id)"
                             >
-                                <span v-if="pkg.is_current && currentSubscription.is_trial">
-                                    {{ t('subscription.activate_plan', 'Activate This Plan') }}
+                                <span
+                                    v-if="
+                                        pkg.is_current &&
+                                        currentSubscription.is_trial
+                                    "
+                                >
+                                    {{
+                                        t(
+                                            'subscription.activate_plan',
+                                            'Activate This Plan',
+                                        )
+                                    }}
                                 </span>
                                 <span v-else>
-                                    {{ t('subscription.select_plan', 'Select This Plan') }}
+                                    {{
+                                        t(
+                                            'subscription.select_plan',
+                                            'Select This Plan',
+                                        )
+                                    }}
                                 </span>
-                                <ArrowRight class="h-4 w-4 ml-2" />
+                                <ArrowRight class="ml-2 h-4 w-4" />
                             </Button>
 
                             <!-- Only show disabled button if current plan AND not on trial -->
                             <Button
-                                v-else-if="pkg.is_current && !currentSubscription.is_trial"
+                                v-else-if="
+                                    pkg.is_current &&
+                                    !currentSubscription.is_trial
+                                "
                                 class="w-full"
                                 disabled
                                 variant="secondary"
                             >
-                                {{ t('subscription.current_plan', 'Current Plan') }}
+                                {{
+                                    t(
+                                        'subscription.current_plan',
+                                        'Current Plan',
+                                    )
+                                }}
                             </Button>
                         </CardContent>
                     </Card>
@@ -304,7 +413,12 @@ const handleSelectPackage = (packageId: number) => {
                 <Alert>
                     <AlertCircle class="h-4 w-4" />
                     <AlertDescription>
-                        {{ t('subscription.payment_note', 'You will be redirected to secure payment page after selecting a plan. All payments are processed securely.') }}
+                        {{
+                            t(
+                                'subscription.payment_note',
+                                'You will be redirected to secure payment page after selecting a plan. All payments are processed securely.',
+                            )
+                        }}
                     </AlertDescription>
                 </Alert>
             </div>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import { edit } from '@/routes/dashboard/settings/profile';
 import { index as dashboard } from '@/routes/dashboard';
+import { edit } from '@/routes/dashboard/settings/profile';
 import { send } from '@/routes/verification';
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 
@@ -13,12 +13,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { useTranslation } from '@/composables/useTranslation';
 import { type BreadcrumbItem } from '@/types';
-import { Globe, Phone, Mail, Calendar, CheckCircle, XCircle } from 'lucide-vue-next';
+import {
+    Calendar,
+    CheckCircle,
+    Globe,
+    Mail,
+    Phone,
+    XCircle,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface UserDetails {
@@ -76,7 +89,8 @@ const memberSince = computed(() => {
 });
 
 const formattedPhone = computed(() => {
-    if (!props.user.country || !props.user.mobile_number) return props.user.mobile_number;
+    if (!props.user.country || !props.user.mobile_number)
+        return props.user.mobile_number;
     return `+${props.user.country.phone_code} ${props.user.mobile_number}`;
 });
 </script>
@@ -90,20 +104,26 @@ const formattedPhone = computed(() => {
                 <!-- Profile Overview Card -->
                 <Card>
                     <CardHeader>
-                        <CardTitle>{{ t('settings.profile_overview', 'Profile Overview') }}</CardTitle>
+                        <CardTitle>{{
+                            t('settings.profile_overview', 'Profile Overview')
+                        }}</CardTitle>
                     </CardHeader>
                     <CardContent class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <!-- Email Status -->
                             <div class="flex items-center gap-2">
                                 <Mail class="h-4 w-4 text-muted-foreground" />
                                 <span class="text-sm">{{ user.email }}</span>
-                                <Badge v-if="user.email_verified_at" variant="default" class="bg-[#25D366]">
-                                    <CheckCircle class="h-3 w-3 mr-1" />
+                                <Badge
+                                    v-if="user.email_verified_at"
+                                    class="bg-[#25D366]"
+                                    variant="default"
+                                >
+                                    <CheckCircle class="mr-1 h-3 w-3" />
                                     {{ t('settings.verified', 'Verified') }}
                                 </Badge>
                                 <Badge v-else variant="destructive">
-                                    <XCircle class="h-3 w-3 mr-1" />
+                                    <XCircle class="mr-1 h-3 w-3" />
                                     {{ t('settings.unverified', 'Unverified') }}
                                 </Badge>
                             </div>
@@ -111,24 +131,43 @@ const formattedPhone = computed(() => {
                             <!-- Phone Status -->
                             <div class="flex items-center gap-2">
                                 <Phone class="h-4 w-4 text-muted-foreground" />
-                                <span class="text-sm">{{ formattedPhone }}</span>
-                                <Badge v-if="user.mobile_verified_at" variant="default" class="bg-[#25D366]">
-                                    <CheckCircle class="h-3 w-3 mr-1" />
+                                <span class="text-sm">{{
+                                    formattedPhone
+                                }}</span>
+                                <Badge
+                                    v-if="user.mobile_verified_at"
+                                    class="bg-[#25D366]"
+                                    variant="default"
+                                >
+                                    <CheckCircle class="mr-1 h-3 w-3" />
                                     {{ t('settings.verified', 'Verified') }}
                                 </Badge>
                             </div>
 
                             <!-- Country -->
-                            <div v-if="user.country" class="flex items-center gap-2">
+                            <div
+                                v-if="user.country"
+                                class="flex items-center gap-2"
+                            >
                                 <Globe class="h-4 w-4 text-muted-foreground" />
-                                <span class="text-sm">{{ user.country.name }}</span>
+                                <span class="text-sm">{{
+                                    user.country.name
+                                }}</span>
                             </div>
 
                             <!-- Member Since -->
                             <div class="flex items-center gap-2">
-                                <Calendar class="h-4 w-4 text-muted-foreground" />
+                                <Calendar
+                                    class="h-4 w-4 text-muted-foreground"
+                                />
                                 <span class="text-sm">
-                                    {{ t('settings.member_since', 'Member since') }} {{ memberSince }}
+                                    {{
+                                        t(
+                                            'settings.member_since',
+                                            'Member since',
+                                        )
+                                    }}
+                                    {{ memberSince }}
                                 </span>
                             </div>
                         </div>
@@ -138,8 +177,18 @@ const formattedPhone = computed(() => {
                 <!-- Profile Form -->
                 <div class="space-y-6">
                     <HeadingSmall
-                        :description="t('settings.update_profile_info', 'Update your name and email address')"
-                        :title="t('settings.profile_information', 'Profile Information')"
+                        :description="
+                            t(
+                                'settings.update_profile_info',
+                                'Update your name and email address',
+                            )
+                        "
+                        :title="
+                            t(
+                                'settings.profile_information',
+                                'Profile Information',
+                            )
+                        "
                     />
 
                     <Form
@@ -147,35 +196,49 @@ const formattedPhone = computed(() => {
                         class="space-y-6"
                         v-bind="ProfileController.update.form()"
                     >
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <!-- First Name -->
                             <div class="grid gap-2">
-                                <Label :class="isRTL() ? 'text-right' : 'text-left'" for="first_name">
+                                <Label
+                                    :class="
+                                        isRTL() ? 'text-right' : 'text-left'
+                                    "
+                                    for="first_name"
+                                >
                                     {{ t('settings.first_name', 'First Name') }}
                                 </Label>
                                 <Input
                                     id="first_name"
                                     :default-value="user.first_name"
-                                    name="first_name"
-                                    :placeholder="t('settings.first_name', 'First Name')"
-                                    required
                                     :dir="isRTL() ? 'rtl' : 'ltr'"
+                                    :placeholder="
+                                        t('settings.first_name', 'First Name')
+                                    "
+                                    name="first_name"
+                                    required
                                 />
                                 <InputError :message="errors.first_name" />
                             </div>
 
                             <!-- Last Name -->
                             <div class="grid gap-2">
-                                <Label :class="isRTL() ? 'text-right' : 'text-left'" for="last_name">
+                                <Label
+                                    :class="
+                                        isRTL() ? 'text-right' : 'text-left'
+                                    "
+                                    for="last_name"
+                                >
                                     {{ t('settings.last_name', 'Last Name') }}
                                 </Label>
                                 <Input
                                     id="last_name"
                                     :default-value="user.last_name"
-                                    name="last_name"
-                                    :placeholder="t('settings.last_name', 'Last Name')"
-                                    required
                                     :dir="isRTL() ? 'rtl' : 'ltr'"
+                                    :placeholder="
+                                        t('settings.last_name', 'Last Name')
+                                    "
+                                    name="last_name"
+                                    required
                                 />
                                 <InputError :message="errors.last_name" />
                             </div>
@@ -183,28 +246,41 @@ const formattedPhone = computed(() => {
 
                         <!-- Email -->
                         <div class="grid gap-2">
-                            <Label :class="isRTL() ? 'text-right' : 'text-left'" for="email">
+                            <Label
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                for="email"
+                            >
                                 {{ t('settings.email', 'Email address') }}
                             </Label>
                             <Input
                                 id="email"
                                 :default-value="user.email"
+                                :placeholder="
+                                    t('settings.email', 'Email address')
+                                "
                                 autocomplete="username"
+                                dir="ltr"
                                 name="email"
-                                :placeholder="t('settings.email', 'Email address')"
                                 required
                                 type="email"
-                                dir="ltr"
                             />
                             <InputError :message="errors.email" />
                         </div>
 
                         <!-- Language Preference -->
                         <div class="grid gap-2">
-                            <Label :class="isRTL() ? 'text-right' : 'text-left'" for="locale">
-                                {{ t('settings.language', 'Language Preference') }}
+                            <Label
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                for="locale"
+                            >
+                                {{
+                                    t(
+                                        'settings.language',
+                                        'Language Preference',
+                                    )
+                                }}
                             </Label>
-                            <Select name="locale" :defaultValue="user.locale">
+                            <Select :defaultValue="user.locale" name="locale">
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
@@ -219,13 +295,23 @@ const formattedPhone = computed(() => {
                         <!-- Email Verification Notice -->
                         <div v-if="mustVerifyEmail && !user.email_verified_at">
                             <p class="text-sm text-muted-foreground">
-                                {{ t('settings.email_unverified', 'Your email address is unverified.') }}
+                                {{
+                                    t(
+                                        'settings.email_unverified',
+                                        'Your email address is unverified.',
+                                    )
+                                }}
                                 <Link
                                     :href="send()"
                                     as="button"
                                     class="text-[#25D366] underline decoration-[#25D366]/30 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-[#25D366]"
                                 >
-                                    {{ t('settings.resend_verification', 'Click here to resend the verification email.') }}
+                                    {{
+                                        t(
+                                            'settings.resend_verification',
+                                            'Click here to resend the verification email.',
+                                        )
+                                    }}
                                 </Link>
                             </p>
 
@@ -233,19 +319,26 @@ const formattedPhone = computed(() => {
                                 v-if="status === 'verification-link-sent'"
                                 class="mt-2 text-sm font-medium text-[#25D366]"
                             >
-                                {{ t('settings.verification_sent', 'A new verification link has been sent to your email address.') }}
+                                {{
+                                    t(
+                                        'settings.verification_sent',
+                                        'A new verification link has been sent to your email address.',
+                                    )
+                                }}
                             </div>
                         </div>
 
                         <!-- Submit Button -->
-                        <div :class="[
-                            'flex items-center gap-4',
-                            isRTL() ? 'flex-row-reverse' : 'flex-row'
-                        ]">
+                        <div
+                            :class="[
+                                'flex items-center gap-4',
+                                isRTL() ? 'flex-row-reverse' : 'flex-row',
+                            ]"
+                        >
                             <Button
                                 :disabled="processing"
+                                class="bg-[#25D366] text-white hover:bg-[#128C7E]"
                                 data-test="update-profile-button"
-                                class="bg-[#25D366] hover:bg-[#128C7E] text-white"
                             >
                                 {{ t('settings.save', 'Save') }}
                             </Button>

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -73,26 +73,37 @@ const formatLimit = (value: number | string): string => {
                         {{
                             isUnlimited
                                 ? formatLimit(usage.limit)
-                                : t('templates.usage.used_of_limit', '{used} of {limit}', {
-                                    used: usage.used,
-                                    limit: formatLimit(usage.limit),
-                                })
+                                : t(
+                                      'templates.usage.used_of_limit',
+                                      '{used} of {limit}',
+                                      {
+                                          used: usage.used,
+                                          limit: formatLimit(usage.limit),
+                                      },
+                                  )
                         }}
                     </Badge>
                 </div>
 
                 <div v-if="!isUnlimited" class="space-y-2">
-                    <Progress :model-value="percentage" :class="getProgressColor" />
+                    <Progress
+                        :class="getProgressColor"
+                        :model-value="percentage"
+                    />
                     <p class="text-sm text-muted-foreground">
                         {{
-                            t('templates.usage.remaining', '{remaining} remaining', {
-                                remaining: usage.remaining,
-                            })
+                            t(
+                                'templates.usage.remaining',
+                                '{remaining} remaining',
+                                {
+                                    remaining: usage.remaining,
+                                },
+                            )
                         }}
                     </p>
                 </div>
 
-                <Alert v-if="showWarning" variant="destructive" class="mt-3">
+                <Alert v-if="showWarning" class="mt-3" variant="destructive">
                     <AlertCircle class="h-4 w-4" />
                     <AlertDescription>
                         {{

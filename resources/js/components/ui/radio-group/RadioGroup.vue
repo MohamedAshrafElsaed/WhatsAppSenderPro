@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { RadioGroup } from '@headlessui/vue';
 import { cn } from '@/lib/utils';
 
@@ -24,11 +24,11 @@ const handleChange = (value: any) => {
 
 <template>
     <RadioGroup
-        :model-value="modelValue"
+        :class="cn('grid gap-2', props.class)"
         :default-value="defaultValue"
         :disabled="disabled"
+        :model-value="modelValue"
         :name="name"
-        :class="cn('grid gap-2', props.class)"
         @update:model-value="handleChange"
     >
         <slot />

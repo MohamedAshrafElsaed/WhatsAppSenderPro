@@ -430,7 +430,6 @@
         "media_attached": "مرفقة",
         "create_campaign": "إنشاء الحملة",
         "search_contacts": "البحث في جهات الاتصال...",
-
         "type": {
             "text": "نص فقط",
             "image": "نص + صورة",
@@ -438,7 +437,6 @@
             "audio": "صوت",
             "document": "مستند"
         },
-
         "errors": {
             "no_connected_session": "لا توجد جلسة واتساب متصلة",
             "no_connected_session_desc": "يرجى توصيل جلسة واتساب قبل إنشاء حملة."

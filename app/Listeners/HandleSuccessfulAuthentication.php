@@ -10,7 +10,9 @@ readonly class HandleSuccessfulAuthentication
 {
     public function __construct(
         private DeviceTrackingService $deviceTrackingService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Handle login event

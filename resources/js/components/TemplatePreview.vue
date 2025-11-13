@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Badge } from '@/components/ui/badge';
 import {
     Card,
@@ -8,8 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { useTranslation } from '@/composables/useTranslation';
-import type { Template } from '@/types/template';
-import { FileText, Image as ImageIcon, Video } from 'lucide-vue-next';
+import { FileText } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface Props {
@@ -106,7 +105,10 @@ const typeBadgeColor = computed(() => {
 <template>
     <Card>
         <CardHeader>
-            <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex items-center justify-between">
+            <div
+                :class="isRTL() ? 'flex-row-reverse' : ''"
+                class="flex items-center justify-between"
+            >
                 <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
                     {{ t('templates.template_preview', 'Template Preview') }}
                 </CardTitle>
@@ -114,14 +116,20 @@ const typeBadgeColor = computed(() => {
                     {{ typeLabel }}
                 </Badge>
             </div>
-            <CardDescription v-if="useSampleData" :class="isRTL() ? 'text-right' : 'text-left'">
+            <CardDescription
+                v-if="useSampleData"
+                :class="isRTL() ? 'text-right' : 'text-left'"
+            >
                 {{ t('templates.sample_preview', 'Preview with Sample Data') }}
             </CardDescription>
         </CardHeader>
         <CardContent>
             <div class="space-y-4">
                 <!-- Media Preview -->
-                <div v-if="mediaUrl && type === 'text_image'" class="overflow-hidden rounded-lg border">
+                <div
+                    v-if="mediaUrl && type === 'text_image'"
+                    class="overflow-hidden rounded-lg border"
+                >
                     <img
                         :src="mediaUrl"
                         alt="Template media"
@@ -129,18 +137,22 @@ const typeBadgeColor = computed(() => {
                     />
                 </div>
 
-                <div v-if="mediaUrl && type === 'text_video'" class="overflow-hidden rounded-lg border">
-                    <video
-                        :src="mediaUrl"
-                        class="w-full"
-                        controls
-                    />
+                <div
+                    v-if="mediaUrl && type === 'text_video'"
+                    class="overflow-hidden rounded-lg border"
+                >
+                    <video :src="mediaUrl" class="w-full" controls />
                 </div>
 
-                <div v-if="mediaUrl && type === 'text_document'" class="flex items-center gap-4 rounded-lg border p-4">
+                <div
+                    v-if="mediaUrl && type === 'text_document'"
+                    class="flex items-center gap-4 rounded-lg border p-4"
+                >
                     <FileText class="size-8 text-muted-foreground" />
                     <div>
-                        <p class="font-medium">{{ t('templates.document_file', 'Document file') }}</p>
+                        <p class="font-medium">
+                            {{ t('templates.document_file', 'Document file') }}
+                        </p>
                         <p class="text-sm text-muted-foreground">
                             {{ mediaUrl.split('/').pop() }}
                         </p>
@@ -170,11 +182,27 @@ const typeBadgeColor = computed(() => {
                     :class="isRTL() ? 'text-right' : 'text-left'"
                     class="rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-950 dark:text-blue-200"
                 >
-                    <p class="font-medium">{{ t('templates.sample_data_used', 'Sample data used:') }}</p>
-                    <ul :class="isRTL() ? 'pr-4' : 'pl-4'" class="mt-1 list-disc space-y-1">
-                        <li>{{ t('contacts.fields.first_name', 'First Name') }}: {{ sampleData.first_name }}</li>
-                        <li>{{ t('contacts.fields.last_name', 'Last Name') }}: {{ sampleData.last_name }}</li>
-                        <li>{{ t('contacts.fields.phone_number', 'Phone') }}: {{ sampleData.phone }}</li>
+                    <p class="font-medium">
+                        {{
+                            t('templates.sample_data_used', 'Sample data used:')
+                        }}
+                    </p>
+                    <ul
+                        :class="isRTL() ? 'pr-4' : 'pl-4'"
+                        class="mt-1 list-disc space-y-1"
+                    >
+                        <li>
+                            {{ t('contacts.fields.first_name', 'First Name') }}:
+                            {{ sampleData.first_name }}
+                        </li>
+                        <li>
+                            {{ t('contacts.fields.last_name', 'Last Name') }}:
+                            {{ sampleData.last_name }}
+                        </li>
+                        <li>
+                            {{ t('contacts.fields.phone_number', 'Phone') }}:
+                            {{ sampleData.phone }}
+                        </li>
                     </ul>
                 </div>
             </div>

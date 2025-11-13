@@ -62,7 +62,6 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')
         Route::post('bulk-validate', [ContactController::class, 'bulkValidate'])->name('bulk-validate');
 
 
-
     });
 
     // ==================== TEMPLATES  ====================

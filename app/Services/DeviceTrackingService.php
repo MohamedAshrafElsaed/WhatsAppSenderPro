@@ -3,9 +3,8 @@
 namespace App\Services;
 
 use App\Models\UserDevice;
-use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
 
 class DeviceTrackingService
 {
@@ -87,24 +86,6 @@ class DeviceTrackingService
     }
 
     /**
-     * Get the real IP address
-     */
-    protected function getIpAddress(Request $request): string
-    {
-        // Cloudflare real IP
-        if ($request->header('CF-Connecting-IP')) {
-            return $request->header('CF-Connecting-IP');
-        }
-
-        // Standard forwarded IP
-        if ($request->header('X-Forwarded-For')) {
-            return explode(',', $request->header('X-Forwarded-For'))[0];
-        }
-
-        return $request->ip();
-    }
-
-    /**
      * Get device type
      */
     protected function getDeviceType(): string
@@ -122,6 +103,24 @@ class DeviceTrackingService
         }
 
         return 'unknown';
+    }
+
+    /**
+     * Get the real IP address
+     */
+    protected function getIpAddress(Request $request): string
+    {
+        // Cloudflare real IP
+        if ($request->header('CF-Connecting-IP')) {
+            return $request->header('CF-Connecting-IP');
+        }
+
+        // Standard forwarded IP
+        if ($request->header('X-Forwarded-For')) {
+            return explode(',', $request->header('X-Forwarded-For'))[0];
+        }
+
+        return $request->ip();
     }
 
     /**

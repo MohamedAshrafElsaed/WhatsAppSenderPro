@@ -1,6 +1,5 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import CampaignProgressBar from '@/components/CampaignProgressBar.vue';
-import CampaignStatusBadge from '@/components/CampaignStatusBadge.vue';
 import Heading from '@/components/Heading.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,8 +15,12 @@ import {
 } from '@/components/ui/table';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { index, show, export as exportResults } from '@/routes/dashboard/campaigns';
 import { index as dashboard } from '@/routes/dashboard';
+import {
+    export as exportResults,
+    index,
+    show,
+} from '@/routes/dashboard/campaigns';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import {
@@ -99,7 +102,8 @@ const filteredRecipients = computed(() => {
 
     const query = searchQuery.value.toLowerCase();
     return props.recipients.data.filter((r) => {
-        const name = `${r.contact.first_name} ${r.contact.last_name || ''}`.toLowerCase();
+        const name =
+            `${r.contact.first_name} ${r.contact.last_name || ''}`.toLowerCase();
         const phone = r.contact.phone_number.toLowerCase();
         return name.includes(query) || phone.includes(query);
     });
@@ -146,23 +150,33 @@ const getStatusIcon = (status: string) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head :title="`${campaign.name} - ${t('campaigns.results', 'Results')}`" />
+        <Head
+            :title="`${campaign.name} - ${t('campaigns.results', 'Results')}`"
+        />
 
         <div :class="isRTL() ? 'text-right' : 'text-left'" class="space-y-6">
             <!-- Header -->
-            <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex items-center justify-between">
+            <div
+                :class="isRTL() ? 'flex-row-reverse' : ''"
+                class="flex items-center justify-between"
+            >
                 <Heading
-                    :title="t('campaigns.results_title', 'Campaign Results')"
                     :description="campaign.name"
+                    :title="t('campaigns.results_title', 'Campaign Results')"
                 >
                     <template #icon>
-                        <div class="flex items-center justify-center rounded-lg bg-[#25D366] p-2">
+                        <div
+                            class="flex items-center justify-center rounded-lg bg-[#25D366] p-2"
+                        >
                             <FileText class="h-5 w-5 text-white" />
                         </div>
                     </template>
                 </Heading>
 
-                <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex gap-2">
+                <div
+                    :class="isRTL() ? 'flex-row-reverse' : ''"
+                    class="flex gap-2"
+                >
                     <Button variant="outline" @click="handleRefresh">
                         <RefreshCw class="mr-2 h-4 w-4" />
                         {{ t('campaigns.refresh', 'Refresh') }}
@@ -173,10 +187,15 @@ const getStatusIcon = (status: string) => {
                         {{ t('campaigns.export', 'Export CSV') }}
                     </Button>
 
-                    <Button variant="outline" as-child>
+                    <Button as-child variant="outline">
                         <Link :href="show(campaign.id)">
                             <ArrowLeft class="mr-2 h-4 w-4" />
-                            {{ t('campaigns.back_to_campaign', 'Back to Campaign') }}
+                            {{
+                                t(
+                                    'campaigns.back_to_campaign',
+                                    'Back to Campaign',
+                                )
+                            }}
                         </Link>
                     </Button>
                 </div>
@@ -185,63 +204,106 @@ const getStatusIcon = (status: string) => {
             <!-- Stats Overview -->
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
+                    <CardHeader
+                        class="flex flex-row items-center justify-between pb-2"
+                    >
                         <CardTitle class="text-sm font-medium">
-                            {{ t('campaigns.stats.total_recipients', 'Total Recipients') }}
+                            {{
+                                t(
+                                    'campaigns.stats.total_recipients',
+                                    'Total Recipients',
+                                )
+                            }}
                         </CardTitle>
                         <Users class="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div class="text-2xl font-bold">{{ stats.total }}</div>
                         <p class="text-xs text-muted-foreground">
-                            {{ t('campaigns.contacts_in_campaign', 'Contacts in this campaign') }}
+                            {{
+                                t(
+                                    'campaigns.contacts_in_campaign',
+                                    'Contacts in this campaign',
+                                )
+                            }}
                         </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
+                    <CardHeader
+                        class="flex flex-row items-center justify-between pb-2"
+                    >
                         <CardTitle class="text-sm font-medium">
                             {{ t('campaigns.stats.delivered', 'Delivered') }}
                         </CardTitle>
                         <CheckCircle class="h-4 w-4 text-[#25D366]" />
                     </CardHeader>
                     <CardContent>
-                        <div class="text-2xl font-bold text-[#25D366]">{{ stats.delivered }}</div>
-                        <div class="flex items-center gap-1 text-xs text-muted-foreground">
+                        <div class="text-2xl font-bold text-[#25D366]">
+                            {{ stats.delivered }}
+                        </div>
+                        <div
+                            class="flex items-center gap-1 text-xs text-muted-foreground"
+                        >
                             <TrendingUp class="h-3 w-3 text-[#25D366]" />
-                            <span>{{ stats.success_rate }}% {{ t('campaigns.success_rate', 'success rate') }}</span>
+                            <span
+                                >{{ stats.success_rate }}%
+                                {{
+                                    t('campaigns.success_rate', 'success rate')
+                                }}</span
+                            >
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
+                    <CardHeader
+                        class="flex flex-row items-center justify-between pb-2"
+                    >
                         <CardTitle class="text-sm font-medium">
                             {{ t('campaigns.stats.failed', 'Failed') }}
                         </CardTitle>
                         <XCircle class="h-4 w-4 text-red-600" />
                     </CardHeader>
                     <CardContent>
-                        <div class="text-2xl font-bold text-red-600">{{ stats.failed }}</div>
-                        <div class="flex items-center gap-1 text-xs text-muted-foreground">
+                        <div class="text-2xl font-bold text-red-600">
+                            {{ stats.failed }}
+                        </div>
+                        <div
+                            class="flex items-center gap-1 text-xs text-muted-foreground"
+                        >
                             <TrendingDown class="h-3 w-3 text-red-600" />
-                            <span>{{ stats.failure_rate }}% {{ t('campaigns.failure_rate', 'failure rate') }}</span>
+                            <span
+                                >{{ stats.failure_rate }}%
+                                {{
+                                    t('campaigns.failure_rate', 'failure rate')
+                                }}</span
+                            >
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
+                    <CardHeader
+                        class="flex flex-row items-center justify-between pb-2"
+                    >
                         <CardTitle class="text-sm font-medium">
                             {{ t('campaigns.stats.pending', 'Pending') }}
                         </CardTitle>
                         <Clock class="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div class="text-2xl font-bold">{{ stats.pending }}</div>
+                        <div class="text-2xl font-bold">
+                            {{ stats.pending }}
+                        </div>
                         <p class="text-xs text-muted-foreground">
-                            {{ t('campaigns.awaiting_delivery', 'Awaiting delivery') }}
+                            {{
+                                t(
+                                    'campaigns.awaiting_delivery',
+                                    'Awaiting delivery',
+                                )
+                            }}
                         </p>
                     </CardContent>
                 </Card>
@@ -250,7 +312,9 @@ const getStatusIcon = (status: string) => {
             <!-- Progress Bar -->
             <Card>
                 <CardHeader>
-                    <CardTitle>{{ t('campaigns.delivery_progress', 'Delivery Progress') }}</CardTitle>
+                    <CardTitle>{{
+                        t('campaigns.delivery_progress', 'Delivery Progress')
+                    }}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <CampaignProgressBar
@@ -263,8 +327,13 @@ const getStatusIcon = (status: string) => {
             <!-- Recipients Table -->
             <Card>
                 <CardHeader>
-                    <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex items-center justify-between">
-                        <CardTitle>{{ t('campaigns.delivery_details', 'Delivery Details') }}</CardTitle>
+                    <div
+                        :class="isRTL() ? 'flex-row-reverse' : ''"
+                        class="flex items-center justify-between"
+                    >
+                        <CardTitle>{{
+                            t('campaigns.delivery_details', 'Delivery Details')
+                        }}</CardTitle>
 
                         <div class="relative w-64">
                             <Search
@@ -274,7 +343,12 @@ const getStatusIcon = (status: string) => {
                             <Input
                                 v-model="searchQuery"
                                 :class="isRTL() ? 'pr-10' : 'pl-10'"
-                                :placeholder="t('campaigns.search_recipients', 'Search recipients...')"
+                                :placeholder="
+                                    t(
+                                        'campaigns.search_recipients',
+                                        'Search recipients...',
+                                    )
+                                "
                             />
                         </div>
                     </div>
@@ -284,54 +358,158 @@ const getStatusIcon = (status: string) => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
-                                        {{ t('campaigns.recipient', 'Recipient') }}
+                                    <TableHead
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
+                                        {{
+                                            t(
+                                                'campaigns.recipient',
+                                                'Recipient',
+                                            )
+                                        }}
                                     </TableHead>
-                                    <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                    <TableHead
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
                                         {{ t('campaigns.phone', 'Phone') }}
                                     </TableHead>
-                                    <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                    <TableHead
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
                                         {{ t('campaigns.status', 'Status') }}
                                     </TableHead>
-                                    <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                    <TableHead
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
                                         {{ t('campaigns.sent_at', 'Sent At') }}
                                     </TableHead>
-                                    <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
-                                        {{ t('campaigns.delivered_at', 'Delivered At') }}
+                                    <TableHead
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
+                                        {{
+                                            t(
+                                                'campaigns.delivered_at',
+                                                'Delivered At',
+                                            )
+                                        }}
                                     </TableHead>
-                                    <TableHead :class="isRTL() ? 'text-right' : 'text-left'">
+                                    <TableHead
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
                                         {{ t('campaigns.error', 'Error') }}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow v-for="recipient in filteredRecipients" :key="recipient.id">
-                                    <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="font-medium">
-                                        {{ recipient.contact.first_name }} {{ recipient.contact.last_name }}
+                                <TableRow
+                                    v-for="recipient in filteredRecipients"
+                                    :key="recipient.id"
+                                >
+                                    <TableCell
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                        class="font-medium"
+                                    >
+                                        {{ recipient.contact.first_name }}
+                                        {{ recipient.contact.last_name }}
                                     </TableCell>
-                                    <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                                    <TableCell
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
                                         {{ recipient.contact.phone_number }}
                                     </TableCell>
-                                    <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
-                                        <Badge :class="getStatusBadgeClass(recipient.status)">
-                                            <component :is="getStatusIcon(recipient.status)" class="mr-1 h-3 w-3" />
-                                            {{ t(`campaigns.status_${recipient.status}`, recipient.status) }}
+                                    <TableCell
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
+                                        <Badge
+                                            :class="
+                                                getStatusBadgeClass(
+                                                    recipient.status,
+                                                )
+                                            "
+                                        >
+                                            <component
+                                                :is="
+                                                    getStatusIcon(
+                                                        recipient.status,
+                                                    )
+                                                "
+                                                class="mr-1 h-3 w-3"
+                                            />
+                                            {{
+                                                t(
+                                                    `campaigns.status_${recipient.status}`,
+                                                    recipient.status,
+                                                )
+                                            }}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="text-sm text-muted-foreground">
-                                        {{ recipient.sent_at ? formatDate(recipient.sent_at) : '-' }}
+                                    <TableCell
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                        class="text-sm text-muted-foreground"
+                                    >
+                                        {{
+                                            recipient.sent_at
+                                                ? formatDate(recipient.sent_at)
+                                                : '-'
+                                        }}
                                     </TableCell>
-                                    <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="text-sm text-muted-foreground">
-                                        {{ recipient.delivered_at ? formatDate(recipient.delivered_at) : '-' }}
+                                    <TableCell
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                        class="text-sm text-muted-foreground"
+                                    >
+                                        {{
+                                            recipient.delivered_at
+                                                ? formatDate(
+                                                      recipient.delivered_at,
+                                                  )
+                                                : '-'
+                                        }}
                                     </TableCell>
-                                    <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="max-w-xs truncate text-sm text-red-600">
+                                    <TableCell
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                        class="max-w-xs truncate text-sm text-red-600"
+                                    >
                                         {{ recipient.error_message || '-' }}
                                     </TableCell>
                                 </TableRow>
 
-                                <TableRow v-if="filteredRecipients.length === 0">
-                                    <TableCell colspan="6" class="text-center text-muted-foreground">
-                                        {{ t('campaigns.no_results', 'No results found') }}
+                                <TableRow
+                                    v-if="filteredRecipients.length === 0"
+                                >
+                                    <TableCell
+                                        class="text-center text-muted-foreground"
+                                        colspan="6"
+                                    >
+                                        {{
+                                            t(
+                                                'campaigns.no_results',
+                                                'No results found',
+                                            )
+                                        }}
                                     </TableCell>
                                 </TableRow>
                             </TableBody>
@@ -339,7 +517,10 @@ const getStatusIcon = (status: string) => {
                     </div>
 
                     <!-- Pagination -->
-                    <div v-if="recipients.meta.last_page > 1" class="mt-4 flex justify-center">
+                    <div
+                        v-if="recipients.meta.last_page > 1"
+                        class="mt-4 flex justify-center"
+                    >
                         <div class="flex gap-2">
                             <Button
                                 v-for="link in recipients.links"

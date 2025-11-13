@@ -11,7 +11,9 @@ class ReportController extends Controller
 {
     public function __construct(
         private readonly ReportService $reportService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Display reports dashboard

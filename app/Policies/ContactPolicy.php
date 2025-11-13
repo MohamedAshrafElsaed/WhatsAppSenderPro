@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\Contact;
-use App\Models\ContactImport;
 use App\Models\User;
 
 class ContactPolicy

@@ -10,7 +10,9 @@ readonly class CampaignPolicy
 {
     public function __construct(
         private UsageTrackingService $usageTracking
-    ) {}
+    )
+    {
+    }
 
     /**
      * Determine whether the user can view any campaigns.

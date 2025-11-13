@@ -13,7 +13,9 @@ readonly class BulkMessageService
 {
     public function __construct(
         private WhatsAppApiService $whatsappApi
-    ) {}
+    )
+    {
+    }
 
     /**
      * Send a message to a campaign recipient
@@ -62,16 +64,44 @@ readonly class BulkMessageService
     }
 
     /**
+     * Personalize message with contact placeholders
+     */
+    private function personalizeMessage(string $message, Contact $contact): string
+    {
+        $placeholders = [
+            '{{first_name}}' => $contact->first_name,
+            '{{last_name}}' => $contact->last_name ?? '',
+            '{{full_name}}' => $contact->full_name,
+            '{{phone}}' => $contact->phone_number,
+            '{{email}}' => $contact->email ?? '',
+        ];
+
+        // Add custom fields if available
+        if ($contact->custom_fields && is_array($contact->custom_fields)) {
+            foreach ($contact->custom_fields as $key => $value) {
+                $placeholders["{{$key}}"] = $value;
+            }
+        }
+
+        return str_replace(
+            array_keys($placeholders),
+            array_values($placeholders),
+            $message
+        );
+    }
+
+    /**
      * Send text message via Go API
      * @throws Exception
      */
     private function sendTextMessage(
-        Campaign $campaign,
+        Campaign          $campaign,
         CampaignRecipient $recipient,
-        Contact $contact,
-        string $message,
-        string $sessionId
-    ): bool {
+        Contact           $contact,
+        string            $message,
+        string            $sessionId
+    ): bool
+    {
         try {
             // Use simple send endpoint for text messages
             $response = $this->whatsappApi->sendMessage(
@@ -112,12 +142,13 @@ readonly class BulkMessageService
      * @throws Exception
      */
     private function sendMediaMessage(
-        Campaign $campaign,
+        Campaign          $campaign,
         CampaignRecipient $recipient,
-        Contact $contact,
-        string $caption,
-        string $sessionId
-    ): bool {
+        Contact           $contact,
+        string            $caption,
+        string            $sessionId
+    ): bool
+    {
         try {
             // Get media file
             if (!$campaign->media_path) {
@@ -176,32 +207,5 @@ readonly class BulkMessageService
             ]);
             throw $e;
         }
-    }
-
-    /**
-     * Personalize message with contact placeholders
-     */
-    private function personalizeMessage(string $message, Contact $contact): string
-    {
-        $placeholders = [
-            '{{first_name}}' => $contact->first_name,
-            '{{last_name}}' => $contact->last_name ?? '',
-            '{{full_name}}' => $contact->full_name,
-            '{{phone}}' => $contact->phone_number,
-            '{{email}}' => $contact->email ?? '',
-        ];
-
-        // Add custom fields if available
-        if ($contact->custom_fields && is_array($contact->custom_fields)) {
-            foreach ($contact->custom_fields as $key => $value) {
-                $placeholders["{{$key}}"] = $value;
-            }
-        }
-
-        return str_replace(
-            array_keys($placeholders),
-            array_values($placeholders),
-            $message
-        );
     }
 }

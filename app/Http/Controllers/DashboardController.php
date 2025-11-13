@@ -12,8 +12,10 @@ class DashboardController extends Controller
 {
     public function __construct(
         private readonly SubscriptionService $subscriptionService,
-        private readonly WhatsAppApiService $whatsappApi
-    ) {}
+        private readonly WhatsAppApiService  $whatsappApi
+    )
+    {
+    }
 
     /**
      * Display the dashboard with subscription, usage, and onboarding data

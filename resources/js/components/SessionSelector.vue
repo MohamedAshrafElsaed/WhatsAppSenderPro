@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -38,7 +38,7 @@ const selectedSession = computed({
 });
 
 const connectedSessions = computed(() => {
-    return props.sessions.filter(s => s.status === 'connected');
+    return props.sessions.filter((s) => s.status === 'connected');
 });
 
 const hasConnectedSessions = computed(() => connectedSessions.value.length > 0);
@@ -50,15 +50,31 @@ const hasConnectedSessions = computed(() => connectedSessions.value.length > 0);
             {{ t('campaigns.select_session', 'Select WhatsApp Session') }}
         </Label>
 
-        <div v-if="!hasConnectedSessions" class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950">
-            <div :class="isRTL() ? 'flex-row-reverse text-right' : 'text-left'" class="flex items-start gap-3">
+        <div
+            v-if="!hasConnectedSessions"
+            class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950"
+        >
+            <div
+                :class="isRTL() ? 'flex-row-reverse text-right' : 'text-left'"
+                class="flex items-start gap-3"
+            >
                 <Phone class="mt-0.5 h-5 w-5 text-red-600" />
                 <div class="flex-1">
                     <p class="font-medium text-red-900 dark:text-red-100">
-                        {{ t('campaigns.errors.no_connected_session', 'No Connected WhatsApp Session') }}
+                        {{
+                            t(
+                                'campaigns.errors.no_connected_session',
+                                'No Connected WhatsApp Session',
+                            )
+                        }}
                     </p>
                     <p class="mt-1 text-sm text-red-700 dark:text-red-200">
-                        {{ t('campaigns.errors.no_connected_session_desc', 'Please connect a WhatsApp session before creating a campaign.') }}
+                        {{
+                            t(
+                                'campaigns.errors.no_connected_session_desc',
+                                'Please connect a WhatsApp session before creating a campaign.',
+                            )
+                        }}
                     </p>
                 </div>
             </div>
@@ -66,7 +82,11 @@ const hasConnectedSessions = computed(() => connectedSessions.value.length > 0);
 
         <Select v-else v-model="selectedSession">
             <SelectTrigger :class="error ? 'border-red-500' : ''">
-                <SelectValue :placeholder="t('campaigns.select_session', 'Select WhatsApp Session')" />
+                <SelectValue
+                    :placeholder="
+                        t('campaigns.select_session', 'Select WhatsApp Session')
+                    "
+                />
             </SelectTrigger>
             <SelectContent>
                 <SelectItem
@@ -74,11 +94,23 @@ const hasConnectedSessions = computed(() => connectedSessions.value.length > 0);
                     :key="session.id"
                     :value="session.id"
                 >
-                    <div :class="isRTL() ? 'flex-row-reverse text-right' : 'text-left'" class="flex items-center gap-2">
+                    <div
+                        :class="
+                            isRTL()
+                                ? 'flex-row-reverse text-right'
+                                : 'text-left'
+                        "
+                        class="flex items-center gap-2"
+                    >
                         <CheckCircle class="h-4 w-4 text-[#25D366]" />
                         <div>
-                            <div class="font-medium">{{ session.session_name }}</div>
-                            <div v-if="session.phone_number" class="text-xs text-muted-foreground">
+                            <div class="font-medium">
+                                {{ session.session_name }}
+                            </div>
+                            <div
+                                v-if="session.phone_number"
+                                class="text-xs text-muted-foreground"
+                            >
                                 {{ session.phone_number }}
                             </div>
                         </div>

@@ -36,10 +36,7 @@ const isActive = (href: string) => {
                         :tooltip="item.title"
                         as-child
                     >
-                        <Link
-                            class="flex items-center gap-2"
-                            :href="item.href"
-                        >
+                        <Link :href="item.href" class="flex items-center gap-2">
                             <component :is="item.icon" />
                             <span>{{ item.title }}</span>
                         </Link>

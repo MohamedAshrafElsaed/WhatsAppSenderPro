@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\ContactImport;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\Csv\Exception;
@@ -17,9 +16,11 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 readonly class ContactImportService
 {
     public function __construct(
-        private ContactService $contactService,
+        private ContactService        $contactService,
         private ImportProgressService $progressService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Parse uploaded file and return preview data
@@ -123,54 +124,18 @@ readonly class ContactImportService
     }
 
     /**
-     * Read all data from file (not just preview)
-     */
-    private function readAllData(string $filePath, string $fileType): array
-    {
-        if ($fileType === 'csv') {
-            $csv = Reader::createFromPath(Storage::path($filePath), 'r');
-            $csv->setHeaderOffset(0);
-            $headers = $csv->getHeader();
-            $records = iterator_to_array($csv->getRecords());
-            return [
-                'headers' => $headers,
-                'data' => array_values($records),
-            ];
-        } else {
-            $spreadsheet = IOFactory::load(Storage::path($filePath));
-            $worksheet = $spreadsheet->getActiveSheet();
-            $allData = $worksheet->toArray();
-
-            if (empty($allData)) {
-                throw new \Exception('Excel file is empty');
-            }
-
-            $headers = array_shift($allData);
-
-            // Remove empty rows
-            $allData = array_filter($allData, function ($row) {
-                return !empty(array_filter($row));
-            });
-
-            return [
-                'headers' => $headers,
-                'data' => array_values($allData),
-            ];
-        }
-    }
-
-    /**
      * Process import with column mapping
      * @throws \Exception|\Throwable
      */
     public function processImport(
-        User $user,
+        User          $user,
         ContactImport $import,
-        array $columnMapping,
-        bool $validateWhatsApp = false,
-        ?int $tagId = null,
-        ?int $defaultCountryId = null
-    ): array {
+        array         $columnMapping,
+        bool          $validateWhatsApp = false,
+        ?int          $tagId = null,
+        ?int          $defaultCountryId = null
+    ): array
+    {
         try {
             $import->markAsProcessing();
 
@@ -350,6 +315,85 @@ readonly class ContactImportService
     }
 
     /**
+     * Read all data from file (not just preview)
+     */
+    private function readAllData(string $filePath, string $fileType): array
+    {
+        if ($fileType === 'csv') {
+            $csv = Reader::createFromPath(Storage::path($filePath), 'r');
+            $csv->setHeaderOffset(0);
+            $headers = $csv->getHeader();
+            $records = iterator_to_array($csv->getRecords());
+            return [
+                'headers' => $headers,
+                'data' => array_values($records),
+            ];
+        } else {
+            $spreadsheet = IOFactory::load(Storage::path($filePath));
+            $worksheet = $spreadsheet->getActiveSheet();
+            $allData = $worksheet->toArray();
+
+            if (empty($allData)) {
+                throw new \Exception('Excel file is empty');
+            }
+
+            $headers = array_shift($allData);
+
+            // Remove empty rows
+            $allData = array_filter($allData, function ($row) {
+                return !empty(array_filter($row));
+            });
+
+            return [
+                'headers' => $headers,
+                'data' => array_values($allData),
+            ];
+        }
+    }
+
+    /**
+     * Map row data to contact fields with phone normalization
+     */
+    private function mapRowToContact(
+        array $row,
+        array $columnMapping,
+        array $headers,
+        ?int  $defaultCountryId = null
+    ): array
+    {
+        $contactData = [];
+
+        foreach ($columnMapping as $field => $columnIndex) {
+            if ($columnIndex === null || $columnIndex === '') {
+                continue;
+            }
+
+            // Get value from row
+            $value = null;
+
+            if (is_numeric($columnIndex)) {
+                // Numeric index (for Excel files with numeric arrays)
+                $value = $row[$columnIndex] ?? null;
+            } else {
+                // ✅ FIX: For CSV files, rows are associative arrays
+                // Access directly by column name instead of converting to index
+                $value = $row[$columnIndex] ?? null;
+            }
+
+            if ($value !== null && $value !== '') {
+                $contactData[$field] = trim($value);
+            }
+        }
+
+        // Add default country if provided and not in data
+        if ($defaultCountryId && empty($contactData['country_id'])) {
+            $contactData['country_id'] = $defaultCountryId;
+        }
+
+        return $contactData;
+    }
+
+    /**
      * Detect country from phone number
      */
     private function detectCountryFromPhone(string $phoneNumber): ?int
@@ -381,47 +425,6 @@ readonly class ContactImportService
             ]);
             return null;
         }
-    }
-
-    /**
-     * Map row data to contact fields with phone normalization
-     */
-    private function mapRowToContact(
-        array $row,
-        array $columnMapping,
-        array $headers,
-        ?int $defaultCountryId = null
-    ): array {
-        $contactData = [];
-
-        foreach ($columnMapping as $field => $columnIndex) {
-            if ($columnIndex === null || $columnIndex === '') {
-                continue;
-            }
-
-            // Get value from row
-            $value = null;
-
-            if (is_numeric($columnIndex)) {
-                // Numeric index (for Excel files with numeric arrays)
-                $value = $row[$columnIndex] ?? null;
-            } else {
-                // ✅ FIX: For CSV files, rows are associative arrays
-                // Access directly by column name instead of converting to index
-                $value = $row[$columnIndex] ?? null;
-            }
-
-            if ($value !== null && $value !== '') {
-                $contactData[$field] = trim($value);
-            }
-        }
-
-        // Add default country if provided and not in data
-        if ($defaultCountryId && empty($contactData['country_id'])) {
-            $contactData['country_id'] = $defaultCountryId;
-        }
-
-        return $contactData;
     }
 
     /**

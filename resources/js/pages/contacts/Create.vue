@@ -118,28 +118,28 @@ watch(
             />
 
             <Form
-                v-bind="ContactController.store.form()"
                 v-slot="{ errors, processing }"
                 class="space-y-6"
+                v-bind="ContactController.store.form()"
             >
                 <Card>
                     <CardHeader>
-                        <CardTitle>{{
-                                t('contacts.basic_info', 'Basic Information')
-                            }}</CardTitle>
+                        <CardTitle
+                            >{{ t('contacts.basic_info', 'Basic Information') }}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent class="space-y-4">
                         <!-- First Name -->
                         <div>
                             <Label for="first_name">{{
-                                    t('contacts.fields.first_name')
-                                }}</Label>
+                                t('contacts.fields.first_name')
+                            }}</Label>
                             <Input
                                 id="first_name"
                                 :disabled="processing"
+                                class="focus-visible:ring-[#25D366]"
                                 name="first_name"
                                 required
-                                class="focus-visible:ring-[#25D366]"
                             />
                             <InputError :message="errors.first_name" />
                         </div>
@@ -147,13 +147,13 @@ watch(
                         <!-- Last Name -->
                         <div>
                             <Label for="last_name">{{
-                                    t('contacts.fields.last_name')
-                                }}</Label>
+                                t('contacts.fields.last_name')
+                            }}</Label>
                             <Input
                                 id="last_name"
                                 :disabled="processing"
-                                name="last_name"
                                 class="focus-visible:ring-[#25D366]"
+                                name="last_name"
                             />
                             <InputError :message="errors.last_name" />
                         </div>
@@ -161,8 +161,8 @@ watch(
                         <!-- Country -->
                         <div>
                             <Label for="country_id">{{
-                                    t('contacts.fields.country')
-                                }}</Label>
+                                t('contacts.fields.country')
+                            }}</Label>
                             <Select v-model="selectedCountry">
                                 <SelectTrigger class="focus:ring-[#25D366]">
                                     <SelectValue
@@ -195,8 +195,8 @@ watch(
                         <!-- Phone Number -->
                         <div>
                             <Label for="phone_number">{{
-                                    t('contacts.fields.phone_number')
-                                }}</Label>
+                                t('contacts.fields.phone_number')
+                            }}</Label>
                             <Input
                                 id="phone_number"
                                 v-model="mobileNumber"
@@ -230,9 +230,7 @@ watch(
                             </p>
                             <p
                                 v-else-if="
-                                    mobileNumber &&
-                                    !isValid &&
-                                    selectedCountry
+                                    mobileNumber && !isValid && selectedCountry
                                 "
                                 class="mt-1 text-xs text-destructive"
                             >
@@ -260,14 +258,14 @@ watch(
                         <!-- Email -->
                         <div>
                             <Label for="email">{{
-                                    t('contacts.fields.email')
-                                }}</Label>
+                                t('contacts.fields.email')
+                            }}</Label>
                             <Input
                                 id="email"
                                 :disabled="processing"
+                                class="focus-visible:ring-[#25D366]"
                                 name="email"
                                 type="email"
-                                class="focus-visible:ring-[#25D366]"
                             />
                             <InputError :message="errors.email" />
                         </div>
@@ -311,14 +309,14 @@ watch(
                         <!-- Notes -->
                         <div>
                             <Label for="notes">{{
-                                    t('contacts.fields.notes')
-                                }}</Label>
+                                t('contacts.fields.notes')
+                            }}</Label>
                             <Textarea
                                 id="notes"
                                 :disabled="processing"
+                                class="focus-visible:ring-[#25D366]"
                                 name="notes"
                                 rows="3"
-                                class="focus-visible:ring-[#25D366]"
                             />
                             <InputError :message="errors.notes" />
                         </div>
@@ -329,8 +327,8 @@ watch(
                                 id="validate_whatsapp"
                                 v-model:checked="validateWhatsApp"
                                 :disabled="processing"
+                                class="data-[state=checked]:border-[#25D366] data-[state=checked]:bg-[#25D366]"
                                 name="validate_whatsapp"
-                                class="data-[state=checked]:bg-[#25D366] data-[state=checked]:border-[#25D366]"
                             />
                             <Label
                                 class="cursor-pointer font-normal"
@@ -351,8 +349,8 @@ watch(
                 <div class="flex gap-2">
                     <Button
                         :disabled="processing"
-                        type="submit"
                         class="bg-[#25D366] hover:bg-[#128C7E]"
+                        type="submit"
                     >
                         {{ t('common.save', 'Save') }}
                     </Button>

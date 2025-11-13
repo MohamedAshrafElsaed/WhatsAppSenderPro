@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaction;
 use App\Services\PaymobService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
@@ -11,9 +10,11 @@ use Illuminate\Support\Facades\Log;
 class PaymobCallbackController extends Controller
 {
     public function __construct(
-        private readonly PaymobService $paymobService,
+        private readonly PaymobService       $paymobService,
         private readonly SubscriptionService $subscriptionService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Handle Paymob callback (notification URL)

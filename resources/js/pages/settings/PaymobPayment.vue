@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { Head } from '@inertiajs/vue3';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-vue-next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/composables/useTranslation';
+import { Head } from '@inertiajs/vue3';
+import { Loader2 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 
 interface Props {
@@ -44,25 +44,52 @@ onMounted(() => {
         <div class="container mx-auto max-w-4xl px-4">
             <Card class="mb-6">
                 <CardHeader>
-                    <CardTitle>{{ t('payment.redirecting', 'Redirecting to Payment') }}</CardTitle>
+                    <CardTitle
+                        >{{
+                            t('payment.redirecting', 'Redirecting to Payment')
+                        }}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <!-- Order Summary -->
                     <div class="rounded-lg border p-4">
-                        <h3 class="font-semibold mb-2">{{ t('payment.order_summary', 'Order Summary') }}</h3>
+                        <h3 class="mb-2 font-semibold">
+                            {{ t('payment.order_summary', 'Order Summary') }}
+                        </h3>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between">
                                 <span>{{ package.name }}</span>
-                                <span>{{ paymentData.base_amount }} {{ t('common.currency', 'EGP') }}</span>
+                                <span
+                                    >{{ paymentData.base_amount }}
+                                    {{ t('common.currency', 'EGP') }}</span
+                                >
                             </div>
-                            <div class="flex justify-between text-muted-foreground">
-                                <span>{{ t('payment.processing_fee', 'Processing Fee') }} (2%)</span>
-                                <span>{{ paymentData.fee_amount }} {{ t('common.currency', 'EGP') }}</span>
+                            <div
+                                class="flex justify-between text-muted-foreground"
+                            >
+                                <span
+                                    >{{
+                                        t(
+                                            'payment.processing_fee',
+                                            'Processing Fee',
+                                        )
+                                    }}
+                                    (2%)</span
+                                >
+                                <span
+                                    >{{ paymentData.fee_amount }}
+                                    {{ t('common.currency', 'EGP') }}</span
+                                >
                             </div>
                             <div class="border-t pt-2 font-semibold">
                                 <div class="flex justify-between">
-                                    <span>{{ t('payment.total', 'Total') }}</span>
-                                    <span class="text-[#25D366]">{{ paymentData.total_amount }} {{ t('common.currency', 'EGP') }}</span>
+                                    <span>{{
+                                        t('payment.total', 'Total')
+                                    }}</span>
+                                    <span class="text-[#25D366]"
+                                        >{{ paymentData.total_amount }}
+                                        {{ t('common.currency', 'EGP') }}</span
+                                    >
                                 </div>
                             </div>
                         </div>
@@ -71,28 +98,48 @@ onMounted(() => {
                     <!-- Transaction Info -->
                     <Alert>
                         <AlertDescription>
-                            {{ t('payment.transaction_id', 'Transaction ID') }}: {{ transaction.transaction_id }}
+                            {{ t('payment.transaction_id', 'Transaction ID') }}:
+                            {{ transaction.transaction_id }}
                         </AlertDescription>
                     </Alert>
 
                     <!-- Loading indicator -->
                     <div class="flex items-center justify-center py-8">
                         <div class="text-center">
-                            <Loader2 class="h-8 w-8 animate-spin text-[#25D366] mx-auto mb-4" />
-                            <p class="text-lg font-medium">{{ t('payment.redirecting_to_payment', 'Redirecting to secure payment page...') }}</p>
-                            <p class="text-sm text-muted-foreground mt-2">
-                                {{ t('payment.please_wait', 'Please wait, you will be redirected automatically.') }}
+                            <Loader2
+                                class="mx-auto mb-4 h-8 w-8 animate-spin text-[#25D366]"
+                            />
+                            <p class="text-lg font-medium">
+                                {{
+                                    t(
+                                        'payment.redirecting_to_payment',
+                                        'Redirecting to secure payment page...',
+                                    )
+                                }}
+                            </p>
+                            <p class="mt-2 text-sm text-muted-foreground">
+                                {{
+                                    t(
+                                        'payment.please_wait',
+                                        'Please wait, you will be redirected automatically.',
+                                    )
+                                }}
                             </p>
                         </div>
                     </div>
 
                     <!-- Manual redirect link -->
-                    <div class="text-center mt-4">
+                    <div class="mt-4 text-center">
                         <p class="text-sm text-muted-foreground">
-                            {{ t('payment.not_redirected', "If you're not redirected automatically,") }}
+                            {{
+                                t(
+                                    'payment.not_redirected',
+                                    "If you're not redirected automatically,",
+                                )
+                            }}
                             <a
                                 :href="paymentData.checkout_url"
-                                class="text-[#25D366] hover:underline font-medium"
+                                class="font-medium text-[#25D366] hover:underline"
                             >
                                 {{ t('payment.click_here', 'click here') }}
                             </a>

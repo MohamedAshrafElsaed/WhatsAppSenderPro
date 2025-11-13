@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\WhatsAppApiService;
 use App\Services\UsageTrackingService;
-use Illuminate\Http\Request;
+use App\Services\WhatsAppApiService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class WhatsAppSessionController extends Controller
 {
     public function __construct(
-        private readonly WhatsAppApiService $whatsappApi,
+        private readonly WhatsAppApiService   $whatsappApi,
         private readonly UsageTrackingService $usageTracking
-    ) {}
+    )
+    {
+    }
 
     /**
      * Display WhatsApp connection page

@@ -13,9 +13,11 @@ use Inertia\Response;
 class TemplateController extends Controller
 {
     public function __construct(
-        private readonly TemplateService $templateService,
+        private readonly TemplateService      $templateService,
         private readonly UsageTrackingService $usageTrackingService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Display templates list

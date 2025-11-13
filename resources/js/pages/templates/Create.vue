@@ -1,5 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import TemplateController from '@/actions/App/Http/Controllers/TemplateController';
 import Heading from '@/components/Heading.vue';
+import InputError from '@/components/InputError.vue';
 import MediaUploader from '@/components/MediaUploader.vue';
 import PlaceholderPicker from '@/components/PlaceholderPicker.vue';
 import TemplatePreview from '@/components/TemplatePreview.vue';
@@ -12,7 +14,6 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import InputError from '@/components/InputError.vue';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -24,13 +25,16 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import TemplateController from '@/actions/App/Http/Controllers/TemplateController';
 import { index } from '@/routes/dashboard/templates';
 import type { Placeholder, TemplateType } from '@/types/template';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle2, FileText, Image as ImageIcon, MessageSquare, Video, X } from 'lucide-vue-next';
-import { computed, ref, watch, onUnmounted } from 'vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import {
+    FileText,
+    Image as ImageIcon,
+    MessageSquare,
+    Video,
+} from 'lucide-vue-next';
+import { computed, onUnmounted, ref, watch } from 'vue';
 
 interface Props {
     placeholders: Placeholder[];
@@ -95,16 +99,19 @@ const handleMediaRemove = () => {
     }
 };
 
-watch(() => form.type, (newType) => {
-    if (newType === 'text') {
-        form.media = null;
-        form.caption = '';
-        if (previewMediaUrl.value) {
-            URL.revokeObjectURL(previewMediaUrl.value);
-            previewMediaUrl.value = null;
+watch(
+    () => form.type,
+    (newType) => {
+        if (newType === 'text') {
+            form.media = null;
+            form.caption = '';
+            if (previewMediaUrl.value) {
+                URL.revokeObjectURL(previewMediaUrl.value);
+                previewMediaUrl.value = null;
+            }
         }
-    }
-});
+    },
+);
 
 onUnmounted(() => {
     if (previewMediaUrl.value) {
@@ -129,11 +136,18 @@ const submit = () => {
         >
             <!-- Header -->
             <Heading
-                :description="t('templates.create_description', 'Create a new message template with placeholders')"
+                :description="
+                    t(
+                        'templates.create_description',
+                        'Create a new message template with placeholders',
+                    )
+                "
                 :title="t('templates.create_template', 'Create Template')"
             >
                 <template #icon>
-                    <div class="flex items-center justify-center rounded-lg bg-[#25D366] p-2">
+                    <div
+                        class="flex items-center justify-center rounded-lg bg-[#25D366] p-2"
+                    >
                         <MessageSquare class="h-5 w-5 text-white" />
                     </div>
                 </template>
@@ -146,63 +160,141 @@ const submit = () => {
                         <!-- Basic Information -->
                         <Card>
                             <CardHeader>
-                                <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
-                                    {{ t('templates.basic_info', 'Basic Information') }}
+                                <CardTitle
+                                    :class="
+                                        isRTL() ? 'text-right' : 'text-left'
+                                    "
+                                >
+                                    {{
+                                        t(
+                                            'templates.basic_info',
+                                            'Basic Information',
+                                        )
+                                    }}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent class="space-y-4">
                                 <!-- Template Name -->
                                 <div>
-                                    <Label :class="isRTL() ? 'text-right' : 'text-left'" for="name">
-                                        {{ t('templates.template_name', 'Template Name') }}
+                                    <Label
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                        for="name"
+                                    >
+                                        {{
+                                            t(
+                                                'templates.template_name',
+                                                'Template Name',
+                                            )
+                                        }}
                                     </Label>
                                     <Input
                                         id="name"
                                         v-model="form.name"
-                                        :placeholder="t('templates.name_placeholder', 'Enter template name')"
+                                        :placeholder="
+                                            t(
+                                                'templates.name_placeholder',
+                                                'Enter template name',
+                                            )
+                                        "
                                         class="mt-1 focus-visible:ring-[#25D366]"
                                         type="text"
                                     />
-                                    <InputError :message="form.errors.name" class="mt-1" />
+                                    <InputError
+                                        :message="form.errors.name"
+                                        class="mt-1"
+                                    />
                                 </div>
 
                                 <!-- Template Type -->
                                 <div>
-                                    <Label :class="isRTL() ? 'text-right' : 'text-left'" for="type">
-                                        {{ t('templates.template_type', 'Template Type') }}
+                                    <Label
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                        for="type"
+                                    >
+                                        {{
+                                            t(
+                                                'templates.template_type',
+                                                'Template Type',
+                                            )
+                                        }}
                                     </Label>
                                     <Select v-model="form.type" class="mt-1">
-                                        <SelectTrigger class="focus:ring-[#25D366]">
+                                        <SelectTrigger
+                                            class="focus:ring-[#25D366]"
+                                        >
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="text">
-                                                <div class="flex items-center gap-2">
-                                                    <MessageSquare class="h-4 w-4 text-[#25D366]" />
-                                                    {{ t('templates.text_only', 'Text Only') }}
+                                                <div
+                                                    class="flex items-center gap-2"
+                                                >
+                                                    <MessageSquare
+                                                        class="h-4 w-4 text-[#25D366]"
+                                                    />
+                                                    {{
+                                                        t(
+                                                            'templates.text_only',
+                                                            'Text Only',
+                                                        )
+                                                    }}
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="text_image">
-                                                <div class="flex items-center gap-2">
-                                                    <ImageIcon class="h-4 w-4 text-[#25D366]" />
-                                                    {{ t('templates.text_image', 'Text + Image') }}
+                                                <div
+                                                    class="flex items-center gap-2"
+                                                >
+                                                    <ImageIcon
+                                                        class="h-4 w-4 text-[#25D366]"
+                                                    />
+                                                    {{
+                                                        t(
+                                                            'templates.text_image',
+                                                            'Text + Image',
+                                                        )
+                                                    }}
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="text_video">
-                                                <div class="flex items-center gap-2">
-                                                    <Video class="h-4 w-4 text-[#25D366]" />
-                                                    {{ t('templates.text_video', 'Text + Video') }}
+                                                <div
+                                                    class="flex items-center gap-2"
+                                                >
+                                                    <Video
+                                                        class="h-4 w-4 text-[#25D366]"
+                                                    />
+                                                    {{
+                                                        t(
+                                                            'templates.text_video',
+                                                            'Text + Video',
+                                                        )
+                                                    }}
                                                 </div>
                                             </SelectItem>
                                             <SelectItem value="text_document">
-                                                <div class="flex items-center gap-2">
-                                                    <FileText class="h-4 w-4 text-[#25D366]" />
-                                                    {{ t('templates.text_document', 'Text + Document') }}
+                                                <div
+                                                    class="flex items-center gap-2"
+                                                >
+                                                    <FileText
+                                                        class="h-4 w-4 text-[#25D366]"
+                                                    />
+                                                    {{
+                                                        t(
+                                                            'templates.text_document',
+                                                            'Text + Document',
+                                                        )
+                                                    }}
                                                 </div>
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <InputError :message="form.errors.type" class="mt-1" />
+                                    <InputError
+                                        :message="form.errors.type"
+                                        class="mt-1"
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
@@ -219,53 +311,108 @@ const submit = () => {
                         <!-- Caption (for media types) -->
                         <Card v-if="requiresMedia">
                             <CardHeader>
-                                <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
-                                    {{ t('templates.media_caption', 'Media Caption') }}
+                                <CardTitle
+                                    :class="
+                                        isRTL() ? 'text-right' : 'text-left'
+                                    "
+                                >
+                                    {{
+                                        t(
+                                            'templates.media_caption',
+                                            'Media Caption',
+                                        )
+                                    }}
                                 </CardTitle>
-                                <CardDescription :class="isRTL() ? 'text-right' : 'text-left'">
-                                    {{ t('templates.caption_description', 'Optional text to accompany the media') }}
+                                <CardDescription
+                                    :class="
+                                        isRTL() ? 'text-right' : 'text-left'
+                                    "
+                                >
+                                    {{
+                                        t(
+                                            'templates.caption_description',
+                                            'Optional text to accompany the media',
+                                        )
+                                    }}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <Textarea
                                     ref="captionTextarea"
                                     v-model="form.caption"
-                                    :placeholder="t('templates.caption_placeholder', 'Enter caption...')"
+                                    :placeholder="
+                                        t(
+                                            'templates.caption_placeholder',
+                                            'Enter caption...',
+                                        )
+                                    "
                                     class="focus-visible:ring-[#25D366]"
                                     rows="3"
                                 />
-                                <InputError :message="form.errors.caption" class="mt-1" />
+                                <InputError
+                                    :message="form.errors.caption"
+                                    class="mt-1"
+                                />
                             </CardContent>
                         </Card>
 
                         <!-- Message Content -->
                         <Card>
                             <CardHeader>
-                                <CardTitle :class="isRTL() ? 'text-right' : 'text-left'">
-                                    {{ t('templates.template_content', 'Message Content') }}
+                                <CardTitle
+                                    :class="
+                                        isRTL() ? 'text-right' : 'text-left'
+                                    "
+                                >
+                                    {{
+                                        t(
+                                            'templates.template_content',
+                                            'Message Content',
+                                        )
+                                    }}
                                 </CardTitle>
-                                <CardDescription :class="isRTL() ? 'text-right' : 'text-left'">
-                                    {{ t('templates.content_description', 'Use placeholders to personalize messages') }}
+                                <CardDescription
+                                    :class="
+                                        isRTL() ? 'text-right' : 'text-left'
+                                    "
+                                >
+                                    {{
+                                        t(
+                                            'templates.content_description',
+                                            'Use placeholders to personalize messages',
+                                        )
+                                    }}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <Textarea
                                     ref="contentTextarea"
                                     v-model="form.content"
-                                    :placeholder="t('templates.content_placeholder', 'Enter message content...')"
+                                    :placeholder="
+                                        t(
+                                            'templates.content_placeholder',
+                                            'Enter message content...',
+                                        )
+                                    "
                                     class="focus-visible:ring-[#25D366]"
                                     rows="8"
                                 />
-                                <InputError :message="form.errors.content" class="mt-1" />
+                                <InputError
+                                    :message="form.errors.content"
+                                    class="mt-1"
+                                />
                             </CardContent>
                         </Card>
 
                         <!-- Form Actions -->
-                        <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex gap-4">
+                        <div
+                            :class="isRTL() ? 'flex-row-reverse' : ''"
+                            class="flex gap-4"
+                        >
                             <Button
                                 :disabled="form.processing"
-                                type="submit"
                                 class="bg-[#25D366] hover:bg-[#128C7E]"
+                                type="submit"
                             >
                                 {{ t('common.create', 'Create') }}
                             </Button>

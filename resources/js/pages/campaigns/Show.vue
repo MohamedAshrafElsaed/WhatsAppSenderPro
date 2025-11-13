@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import CampaignProgressBar from '@/components/CampaignProgressBar.vue';
 import CampaignStatusBadge from '@/components/CampaignStatusBadge.vue';
 import Heading from '@/components/Heading.vue';
@@ -15,8 +15,16 @@ import {
 } from '@/components/ui/dialog';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { destroy, edit, index, pause, results, resume, send } from '@/routes/dashboard/campaigns';
 import { index as dashboard } from '@/routes/dashboard';
+import {
+    destroy,
+    edit,
+    index,
+    pause,
+    results,
+    resume,
+    send,
+} from '@/routes/dashboard/campaigns';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import {
@@ -49,7 +57,13 @@ interface CampaignRecipient {
 interface Campaign {
     id: number;
     name: string;
-    status: 'draft' | 'scheduled' | 'running' | 'paused' | 'completed' | 'failed';
+    status:
+        | 'draft'
+        | 'scheduled'
+        | 'running'
+        | 'paused'
+        | 'completed'
+        | 'failed';
     message_type: string;
     message_content: string;
     message_caption: string | null;
@@ -88,21 +102,33 @@ const breadcrumbs: BreadcrumbItem[] = [
 const confirmDelete = ref(false);
 
 const handlePause = () => {
-    router.post(pause(props.campaign.id), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        pause(props.campaign.id),
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
 };
 
 const handleResume = () => {
-    router.post(resume(props.campaign.id), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        resume(props.campaign.id),
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
 };
 
 const handleSend = () => {
-    router.post(send(props.campaign.id), {}, {
-        preserveScroll: true,
-    });
+    router.post(
+        send(props.campaign.id),
+        {},
+        {
+            preserveScroll: true,
+        },
+    );
 };
 
 const handleDelete = () => {
@@ -130,17 +156,29 @@ const formatDate = (date: string) => {
 
         <div :class="isRTL() ? 'text-right' : 'text-left'" class="space-y-6">
             <!-- Header -->
-            <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex items-center justify-between">
+            <div
+                :class="isRTL() ? 'flex-row-reverse' : ''"
+                class="flex items-center justify-between"
+            >
                 <Heading :title="campaign.name">
                     <template #icon>
-                        <div class="flex items-center justify-center rounded-lg bg-[#25D366] p-2">
+                        <div
+                            class="flex items-center justify-center rounded-lg bg-[#25D366] p-2"
+                        >
                             <MessageSquare class="h-5 w-5 text-white" />
                         </div>
                     </template>
                 </Heading>
 
-                <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex gap-2">
-                    <Button v-if="campaign.can_be_edited" variant="outline" as-child>
+                <div
+                    :class="isRTL() ? 'flex-row-reverse' : ''"
+                    class="flex gap-2"
+                >
+                    <Button
+                        v-if="campaign.can_be_edited"
+                        as-child
+                        variant="outline"
+                    >
                         <Link :href="edit(campaign.id)">
                             <Edit2 class="mr-2 h-4 w-4" />
                             {{ t('common.edit', 'Edit') }}
@@ -174,17 +212,19 @@ const formatDate = (date: string) => {
                         {{ t('campaigns.actions.send', 'Send Now') }}
                     </Button>
 
-                    <Button variant="outline" as-child>
+                    <Button as-child variant="outline">
                         <Link :href="results(campaign.id)">
                             <Eye class="mr-2 h-4 w-4" />
-                            {{ t('campaigns.actions.view_results', 'View Results') }}
+                            {{
+                                t(
+                                    'campaigns.actions.view_results',
+                                    'View Results',
+                                )
+                            }}
                         </Link>
                     </Button>
 
-                    <Button
-                        variant="destructive"
-                        @click="confirmDelete = true"
-                    >
+                    <Button variant="destructive" @click="confirmDelete = true">
                         <Trash2 class="mr-2 h-4 w-4" />
                         {{ t('common.delete', 'Delete') }}
                     </Button>
@@ -197,16 +237,31 @@ const formatDate = (date: string) => {
                     <!-- Campaign Info -->
                     <Card>
                         <CardHeader>
-                            <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex items-center justify-between">
-                                <CardTitle>{{ t('campaigns.campaign_info', 'Campaign Information') }}</CardTitle>
-                                <CampaignStatusBadge :status="campaign.status" />
+                            <div
+                                :class="isRTL() ? 'flex-row-reverse' : ''"
+                                class="flex items-center justify-between"
+                            >
+                                <CardTitle>{{
+                                    t(
+                                        'campaigns.campaign_info',
+                                        'Campaign Information',
+                                    )
+                                }}</CardTitle>
+                                <CampaignStatusBadge
+                                    :status="campaign.status"
+                                />
                             </div>
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <!-- Progress -->
                             <div>
-                                <div :class="isRTL() ? 'flex-row-reverse' : ''" class="mb-2 flex justify-between text-sm">
-                                    <span class="font-medium">{{ t('campaigns.progress', 'Progress') }}</span>
+                                <div
+                                    :class="isRTL() ? 'flex-row-reverse' : ''"
+                                    class="mb-2 flex justify-between text-sm"
+                                >
+                                    <span class="font-medium">{{
+                                        t('campaigns.progress', 'Progress')
+                                    }}</span>
                                     <span class="text-muted-foreground">
                                         {{ campaign.progress_percentage }}%
                                     </span>
@@ -220,47 +275,107 @@ const formatDate = (date: string) => {
                             <!-- Statistics Grid -->
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="rounded-lg bg-muted p-4">
-                                    <div class="flex items-center gap-2 text-muted-foreground">
+                                    <div
+                                        class="flex items-center gap-2 text-muted-foreground"
+                                    >
                                         <Users class="h-4 w-4" />
-                                        <span class="text-sm">{{ t('campaigns.stats.total_recipients', 'Total Recipients') }}</span>
+                                        <span class="text-sm">{{
+                                            t(
+                                                'campaigns.stats.total_recipients',
+                                                'Total Recipients',
+                                            )
+                                        }}</span>
                                     </div>
-                                    <p class="mt-2 text-2xl font-bold">{{ campaign.total_recipients }}</p>
+                                    <p class="mt-2 text-2xl font-bold">
+                                        {{ campaign.total_recipients }}
+                                    </p>
                                 </div>
 
                                 <div class="rounded-lg bg-muted p-4">
-                                    <div class="flex items-center gap-2 text-muted-foreground">
+                                    <div
+                                        class="flex items-center gap-2 text-muted-foreground"
+                                    >
                                         <SendIcon class="h-4 w-4" />
-                                        <span class="text-sm">{{ t('campaigns.stats.sent', 'Sent') }}</span>
+                                        <span class="text-sm">{{
+                                            t('campaigns.stats.sent', 'Sent')
+                                        }}</span>
                                     </div>
-                                    <p class="mt-2 text-2xl font-bold">{{ campaign.messages_sent }}</p>
+                                    <p class="mt-2 text-2xl font-bold">
+                                        {{ campaign.messages_sent }}
+                                    </p>
                                 </div>
 
-                                <div class="rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-4">
-                                    <div class="flex items-center gap-2 text-muted-foreground">
+                                <div
+                                    class="rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-4"
+                                >
+                                    <div
+                                        class="flex items-center gap-2 text-muted-foreground"
+                                    >
                                         <CheckCircle class="h-4 w-4" />
-                                        <span class="text-sm">{{ t('campaigns.stats.delivered', 'Delivered') }}</span>
+                                        <span class="text-sm">{{
+                                            t(
+                                                'campaigns.stats.delivered',
+                                                'Delivered',
+                                            )
+                                        }}</span>
                                     </div>
-                                    <p class="mt-2 text-2xl font-bold text-[#25D366]">{{ campaign.messages_delivered }}</p>
+                                    <p
+                                        class="mt-2 text-2xl font-bold text-[#25D366]"
+                                    >
+                                        {{ campaign.messages_delivered }}
+                                    </p>
                                 </div>
 
-                                <div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950">
-                                    <div class="flex items-center gap-2 text-muted-foreground">
+                                <div
+                                    class="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950"
+                                >
+                                    <div
+                                        class="flex items-center gap-2 text-muted-foreground"
+                                    >
                                         <XCircle class="h-4 w-4" />
-                                        <span class="text-sm">{{ t('campaigns.stats.failed', 'Failed') }}</span>
+                                        <span class="text-sm">{{
+                                            t(
+                                                'campaigns.stats.failed',
+                                                'Failed',
+                                            )
+                                        }}</span>
                                     </div>
-                                    <p class="mt-2 text-2xl font-bold text-red-600">{{ campaign.messages_failed }}</p>
+                                    <p
+                                        class="mt-2 text-2xl font-bold text-red-600"
+                                    >
+                                        {{ campaign.messages_failed }}
+                                    </p>
                                 </div>
                             </div>
 
                             <!-- Message Content -->
                             <div>
-                                <h4 class="mb-2 font-medium">{{ t('campaigns.message_content', 'Message Content') }}</h4>
+                                <h4 class="mb-2 font-medium">
+                                    {{
+                                        t(
+                                            'campaigns.message_content',
+                                            'Message Content',
+                                        )
+                                    }}
+                                </h4>
                                 <div class="rounded-lg bg-muted p-4">
-                                    <p class="whitespace-pre-wrap text-sm">{{ campaign.message_content }}</p>
+                                    <p class="text-sm whitespace-pre-wrap">
+                                        {{ campaign.message_content }}
+                                    </p>
 
                                     <div v-if="campaign.media_url" class="mt-4">
-                                        <Badge>{{ campaign.message_type }}</Badge>
-                                        <img v-if="campaign.message_type === 'image'" :src="campaign.media_url" alt="Media" class="mt-2 max-h-48 rounded-lg" />
+                                        <Badge>{{
+                                            campaign.message_type
+                                        }}</Badge>
+                                        <img
+                                            v-if="
+                                                campaign.message_type ===
+                                                'image'
+                                            "
+                                            :src="campaign.media_url"
+                                            alt="Media"
+                                            class="mt-2 max-h-48 rounded-lg"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -270,19 +385,38 @@ const formatDate = (date: string) => {
                     <!-- Recent Recipients -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>{{ t('campaigns.recent_recipients', 'Recent Recipients') }}</CardTitle>
+                            <CardTitle>{{
+                                t(
+                                    'campaigns.recent_recipients',
+                                    'Recent Recipients',
+                                )
+                            }}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div class="space-y-2">
                                 <div
-                                    v-for="recipient in campaign.recipients.slice(0, 5)"
+                                    v-for="recipient in campaign.recipients.slice(
+                                        0,
+                                        5,
+                                    )"
                                     :key="recipient.contact.id"
                                     :class="isRTL() ? 'flex-row-reverse' : ''"
                                     class="flex items-center justify-between rounded-lg border p-3"
                                 >
-                                    <div :class="isRTL() ? 'text-right' : 'text-left'">
-                                        <p class="font-medium">{{ recipient.contact.first_name }} {{ recipient.contact.last_name }}</p>
-                                        <p class="text-sm text-muted-foreground">{{ recipient.contact.phone_number }}</p>
+                                    <div
+                                        :class="
+                                            isRTL() ? 'text-right' : 'text-left'
+                                        "
+                                    >
+                                        <p class="font-medium">
+                                            {{ recipient.contact.first_name }}
+                                            {{ recipient.contact.last_name }}
+                                        </p>
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
+                                            {{ recipient.contact.phone_number }}
+                                        </p>
                                     </div>
                                     <Badge
                                         :class="
@@ -297,9 +431,18 @@ const formatDate = (date: string) => {
                                     </Badge>
                                 </div>
 
-                                <Button variant="outline" class="w-full" as-child>
+                                <Button
+                                    as-child
+                                    class="w-full"
+                                    variant="outline"
+                                >
                                     <Link :href="results(campaign.id)">
-                                        {{ t('campaigns.view_all_recipients', 'View All Recipients') }}
+                                        {{
+                                            t(
+                                                'campaigns.view_all_recipients',
+                                                'View All Recipients',
+                                            )
+                                        }}
                                     </Link>
                                 </Button>
                             </div>
@@ -312,38 +455,107 @@ const formatDate = (date: string) => {
                     <!-- Dates Card -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>{{ t('campaigns.timeline', 'Timeline') }}</CardTitle>
+                            <CardTitle>{{
+                                t('campaigns.timeline', 'Timeline')
+                            }}</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
-                            <div :class="isRTL() ? 'flex-row-reverse text-right' : 'text-left'" class="flex items-start gap-3">
-                                <Calendar class="mt-0.5 h-5 w-5 text-muted-foreground" />
+                            <div
+                                :class="
+                                    isRTL()
+                                        ? 'flex-row-reverse text-right'
+                                        : 'text-left'
+                                "
+                                class="flex items-start gap-3"
+                            >
+                                <Calendar
+                                    class="mt-0.5 h-5 w-5 text-muted-foreground"
+                                />
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium">{{ t('campaigns.created_at', 'Created') }}</p>
-                                    <p class="text-sm text-muted-foreground">{{ formatDate(campaign.created_at) }}</p>
+                                    <p class="text-sm font-medium">
+                                        {{
+                                            t('campaigns.created_at', 'Created')
+                                        }}
+                                    </p>
+                                    <p class="text-sm text-muted-foreground">
+                                        {{ formatDate(campaign.created_at) }}
+                                    </p>
                                 </div>
                             </div>
 
-                            <div v-if="campaign.scheduled_at" :class="isRTL() ? 'flex-row-reverse text-right' : 'text-left'" class="flex items-start gap-3">
-                                <Calendar class="mt-0.5 h-5 w-5 text-blue-600" />
+                            <div
+                                v-if="campaign.scheduled_at"
+                                :class="
+                                    isRTL()
+                                        ? 'flex-row-reverse text-right'
+                                        : 'text-left'
+                                "
+                                class="flex items-start gap-3"
+                            >
+                                <Calendar
+                                    class="mt-0.5 h-5 w-5 text-blue-600"
+                                />
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium">{{ t('campaigns.scheduled_for', 'Scheduled') }}</p>
-                                    <p class="text-sm text-muted-foreground">{{ formatDate(campaign.scheduled_at) }}</p>
+                                    <p class="text-sm font-medium">
+                                        {{
+                                            t(
+                                                'campaigns.scheduled_for',
+                                                'Scheduled',
+                                            )
+                                        }}
+                                    </p>
+                                    <p class="text-sm text-muted-foreground">
+                                        {{ formatDate(campaign.scheduled_at) }}
+                                    </p>
                                 </div>
                             </div>
 
-                            <div v-if="campaign.started_at" :class="isRTL() ? 'flex-row-reverse text-right' : 'text-left'" class="flex items-start gap-3">
+                            <div
+                                v-if="campaign.started_at"
+                                :class="
+                                    isRTL()
+                                        ? 'flex-row-reverse text-right'
+                                        : 'text-left'
+                                "
+                                class="flex items-start gap-3"
+                            >
                                 <Play class="mt-0.5 h-5 w-5 text-[#25D366]" />
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium">{{ t('campaigns.started_at', 'Started') }}</p>
-                                    <p class="text-sm text-muted-foreground">{{ formatDate(campaign.started_at) }}</p>
+                                    <p class="text-sm font-medium">
+                                        {{
+                                            t('campaigns.started_at', 'Started')
+                                        }}
+                                    </p>
+                                    <p class="text-sm text-muted-foreground">
+                                        {{ formatDate(campaign.started_at) }}
+                                    </p>
                                 </div>
                             </div>
 
-                            <div v-if="campaign.completed_at" :class="isRTL() ? 'flex-row-reverse text-right' : 'text-left'" class="flex items-start gap-3">
-                                <CheckCircle class="mt-0.5 h-5 w-5 text-gray-600" />
+                            <div
+                                v-if="campaign.completed_at"
+                                :class="
+                                    isRTL()
+                                        ? 'flex-row-reverse text-right'
+                                        : 'text-left'
+                                "
+                                class="flex items-start gap-3"
+                            >
+                                <CheckCircle
+                                    class="mt-0.5 h-5 w-5 text-gray-600"
+                                />
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium">{{ t('campaigns.completed_at', 'Completed') }}</p>
-                                    <p class="text-sm text-muted-foreground">{{ formatDate(campaign.completed_at) }}</p>
+                                    <p class="text-sm font-medium">
+                                        {{
+                                            t(
+                                                'campaigns.completed_at',
+                                                'Completed',
+                                            )
+                                        }}
+                                    </p>
+                                    <p class="text-sm text-muted-foreground">
+                                        {{ formatDate(campaign.completed_at) }}
+                                    </p>
                                 </div>
                             </div>
                         </CardContent>
@@ -352,22 +564,46 @@ const formatDate = (date: string) => {
                     <!-- Details Card -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>{{ t('campaigns.details', 'Details') }}</CardTitle>
+                            <CardTitle>{{
+                                t('campaigns.details', 'Details')
+                            }}</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-3">
                             <div>
-                                <p class="text-sm text-muted-foreground">{{ t('campaigns.message_type', 'Message Type') }}</p>
-                                <p class="font-medium">{{ campaign.message_type }}</p>
+                                <p class="text-sm text-muted-foreground">
+                                    {{
+                                        t(
+                                            'campaigns.message_type',
+                                            'Message Type',
+                                        )
+                                    }}
+                                </p>
+                                <p class="font-medium">
+                                    {{ campaign.message_type }}
+                                </p>
                             </div>
 
                             <div v-if="campaign.template">
-                                <p class="text-sm text-muted-foreground">{{ t('campaigns.template', 'Template') }}</p>
-                                <p class="font-medium">{{ campaign.template.name }}</p>
+                                <p class="text-sm text-muted-foreground">
+                                    {{ t('campaigns.template', 'Template') }}
+                                </p>
+                                <p class="font-medium">
+                                    {{ campaign.template.name }}
+                                </p>
                             </div>
 
                             <div>
-                                <p class="text-sm text-muted-foreground">{{ t('campaigns.success_rate', 'Success Rate') }}</p>
-                                <p class="font-medium text-[#25D366]">{{ campaign.success_rate }}%</p>
+                                <p class="text-sm text-muted-foreground">
+                                    {{
+                                        t(
+                                            'campaigns.success_rate',
+                                            'Success Rate',
+                                        )
+                                    }}
+                                </p>
+                                <p class="font-medium text-[#25D366]">
+                                    {{ campaign.success_rate }}%
+                                </p>
                             </div>
                         </CardContent>
                     </Card>
@@ -376,12 +612,22 @@ const formatDate = (date: string) => {
         </div>
 
         <!-- Delete Confirmation Dialog -->
-        <Dialog :open="confirmDelete" @update:open="(open) => !open && (confirmDelete = false)">
+        <Dialog
+            :open="confirmDelete"
+            @update:open="(open) => !open && (confirmDelete = false)"
+        >
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{{ t('campaigns.delete_confirm_title', 'Delete Campaign?') }}</DialogTitle>
+                    <DialogTitle>{{
+                        t('campaigns.delete_confirm_title', 'Delete Campaign?')
+                    }}</DialogTitle>
                     <DialogDescription>
-                        {{ t('campaigns.delete_confirm_description', 'Are you sure you want to delete this campaign? This action cannot be undone.') }}
+                        {{
+                            t(
+                                'campaigns.delete_confirm_description',
+                                'Are you sure you want to delete this campaign? This action cannot be undone.',
+                            )
+                        }}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

@@ -22,7 +22,9 @@ class SubscriptionController extends Controller
         private readonly SubscriptionService  $subscriptionService,
         private readonly UsageTrackingService $usageService,
         private readonly PaymobService        $paymobService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Show payment page
@@ -168,7 +170,7 @@ class SubscriptionController extends Controller
         $paymentType = 'card'; // Default
 
         if ($paymentMethod) {
-            $paymentType = match($paymentMethod->slug) {
+            $paymentType = match ($paymentMethod->slug) {
                 'card', 'credit_card', 'debit_card', 'paymob_card' => 'card',
                 'vodafone_cash', 'etisalat_cash', 'orange_cash', 'we_pay', 'paymob_wallet' => 'wallet',
                 'instapay' => 'instapay',

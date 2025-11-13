@@ -27,24 +27,6 @@ class PaymobService
     }
 
     /**
-     * Calculate payment fees
-     */
-    public function calculateFees(float $baseAmount): array
-    {
-        // Paymob processing fee: 2% (configurable)
-        $feePercentage = config('services.paymob.fee_percentage', 2);
-        $feeAmount = round($baseAmount * ($feePercentage / 100), 2);
-        $totalAmount = $baseAmount + $feeAmount;
-
-        return [
-            'base_amount' => $baseAmount,
-            'fee_amount' => $feeAmount,
-            'fee_percentage' => $feePercentage,
-            'total_amount' => $totalAmount,
-        ];
-    }
-
-    /**
      * Initiate payment with Paymob using new Intention API
      */
     public function initiatePayment(User $user, Package $package, string $paymentType = 'card'): array
@@ -102,6 +84,24 @@ class PaymobService
                 'error' => 'Payment initiation failed: ' . $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Calculate payment fees
+     */
+    public function calculateFees(float $baseAmount): array
+    {
+        // Paymob processing fee: 2% (configurable)
+        $feePercentage = config('services.paymob.fee_percentage', 2);
+        $feeAmount = round($baseAmount * ($feePercentage / 100), 2);
+        $totalAmount = $baseAmount + $feeAmount;
+
+        return [
+            'base_amount' => $baseAmount,
+            'fee_amount' => $feeAmount,
+            'fee_percentage' => $feePercentage,
+            'total_amount' => $totalAmount,
+        ];
     }
 
     /**

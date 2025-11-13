@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { index, edit, destroy } from '@/routes/dashboard/contacts';
+import { destroy, edit, index } from '@/routes/dashboard/contacts';
 import { Head, router } from '@inertiajs/vue3';
 import {
     Calendar,
@@ -106,9 +106,14 @@ const formatDate = (dateString: string) => {
             <!-- Contact Information -->
             <Card>
                 <CardHeader>
-                    <CardTitle>{{
-                            t('contacts.fields.contact_info', 'Contact Information')
-                        }}</CardTitle>
+                    <CardTitle
+                        >{{
+                            t(
+                                'contacts.fields.contact_info',
+                                'Contact Information',
+                            )
+                        }}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent class="grid gap-6 md:grid-cols-2">
                     <!-- Phone -->
@@ -119,8 +124,8 @@ const formatDate = (dateString: string) => {
                         <div class="flex items-center gap-2">
                             <Phone class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                    contact.phone_number
-                                }}</span>
+                                contact.phone_number
+                            }}</span>
                         </div>
                     </div>
 
@@ -132,8 +137,8 @@ const formatDate = (dateString: string) => {
                         <div class="flex items-center gap-2">
                             <Mail class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                    contact.email || '-'
-                                }}</span>
+                                contact.email || '-'
+                            }}</span>
                         </div>
                     </div>
 
@@ -166,10 +171,7 @@ const formatDate = (dateString: string) => {
                             />
                             {{ t('contacts.validation.valid') }}
                         </Badge>
-                        <Badge
-                            v-else
-                            variant="destructive"
-                        >
+                        <Badge v-else variant="destructive">
                             <XCircle
                                 :class="isRTL() ? 'ml-1' : 'mr-1'"
                                 class="h-3 w-3"
@@ -184,10 +186,13 @@ const formatDate = (dateString: string) => {
                             {{ t('contacts.fields.source') }}
                         </p>
                         <Badge
+                            :class="
+                                contact.source === 'csv_import' ||
+                                contact.source === 'excel_import'
+                                    ? 'border-[#25D366]/20 bg-[#25D366]/10 text-[#25D366]'
+                                    : ''
+                            "
                             variant="outline"
-                            :class="contact.source === 'csv_import' || contact.source === 'excel_import'
-                                ? 'border-[#25D366]/20 bg-[#25D366]/10 text-[#25D366]'
-                                : ''"
                         >
                             {{ t(`contacts.sources.${contact.source}`) }}
                         </Badge>
@@ -199,8 +204,8 @@ const formatDate = (dateString: string) => {
                             {{ t('imports.history.filename') }}
                         </p>
                         <span class="font-medium">{{
-                                contact.import.filename
-                            }}</span>
+                            contact.import.filename
+                        }}</span>
                     </div>
 
                     <!-- Created Date -->
@@ -211,8 +216,8 @@ const formatDate = (dateString: string) => {
                         <div class="flex items-center gap-2">
                             <Calendar class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                    formatDate(contact.created_at)
-                                }}</span>
+                                formatDate(contact.created_at)
+                            }}</span>
                         </div>
                     </div>
 
@@ -229,8 +234,8 @@ const formatDate = (dateString: string) => {
                         <div class="flex items-center gap-2">
                             <Clock class="h-4 w-4 text-[#25D366]" />
                             <span class="font-medium">{{
-                                    formatDate(contact.validated_at)
-                                }}</span>
+                                formatDate(contact.validated_at)
+                            }}</span>
                         </div>
                     </div>
                 </CardContent>
@@ -270,9 +275,9 @@ const formatDate = (dateString: string) => {
         <Dialog v-model:open="showDeleteDialog">
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{{
-                            t('contacts.messages.confirm_delete')
-                        }}</DialogTitle>
+                    <DialogTitle
+                        >{{ t('contacts.messages.confirm_delete') }}
+                    </DialogTitle>
                     <DialogDescription>
                         {{
                             t(

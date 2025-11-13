@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Jobs\SendCampaignMessageJob;
 use App\Models\Campaign;
 use App\Models\CampaignRecipient;
-use App\Models\Contact;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -17,7 +16,9 @@ readonly class CampaignService
 {
     public function __construct(
         private UsageTrackingService $usageTracking
-    ) {}
+    )
+    {
+    }
 
     /**
      * Create a new campaign
@@ -64,6 +65,88 @@ readonly class CampaignService
 
             throw $e;
         }
+    }
+
+    /**
+     * Handle media file upload
+     * @throws Exception
+     */
+    private function handleMediaUpload(UploadedFile $file, string $messageType): array
+    {
+        // Validate file based on message type
+        $validationRules = $this->getMediaValidationRules($messageType);
+
+        $maxSize = $validationRules['max_size'];
+        $allowedMimes = $validationRules['mimes'];
+
+        // Check file size (in KB)
+        if ($file->getSize() > $maxSize * 1024) {
+            throw new Exception("File size exceeds maximum allowed ({$maxSize}KB)");
+        }
+
+        // Check mime type
+        if (!in_array($file->getClientOriginalExtension(), $allowedMimes)) {
+            throw new Exception("Invalid file type for {$messageType}");
+        }
+
+        // Store file
+        $path = $file->store('campaigns', 'public');
+        $url = Storage::url($path);
+
+        return [
+            'path' => $path,
+            'url' => $url,
+        ];
+    }
+
+    /**
+     * Get validation rules for media based on message type
+     */
+    private function getMediaValidationRules(string $messageType): array
+    {
+        return match ($messageType) {
+            'image' => [
+                'max_size' => 5120, // 5MB
+                'mimes' => ['jpg', 'jpeg', 'png', 'gif'],
+            ],
+            'video' => [
+                'max_size' => 16384, // 16MB
+                'mimes' => ['mp4'],
+            ],
+            'audio' => [
+                'max_size' => 16384, // 16MB
+                'mimes' => ['mp3', 'ogg', 'wav'],
+            ],
+            'document' => [
+                'max_size' => 10240, // 10MB
+                'mimes' => ['pdf', 'doc', 'docx', 'xls', 'xlsx'],
+            ],
+            default => [
+                'max_size' => 0,
+                'mimes' => [],
+            ],
+        };
+    }
+
+    /**
+     * Add recipients to campaign
+     */
+    private function addRecipientsToCampaign(Campaign $campaign, array $contactIds): void
+    {
+        $recipients = [];
+        foreach ($contactIds as $contactId) {
+            $recipients[] = [
+                'campaign_id' => $campaign->id,
+                'contact_id' => $contactId,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        CampaignRecipient::insert($recipients);
+
+        $campaign->update(['total_recipients' => count($recipients)]);
     }
 
     /**
@@ -118,27 +201,6 @@ readonly class CampaignService
             DB::rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * Add recipients to campaign
-     */
-    private function addRecipientsToCampaign(Campaign $campaign, array $contactIds): void
-    {
-        $recipients = [];
-        foreach ($contactIds as $contactId) {
-            $recipients[] = [
-                'campaign_id' => $campaign->id,
-                'contact_id' => $contactId,
-                'status' => 'pending',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        CampaignRecipient::insert($recipients);
-
-        $campaign->update(['total_recipients' => count($recipients)]);
     }
 
     /**
@@ -272,66 +334,5 @@ readonly class CampaignService
             DB::rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * Handle media file upload
-     * @throws Exception
-     */
-    private function handleMediaUpload(UploadedFile $file, string $messageType): array
-    {
-        // Validate file based on message type
-        $validationRules = $this->getMediaValidationRules($messageType);
-
-        $maxSize = $validationRules['max_size'];
-        $allowedMimes = $validationRules['mimes'];
-
-        // Check file size (in KB)
-        if ($file->getSize() > $maxSize * 1024) {
-            throw new Exception("File size exceeds maximum allowed ({$maxSize}KB)");
-        }
-
-        // Check mime type
-        if (!in_array($file->getClientOriginalExtension(), $allowedMimes)) {
-            throw new Exception("Invalid file type for {$messageType}");
-        }
-
-        // Store file
-        $path = $file->store('campaigns', 'public');
-        $url = Storage::url($path);
-
-        return [
-            'path' => $path,
-            'url' => $url,
-        ];
-    }
-
-    /**
-     * Get validation rules for media based on message type
-     */
-    private function getMediaValidationRules(string $messageType): array
-    {
-        return match ($messageType) {
-            'image' => [
-                'max_size' => 5120, // 5MB
-                'mimes' => ['jpg', 'jpeg', 'png', 'gif'],
-            ],
-            'video' => [
-                'max_size' => 16384, // 16MB
-                'mimes' => ['mp4'],
-            ],
-            'audio' => [
-                'max_size' => 16384, // 16MB
-                'mimes' => ['mp3', 'ogg', 'wav'],
-            ],
-            'document' => [
-                'max_size' => 10240, // 10MB
-                'mimes' => ['pdf', 'doc', 'docx', 'xls', 'xlsx'],
-            ],
-            default => [
-                'max_size' => 0,
-                'mimes' => [],
-            ],
-        };
     }
 }

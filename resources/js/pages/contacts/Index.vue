@@ -34,7 +34,13 @@ import {
 } from '@/components/ui/table';
 import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { create, destroy, edit, index, show } from '@/routes/dashboard/contacts';
+import {
+    create,
+    destroy,
+    edit,
+    index,
+    show,
+} from '@/routes/dashboard/contacts';
 import { index as importsIndex } from '@/routes/dashboard/contacts/imports';
 import { Head, router } from '@inertiajs/vue3';
 import {
@@ -228,8 +234,7 @@ const getStatusBadge = (contact: Contact) => {
 const getSourceColor = (source: string): string => {
     const colors: Record<string, string> = {
         manual: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-        csv_import:
-            'bg-[#25D366]/10 text-[#25D366] border-[#25D366]/20',
+        csv_import: 'bg-[#25D366]/10 text-[#25D366] border-[#25D366]/20',
         excel_import:
             'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
         api: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
@@ -256,8 +261,8 @@ const getSourceColor = (source: string): string => {
                 />
                 <div class="flex gap-2">
                     <Button
-                        variant="outline"
                         class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
+                        variant="outline"
                         @click="router.visit(importsIndex())"
                     >
                         <Upload
@@ -308,18 +313,18 @@ const getSourceColor = (source: string): string => {
                             />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{{
-                                    t('contacts.filters.all_sources')
-                                }}</SelectItem>
-                            <SelectItem value="manual">{{
-                                    t('contacts.sources.manual')
-                                }}</SelectItem>
-                            <SelectItem value="csv_import">{{
-                                    t('contacts.sources.csv_import')
-                                }}</SelectItem>
-                            <SelectItem value="excel_import">{{
-                                    t('contacts.sources.excel_import')
-                                }}</SelectItem>
+                            <SelectItem value="all"
+                                >{{ t('contacts.filters.all_sources') }}
+                            </SelectItem>
+                            <SelectItem value="manual"
+                                >{{ t('contacts.sources.manual') }}
+                            </SelectItem>
+                            <SelectItem value="csv_import"
+                                >{{ t('contacts.sources.csv_import') }}
+                            </SelectItem>
+                            <SelectItem value="excel_import"
+                                >{{ t('contacts.sources.excel_import') }}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
 
@@ -333,15 +338,15 @@ const getSourceColor = (source: string): string => {
                             />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{{
-                                    t('contacts.filters.all_status')
-                                }}</SelectItem>
-                            <SelectItem value="valid">{{
-                                    t('contacts.validation.valid')
-                                }}</SelectItem>
-                            <SelectItem value="invalid">{{
-                                    t('contacts.validation.invalid')
-                                }}</SelectItem>
+                            <SelectItem value="all"
+                                >{{ t('contacts.filters.all_status') }}
+                            </SelectItem>
+                            <SelectItem value="valid"
+                                >{{ t('contacts.validation.valid') }}
+                            </SelectItem>
+                            <SelectItem value="invalid"
+                                >{{ t('contacts.validation.invalid') }}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
 
@@ -354,7 +359,7 @@ const getSourceColor = (source: string): string => {
             <!-- Bulk Actions -->
             <div
                 v-if="selectedContacts.length > 0"
-                class="flex items-center justify-between rounded-lg bg-[#25D366]/10 border border-[#25D366]/20 p-4"
+                class="flex items-center justify-between rounded-lg border border-[#25D366]/20 bg-[#25D366]/10 p-4"
             >
                 <span class="text-sm font-medium">
                     {{
@@ -365,9 +370,9 @@ const getSourceColor = (source: string): string => {
                 </span>
                 <div class="flex gap-2">
                     <Button
+                        class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
                         size="sm"
                         variant="outline"
-                        class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
                         @click="bulkValidate"
                     >
                         {{ t('contacts.validate_selected') }}
@@ -383,7 +388,10 @@ const getSourceColor = (source: string): string => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'" class="w-12">
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="w-12"
+                            >
                                 <input
                                     :checked="allSelected"
                                     class="rounded border-gray-300 text-[#25D366] focus:ring-[#25D366]"
@@ -391,27 +399,34 @@ const getSourceColor = (source: string): string => {
                                     @change="toggleSelectAll"
                                 />
                             </TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">{{
-                                    t('contacts.fields.first_name')
-                                }}</TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">{{
-                                    t('contacts.fields.phone_number')
-                                }}</TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">{{
-                                    t('contacts.fields.email')
-                                }}</TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">{{
-                                    t('contacts.fields.tags')
-                                }}</TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">{{
-                                    t('contacts.fields.source')
-                                }}</TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">{{
-                                    t('contacts.fields.whatsapp_status')
-                                }}</TableHead>
-                            <TableHead :class="isRTL() ? 'text-right' : 'text-left'">{{
-                                    t('contacts.fields.actions')
-                                }}</TableHead>
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ t('contacts.fields.first_name') }}
+                            </TableHead>
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ t('contacts.fields.phone_number') }}
+                            </TableHead>
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ t('contacts.fields.email') }}
+                            </TableHead>
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ t('contacts.fields.tags') }}
+                            </TableHead>
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ t('contacts.fields.source') }}
+                            </TableHead>
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ t('contacts.fields.whatsapp_status') }}
+                            </TableHead>
+                            <TableHead
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ t('contacts.fields.actions') }}
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -431,7 +446,9 @@ const getSourceColor = (source: string): string => {
                             v-for="contact in contacts.data"
                             :key="contact.id"
                         >
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 <input
                                     :checked="isSelected(contact.id)"
                                     class="rounded border-gray-300 text-[#25D366] focus:ring-[#25D366]"
@@ -439,12 +456,22 @@ const getSourceColor = (source: string): string => {
                                     @change="toggleSelect(contact.id)"
                                 />
                             </TableCell>
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'" class="font-medium">{{
-                                    contact.first_name
-                                }}</TableCell>
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">{{ contact.phone_number }}</TableCell>
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">{{ contact.email || '-' }}</TableCell>
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                class="font-medium"
+                                >{{ contact.first_name }}
+                            </TableCell>
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ contact.phone_number }}
+                            </TableCell>
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                                >{{ contact.email || '-' }}
+                            </TableCell>
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 <div class="flex flex-wrap gap-1">
                                     <Badge
                                         v-for="tag in contact.tags"
@@ -456,7 +483,9 @@ const getSourceColor = (source: string): string => {
                                     </Badge>
                                 </div>
                             </TableCell>
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 <Badge
                                     :class="getSourceColor(contact.source)"
                                     variant="outline"
@@ -466,10 +495,12 @@ const getSourceColor = (source: string): string => {
                                     }}
                                 </Badge>
                             </TableCell>
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 <Badge
-                                    :variant="getStatusBadge(contact).variant"
                                     :class="getStatusBadge(contact).color"
+                                    :variant="getStatusBadge(contact).variant"
                                 >
                                     <component
                                         :is="getStatusBadge(contact).icon"
@@ -479,7 +510,9 @@ const getSourceColor = (source: string): string => {
                                     {{ getStatusBadge(contact).text }}
                                 </Badge>
                             </TableCell>
-                            <TableCell :class="isRTL() ? 'text-right' : 'text-left'">
+                            <TableCell
+                                :class="isRTL() ? 'text-right' : 'text-left'"
+                            >
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>
                                         <Button size="sm" variant="ghost">
@@ -488,22 +521,41 @@ const getSourceColor = (source: string): string => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem
-                                            @click="router.visit(show(contact.id))"
+                                            @click="
+                                                router.visit(show(contact.id))
+                                            "
                                         >
-                                            <Eye :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            <Eye
+                                                :class="
+                                                    isRTL() ? 'ml-2' : 'mr-2'
+                                                "
+                                                class="h-4 w-4"
+                                            />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
-                                            @click="router.visit(edit(contact.id))"
+                                            @click="
+                                                router.visit(edit(contact.id))
+                                            "
                                         >
-                                            <Edit :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            <Edit
+                                                :class="
+                                                    isRTL() ? 'ml-2' : 'mr-2'
+                                                "
+                                                class="h-4 w-4"
+                                            />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             class="text-destructive"
                                             @click="confirmDelete(contact)"
                                         >
-                                            <Trash2 :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
+                                            <Trash2
+                                                :class="
+                                                    isRTL() ? 'ml-2' : 'mr-2'
+                                                "
+                                                class="h-4 w-4"
+                                            />
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -518,9 +570,9 @@ const getSourceColor = (source: string): string => {
             <Dialog v-model:open="showDeleteDialog">
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{{
-                                t('contacts.messages.confirm_delete')
-                            }}</DialogTitle>
+                        <DialogTitle
+                            >{{ t('contacts.messages.confirm_delete') }}
+                        </DialogTitle>
                         <DialogDescription>
                             This action cannot be undone.
                         </DialogDescription>

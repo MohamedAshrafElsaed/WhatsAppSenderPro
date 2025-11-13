@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { Form, Head, Link } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import LandingLayout from '@/layouts/LandingLayout.vue';
 import { useTranslation } from '@/composables/useTranslation';
-import { Loader2 } from 'lucide-vue-next';
+import LandingLayout from '@/layouts/LandingLayout.vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import { Form, Head, Link } from '@inertiajs/vue3';
+import { Loader2 } from 'lucide-vue-next';
 
 defineProps<{
     status?: string;

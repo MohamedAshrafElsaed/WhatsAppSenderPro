@@ -1,8 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { RadioGroupOption } from '@headlessui/vue';
-import { Check, Circle } from 'lucide-vue-next';
+import { Circle } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
-import { computed } from 'vue';
 
 interface Props {
     value: any;
@@ -16,9 +15,9 @@ const props = defineProps<Props>();
 <template>
     <RadioGroupOption
         v-slot="{ checked, disabled: isDisabled }"
-        :value="value"
-        :disabled="disabled"
         :class="cn('cursor-pointer', props.class)"
+        :disabled="disabled"
+        :value="value"
     >
         <span
             :class="cn(

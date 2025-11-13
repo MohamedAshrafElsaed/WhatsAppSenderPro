@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { Head, router } from '@inertiajs/vue3';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,17 +8,18 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { useTranslation } from '@/composables/useTranslation';
 import { index as dashboard } from '@/routes/dashboard';
 import {
     index as subscriptionIndex,
     processPayment,
 } from '@/routes/dashboard/settings/subscription';
 import { type BreadcrumbItem } from '@/types';
+import { Head, router } from '@inertiajs/vue3';
 import { CreditCard, Lock, Shield, Smartphone, Wallet } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
@@ -98,9 +98,11 @@ const priceToPay = computed(() => {
 
 // Show upgrade calculation only when upgrading from a paid plan
 const showUpgradeCalculation = computed(() => {
-    return props.currentSubscription &&
+    return (
+        props.currentSubscription &&
         !props.currentSubscription.is_trial &&
-        props.upgradePrice !== null;
+        props.upgradePrice !== null
+    );
 });
 
 const handlePayment = () => {
@@ -134,56 +136,128 @@ const handlePayment = () => {
                 <!-- Order Summary -->
                 <Card>
                     <CardHeader>
-                        <CardTitle>{{ t('payment.order_summary', 'Order Summary') }}</CardTitle>
+                        <CardTitle>{{
+                            t('payment.order_summary', 'Order Summary')
+                        }}</CardTitle>
                     </CardHeader>
                     <CardContent class="space-y-4">
                         <!-- Selected Package -->
-                        <div class="flex justify-between items-center p-4 bg-muted rounded-lg">
+                        <div
+                            class="flex items-center justify-between rounded-lg bg-muted p-4"
+                        >
                             <div>
                                 <h3 class="font-semibold">
-                                    {{ isRTL() ? package.name_ar : package.name_en }}
+                                    {{
+                                        isRTL()
+                                            ? package.name_ar
+                                            : package.name_en
+                                    }}
                                 </h3>
                                 <p class="text-sm text-muted-foreground">
-                                    {{ t('payment.monthly_subscription', 'Monthly Subscription') }}
+                                    {{
+                                        t(
+                                            'payment.monthly_subscription',
+                                            'Monthly Subscription',
+                                        )
+                                    }}
                                 </p>
                             </div>
                             <div class="text-right">
-                                <p class="text-2xl font-bold">{{ fees.base_amount }} {{ t('common.currency', 'EGP') }}</p>
-                                <p class="text-sm text-muted-foreground">{{ t('payment.per_month', '/month') }}</p>
+                                <p class="text-2xl font-bold">
+                                    {{ fees.base_amount }}
+                                    {{ t('common.currency', 'EGP') }}
+                                </p>
+                                <p class="text-sm text-muted-foreground">
+                                    {{ t('payment.per_month', '/month') }}
+                                </p>
                             </div>
                         </div>
 
                         <!-- Upgrade Calculation (if applicable) -->
-                        <div v-if="showUpgradeCalculation" class="p-4 border rounded-lg space-y-2">
+                        <div
+                            v-if="showUpgradeCalculation"
+                            class="space-y-2 rounded-lg border p-4"
+                        >
                             <div class="flex justify-between text-sm">
-                                <span>{{ t('payment.new_plan', 'New Plan') }}: {{ isRTL() ? package.name_ar : package.name_en }}</span>
-                                <span>{{ package.price }} {{ t('common.currency', 'EGP') }}</span>
+                                <span
+                                    >{{ t('payment.new_plan', 'New Plan') }}:
+                                    {{
+                                        isRTL()
+                                            ? package.name_ar
+                                            : package.name_en
+                                    }}</span
+                                >
+                                <span
+                                    >{{ package.price }}
+                                    {{ t('common.currency', 'EGP') }}</span
+                                >
                             </div>
                             <div class="flex justify-between text-sm">
-                                <span>{{ t('payment.current_plan', 'Current Plan') }}: {{ currentSubscription!.package_name }}</span>
-                                <span class="text-muted-foreground">-{{ currentSubscription!.price }} {{ t('common.currency', 'EGP') }}</span>
+                                <span
+                                    >{{
+                                        t(
+                                            'payment.current_plan',
+                                            'Current Plan',
+                                        )
+                                    }}:
+                                    {{
+                                        currentSubscription!.package_name
+                                    }}</span
+                                >
+                                <span class="text-muted-foreground"
+                                    >-{{ currentSubscription!.price }}
+                                    {{ t('common.currency', 'EGP') }}</span
+                                >
                             </div>
                             <div class="border-t pt-2">
                                 <div class="flex justify-between font-semibold">
-                                    <span>{{ t('payment.upgrade_difference', 'Upgrade Difference') }}</span>
-                                    <span>{{ upgradePrice }} {{ t('common.currency', 'EGP') }}</span>
+                                    <span>{{
+                                        t(
+                                            'payment.upgrade_difference',
+                                            'Upgrade Difference',
+                                        )
+                                    }}</span>
+                                    <span
+                                        >{{ upgradePrice }}
+                                        {{ t('common.currency', 'EGP') }}</span
+                                    >
                                 </div>
                             </div>
                         </div>
 
                         <!-- Processing Fee -->
-                        <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm">{{ t('payment.processing_fee', 'Processing Fee') }} ({{ fees.fee_percentage }}%)</span>
-                                <span class="text-sm font-medium">{{ fees.fee_amount }} {{ t('common.currency', 'EGP') }}</span>
+                        <div
+                            class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
+                        >
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm"
+                                    >{{
+                                        t(
+                                            'payment.processing_fee',
+                                            'Processing Fee',
+                                        )
+                                    }}
+                                    ({{ fees.fee_percentage }}%)</span
+                                >
+                                <span class="text-sm font-medium"
+                                    >{{ fees.fee_amount }}
+                                    {{ t('common.currency', 'EGP') }}</span
+                                >
                             </div>
                         </div>
 
                         <!-- Total to Pay -->
-                        <div class="p-4 border-2 border-[#25D366] rounded-lg bg-[#25D366]/5">
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-semibold">{{ t('payment.total_to_pay', 'Total to Pay') }}</span>
-                                <span class="text-2xl font-bold text-[#25D366]">{{ priceToPay }} {{ t('common.currency', 'EGP') }}</span>
+                        <div
+                            class="rounded-lg border-2 border-[#25D366] bg-[#25D366]/5 p-4"
+                        >
+                            <div class="flex items-center justify-between">
+                                <span class="text-lg font-semibold">{{
+                                    t('payment.total_to_pay', 'Total to Pay')
+                                }}</span>
+                                <span class="text-2xl font-bold text-[#25D366]"
+                                    >{{ priceToPay }}
+                                    {{ t('common.currency', 'EGP') }}</span
+                                >
                             </div>
                         </div>
                     </CardContent>
@@ -192,9 +266,9 @@ const handlePayment = () => {
                 <!-- Payment Methods -->
                 <Card>
                     <CardHeader>
-                        <CardTitle>{{
-                                t('payment.payment_method', 'Payment Method')
-                            }}</CardTitle>
+                        <CardTitle
+                            >{{ t('payment.payment_method', 'Payment Method') }}
+                        </CardTitle>
                         <CardDescription>
                             {{
                                 t(
@@ -227,12 +301,24 @@ const handlePayment = () => {
                                 >
                                     <div class="flex items-center gap-2">
                                         <component
-                                            :is="method.icon === 'credit-card' ? CreditCard : method.icon === 'smartphone' ? Smartphone : Wallet"
+                                            :is="
+                                                method.icon === 'credit-card'
+                                                    ? CreditCard
+                                                    : method.icon ===
+                                                        'smartphone'
+                                                      ? Smartphone
+                                                      : Wallet
+                                            "
                                             class="h-5 w-5 text-[#25D366]"
                                         />
                                         <Label
                                             class="cursor-pointer font-medium"
-                                        >{{ isRTL() ? method.label_ar : method.label_en }}</Label>
+                                            >{{
+                                                isRTL()
+                                                    ? method.label_ar
+                                                    : method.label_en
+                                            }}</Label
+                                        >
                                     </div>
                                     <p
                                         class="mt-1 text-sm text-muted-foreground"
@@ -252,11 +338,11 @@ const handlePayment = () => {
                         <div class="flex items-center gap-2">
                             <Lock class="h-4 w-4" />
                             <span>{{
-                                    t(
-                                        'payment.secure_payment',
-                                        'Your payment information is encrypted and secure',
-                                    )
-                                }}</span>
+                                t(
+                                    'payment.secure_payment',
+                                    'Your payment information is encrypted and secure',
+                                )
+                            }}</span>
                         </div>
                     </AlertDescription>
                 </Alert>

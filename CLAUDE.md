@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-WhatsApp Sender Pro is a Laravel 12 + Vue 3 + Inertia.js SaaS application for WhatsApp bulk messaging and contact management. The frontend uses Vue 3 with TypeScript, Tailwind CSS v4, and Reka UI components. The application integrates with an external WhatsApp Go API server for sending messages through WhatsApp sessions.
+WhatsApp Sender Pro is a Laravel 12 + Vue 3 + Inertia.js SaaS application for WhatsApp bulk messaging and contact
+management. The frontend uses Vue 3 with TypeScript, Tailwind CSS v4, and Reka UI components. The application integrates
+with an external WhatsApp Go API server for sending messages through WhatsApp sessions.
 
 ## Core Architecture
 
@@ -12,6 +14,7 @@ WhatsApp Sender Pro is a Laravel 12 + Vue 3 + Inertia.js SaaS application for Wh
 
 **Route Structure**
 Routes are organized into separate files in the `routes/` directory:
+
 - `web.php` - Main router that imports all other route files
 - `landing.php` - Public landing pages
 - `dashboard.php` - All authenticated dashboard routes (contacts, campaigns, templates, reports, WhatsApp sessions)
@@ -19,7 +22,9 @@ Routes are organized into separate files in the `routes/` directory:
 - `subscription.php` - Subscription and package management
 
 **Key Services**
-- `WhatsAppApiService` - Communicates with external Go API server using JWT authentication. Handles session management, QR code generation, and message sending
+
+- `WhatsAppApiService` - Communicates with external Go API server using JWT authentication. Handles session management,
+  QR code generation, and message sending
 - `CampaignService` - Campaign CRUD, recipient management, media uploads, queue priority based on subscription tier
 - `ContactService` - Contact management and validation
 - `ContactImportService` - Handles bulk CSV/Excel imports with background processing
@@ -30,7 +35,9 @@ Routes are organized into separate files in the `routes/` directory:
 
 **Database Models**
 Core entities:
-- `User` - Has subscriptions, contacts, campaigns, templates, devices. Methods: `generateJWT()`, `canAccessFeature()`, `hasReachedLimit()`, `getRemainingQuota()`
+
+- `User` - Has subscriptions, contacts, campaigns, templates, devices. Methods: `generateJWT()`, `canAccessFeature()`,
+  `hasReachedLimit()`, `getRemainingQuota()`
 - `UserSubscription` - Links users to packages with status (active, trial, expired, cancelled)
 - `Package` - Defines subscription tiers with features and limits stored as JSON
 - `Campaign` - Bulk messaging campaigns with status (draft, scheduled, running, paused, completed, failed)
@@ -41,9 +48,12 @@ Core entities:
 - `WhatsAppSession` - Tracks WhatsApp sessions from the Go API
 
 **Background Jobs**
-- `SendCampaignMessageJob` - Processes individual campaign messages with retry logic, rate limiting (30/min), and exponential backoff
+
+- `SendCampaignMessageJob` - Processes individual campaign messages with retry logic, rate limiting (30/min), and
+  exponential backoff
 
 **Middleware**
+
 - `CheckSubscription` - Validates active subscription before accessing protected features
 - `CheckFeatureAccess` - Validates specific feature access based on package
 - `TrackUserDevice` - Tracks user devices for security
@@ -52,7 +62,9 @@ Core entities:
 ### Frontend (Vue 3 + Inertia.js)
 
 **Structure**
-- `resources/js/pages/` - Inertia page components organized by feature (auth, campaigns, contacts, templates, reports, whatsapp)
+
+- `resources/js/pages/` - Inertia page components organized by feature (auth, campaigns, contacts, templates, reports,
+  whatsapp)
 - `resources/js/components/ui/` - Reusable UI components from Reka UI (shadcn-vue style)
 - `resources/js/composables/` - Vue composables for shared logic
 - `resources/js/layouts/` - Layout components (AppLayout, AuthLayout, LandingLayout)
@@ -60,6 +72,7 @@ Core entities:
 - `resources/js/utils/` - Utility functions
 
 **Key Features**
+
 - Uses Laravel Wayfinder for type-safe routing from backend to frontend
 - RTL support (Arabic locale detection)
 - Dark/light theme support via `useAppearance` composable
@@ -68,9 +81,11 @@ Core entities:
 ### WhatsApp Integration
 
 The application communicates with an external Go-based WhatsApp API server:
+
 - Base URL configured via `WHATSAPP_API_URL` env variable (default: `http://localhost:8988`)
 - Authentication using JWT tokens signed with `JWT_SECRET`
-- Key endpoints: `/api/v1/sessions` (CRUD), `/api/v1/sessions/{id}/send` (messaging), `/api/v1/sessions/{id}/qr` (QR codes)
+- Key endpoints: `/api/v1/sessions` (CRUD), `/api/v1/sessions/{id}/send` (messaging), `/api/v1/sessions/{id}/qr` (QR
+  codes)
 - WebSocket endpoint: `ws://[api-url]/api/v1/sessions/{id}/events` for real-time session status
 
 ## Common Commands
@@ -161,6 +176,7 @@ php artisan pail --clear
 ## Key Configuration
 
 ### Environment Variables
+
 - `WHATSAPP_API_URL` - External WhatsApp Go API server URL
 - `JWT_SECRET` - Shared secret for WhatsApp API authentication (defaults to APP_KEY)
 - `JWT_TTL` - JWT token expiration in seconds (default: 86400)
@@ -169,9 +185,12 @@ php artisan pail --clear
 - Cache: Uses database driver by default, Redis recommended for production
 
 ### Package System
+
 Subscription packages are defined in the `packages` table with JSON columns:
+
 - `features` - Array of feature slugs (e.g., "bulk_messaging", "advanced_analytics")
-- `limits` - Object with keys like "messages_per_month", "contacts_validation_per_month", "connected_numbers", "message_templates"
+- `limits` - Object with keys like "messages_per_month", "contacts_validation_per_month", "connected_numbers", "
+  message_templates"
 
 Usage tracking is handled per billing period in the `user_usages` table.
 

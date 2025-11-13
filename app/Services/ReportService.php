@@ -11,140 +11,6 @@ use Illuminate\Support\Facades\DB;
 readonly class ReportService
 {
     /**
-     * Get overview statistics
-     */
-    public function getOverviewStats(User $user, string $startDate, string $endDate): array
-    {
-        // Total campaigns in date range
-        $totalCampaigns = Campaign::forUser($user)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
-
-        // Total messages sent
-        $totalMessages = Campaign::forUser($user)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('messages_sent');
-
-        // Total contacts
-        $totalContacts = Contact::forUser($user)->count();
-
-        // Average success rate
-        $avgSuccessRate = Campaign::forUser($user)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->where('messages_sent', '>', 0)
-            ->avg(DB::raw('(messages_delivered / messages_sent) * 100'));
-
-        // Active campaigns
-        $activeCampaigns = Campaign::forUser($user)
-            ->where('status', 'running')
-            ->count();
-
-        // Completed campaigns
-        $completedCampaigns = Campaign::forUser($user)
-            ->whereBetween('completed_at', [$startDate, $endDate])
-            ->where('status', 'completed')
-            ->count();
-
-        return [
-            'total_campaigns' => $totalCampaigns,
-            'total_messages' => $totalMessages,
-            'total_contacts' => $totalContacts,
-            'average_success_rate' => round($avgSuccessRate ?? 0, 2),
-            'active_campaigns' => $activeCampaigns,
-            'completed_campaigns' => $completedCampaigns,
-        ];
-    }
-
-    /**
-     * Get campaign performance data
-     */
-    public function getCampaignPerformance(User $user, string $startDate, string $endDate): array
-    {
-        return Campaign::forUser($user)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->select([
-                'id',
-                'name',
-                'total_recipients',
-                'messages_sent',
-                'messages_delivered',
-                'messages_failed',
-                'status',
-                'created_at',
-            ])
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function ($campaign) {
-                return [
-                    'id' => $campaign->id,
-                    'name' => $campaign->name,
-                    'status' => $campaign->status,
-                    'total_recipients' => $campaign->total_recipients,
-                    'messages_sent' => $campaign->messages_sent,
-                    'messages_delivered' => $campaign->messages_delivered,
-                    'messages_failed' => $campaign->messages_failed,
-                    'success_rate' => $campaign->success_rate,
-                    'created_at' => $campaign->created_at->format('Y-m-d'),
-                ];
-            })
-            ->toArray();
-    }
-
-    /**
-     * Get daily message trends
-     */
-    public function getMessageTrends(User $user, string $startDate, string $endDate): array
-    {
-        $messages = DB::table('campaign_recipients')
-            ->join('campaigns', 'campaign_recipients.campaign_id', '=', 'campaigns.id')
-            ->where('campaigns.user_id', $user->id)
-            ->whereBetween('campaign_recipients.sent_at', [$startDate, $endDate])
-            ->select(
-                DB::raw('DATE(campaign_recipients.sent_at) as date'),
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN campaign_recipients.status = "delivered" THEN 1 ELSE 0 END) as delivered'),
-                DB::raw('SUM(CASE WHEN campaign_recipients.status = "failed" THEN 1 ELSE 0 END) as failed')
-            )
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        return $messages->map(function ($item) {
-            return [
-                'date' => $item->date,
-                'total' => $item->total,
-                'delivered' => $item->delivered,
-                'failed' => $item->failed,
-                'success_rate' => $item->total > 0 ? round(($item->delivered / $item->total) * 100, 2) : 0,
-            ];
-        })->toArray();
-    }
-
-    /**
-     * Get contact growth over time
-     */
-    public function getContactGrowth(User $user, string $startDate, string $endDate): array
-    {
-        $contacts = Contact::forUser($user)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        return $contacts->map(function ($item) {
-            return [
-                'date' => $item->date,
-                'count' => $item->count,
-            ];
-        })->toArray();
-    }
-
-    /**
      * Get detailed contact statistics
      */
     public function getContactStats(User $user, string $startDate, string $endDate): array
@@ -380,5 +246,139 @@ readonly class ReportService
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ]);
+    }
+
+    /**
+     * Get campaign performance data
+     */
+    public function getCampaignPerformance(User $user, string $startDate, string $endDate): array
+    {
+        return Campaign::forUser($user)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select([
+                'id',
+                'name',
+                'total_recipients',
+                'messages_sent',
+                'messages_delivered',
+                'messages_failed',
+                'status',
+                'created_at',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function ($campaign) {
+                return [
+                    'id' => $campaign->id,
+                    'name' => $campaign->name,
+                    'status' => $campaign->status,
+                    'total_recipients' => $campaign->total_recipients,
+                    'messages_sent' => $campaign->messages_sent,
+                    'messages_delivered' => $campaign->messages_delivered,
+                    'messages_failed' => $campaign->messages_failed,
+                    'success_rate' => $campaign->success_rate,
+                    'created_at' => $campaign->created_at->format('Y-m-d'),
+                ];
+            })
+            ->toArray();
+    }
+
+    /**
+     * Get contact growth over time
+     */
+    public function getContactGrowth(User $user, string $startDate, string $endDate): array
+    {
+        $contacts = Contact::forUser($user)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return $contacts->map(function ($item) {
+            return [
+                'date' => $item->date,
+                'count' => $item->count,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get daily message trends
+     */
+    public function getMessageTrends(User $user, string $startDate, string $endDate): array
+    {
+        $messages = DB::table('campaign_recipients')
+            ->join('campaigns', 'campaign_recipients.campaign_id', '=', 'campaigns.id')
+            ->where('campaigns.user_id', $user->id)
+            ->whereBetween('campaign_recipients.sent_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(campaign_recipients.sent_at) as date'),
+                DB::raw('COUNT(*) as total'),
+                DB::raw('SUM(CASE WHEN campaign_recipients.status = "delivered" THEN 1 ELSE 0 END) as delivered'),
+                DB::raw('SUM(CASE WHEN campaign_recipients.status = "failed" THEN 1 ELSE 0 END) as failed')
+            )
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return $messages->map(function ($item) {
+            return [
+                'date' => $item->date,
+                'total' => $item->total,
+                'delivered' => $item->delivered,
+                'failed' => $item->failed,
+                'success_rate' => $item->total > 0 ? round(($item->delivered / $item->total) * 100, 2) : 0,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get overview statistics
+     */
+    public function getOverviewStats(User $user, string $startDate, string $endDate): array
+    {
+        // Total campaigns in date range
+        $totalCampaigns = Campaign::forUser($user)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
+        // Total messages sent
+        $totalMessages = Campaign::forUser($user)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('messages_sent');
+
+        // Total contacts
+        $totalContacts = Contact::forUser($user)->count();
+
+        // Average success rate
+        $avgSuccessRate = Campaign::forUser($user)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('messages_sent', '>', 0)
+            ->avg(DB::raw('(messages_delivered / messages_sent) * 100'));
+
+        // Active campaigns
+        $activeCampaigns = Campaign::forUser($user)
+            ->where('status', 'running')
+            ->count();
+
+        // Completed campaigns
+        $completedCampaigns = Campaign::forUser($user)
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->where('status', 'completed')
+            ->count();
+
+        return [
+            'total_campaigns' => $totalCampaigns,
+            'total_messages' => $totalMessages,
+            'total_contacts' => $totalContacts,
+            'average_success_rate' => round($avgSuccessRate ?? 0, 2),
+            'active_campaigns' => $activeCampaigns,
+            'completed_campaigns' => $completedCampaigns,
+        ];
     }
 }

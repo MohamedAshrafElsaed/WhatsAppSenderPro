@@ -15,7 +15,9 @@ class ContactImportController extends Controller
 {
     public function __construct(
         private readonly ContactImportService $importService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Display import history

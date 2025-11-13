@@ -15,7 +15,9 @@ class ContactController extends Controller
 {
     public function __construct(
         private readonly ContactService $contactService
-    ) {}
+    )
+    {
+    }
 
     /**
      * Display contacts list

@@ -100,7 +100,11 @@ onUnmounted(() => {
                     <TwoFactorRecoveryCodes />
 
                     <div class="relative inline">
-                        <Form #default="{ processing }" action="/user/two-factor-authentication" method="delete">
+                        <Form
+                            #default="{ processing }"
+                            action="/user/two-factor-authentication"
+                            method="delete"
+                        >
                             <Button
                                 :disabled="processing"
                                 type="submit"

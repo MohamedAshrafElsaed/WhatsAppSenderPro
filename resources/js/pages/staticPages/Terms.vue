@@ -41,9 +41,9 @@ const { t } = useTranslation();
                 <div class="flex items-center gap-3">
                     <LanguageToggle />
                     <Link :href="landing()">
-                        <Button variant="outline">{{
-                            t('static.back_home')
-                        }}</Button>
+                        <Button variant="outline"
+                            >{{ t('static.back_home') }}
+                        </Button>
                     </Link>
                 </div>
             </div>
@@ -55,9 +55,9 @@ const { t } = useTranslation();
         >
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-3xl text-center">
-                    <Badge class="mb-4 bg-[#25D366]">{{
-                        t('static.terms.badge')
-                    }}</Badge>
+                    <Badge class="mb-4 bg-[#25D366]"
+                        >{{ t('static.terms.badge') }}
+                    </Badge>
                     <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
                         {{ t('static.terms.title') }}
                     </h1>
@@ -124,10 +124,18 @@ const { t } = useTranslation();
                         {{ t('landing.footer.copyright') }}
                     </p>
                     <div class="flex gap-6 text-sm">
-                        <Link href="/about" class="hover:text-[#25D366]">{{ t('static.about.link') }}</Link>
-                        <Link href="/contact" class="hover:text-[#25D366]">{{ t('static.contact.link') }}</Link>
-                        <Link href="/privacy" class="hover:text-[#25D366]">{{ t('static.privacy.link') }}</Link>
-                        <Link href="/terms" class="hover:text-[#25D366]">{{ t('static.terms.link') }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/about">{{
+                            t('static.about.link')
+                        }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/contact">{{
+                            t('static.contact.link')
+                        }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/privacy">{{
+                            t('static.privacy.link')
+                        }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/terms">{{
+                            t('static.terms.link')
+                        }}</Link>
                     </div>
                 </div>
             </div>

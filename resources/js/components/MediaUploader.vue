@@ -1,13 +1,16 @@
-<script setup lang="ts">
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-} from '@/components/ui/card';
+<script lang="ts" setup>
 import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/composables/useTranslation';
 import type { TemplateType } from '@/types/template';
-import { FileText, Image as ImageIcon, Trash2, Upload, Video } from 'lucide-vue-next';
+import {
+    FileText,
+    Image as ImageIcon,
+    Trash2,
+    Upload,
+    Video,
+} from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 interface Props {
@@ -19,7 +22,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{
     'update:file': [file: File | null];
-    'remove': [];
+    remove: [];
 }>();
 
 const { t, isRTL } = useTranslation();
@@ -128,10 +131,20 @@ const getFileName = computed(() => {
                             {{ t('templates.upload_media', 'Upload Media') }}
                         </p>
                         <p class="mt-2 text-sm text-muted-foreground">
-                            {{ t('templates.drag_drop', 'Drag and drop or click to browse') }}
+                            {{
+                                t(
+                                    'templates.drag_drop',
+                                    'Drag and drop or click to browse',
+                                )
+                            }}
                         </p>
-                        <p v-if="mediaConfig" class="mt-1 text-xs text-muted-foreground">
-                            {{ mediaConfig.types }} - {{ t('templates.max_size', 'Max size') }}: {{ mediaConfig.maxSize }}
+                        <p
+                            v-if="mediaConfig"
+                            class="mt-1 text-xs text-muted-foreground"
+                        >
+                            {{ mediaConfig.types }} -
+                            {{ t('templates.max_size', 'Max size') }}:
+                            {{ mediaConfig.maxSize }}
                         </p>
                     </div>
                     <input
@@ -182,26 +195,40 @@ const getFileName = computed(() => {
                     </div>
 
                     <!-- Document Preview -->
-                    <div v-if="type === 'text_document'" class="flex items-center gap-4">
+                    <div
+                        v-if="type === 'text_document'"
+                        class="flex items-center gap-4"
+                    >
                         <div class="rounded-lg border p-4">
                             <FileText class="size-12 text-muted-foreground" />
                         </div>
                         <div class="flex-1">
                             <p class="font-medium">{{ getFileName }}</p>
                             <p class="text-sm text-muted-foreground">
-                                {{ t('templates.document_file', 'Document file') }}
+                                {{
+                                    t(
+                                        'templates.document_file',
+                                        'Document file',
+                                    )
+                                }}
                             </p>
                         </div>
                     </div>
 
                     <!-- Remove Button -->
-                    <div :class="isRTL() ? 'flex-row-reverse' : ''" class="flex gap-2">
+                    <div
+                        :class="isRTL() ? 'flex-row-reverse' : ''"
+                        class="flex gap-2"
+                    >
                         <Button
                             size="sm"
                             variant="destructive"
                             @click="removeMedia"
                         >
-                            <Trash2 :class="isRTL() ? 'ml-2' : 'mr-2'" class="size-4" />
+                            <Trash2
+                                :class="isRTL() ? 'ml-2' : 'mr-2'"
+                                class="size-4"
+                            />
                             {{ t('common.remove', 'Remove') }}
                         </Button>
                         <Button
@@ -209,7 +236,10 @@ const getFileName = computed(() => {
                             variant="outline"
                             @click="fileInput?.click()"
                         >
-                            <Upload :class="isRTL() ? 'ml-2' : 'mr-2'" class="size-4" />
+                            <Upload
+                                :class="isRTL() ? 'ml-2' : 'mr-2'"
+                                class="size-4"
+                            />
                             {{ t('templates.replace_media', 'Replace Media') }}
                         </Button>
                     </div>

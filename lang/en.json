@@ -19,7 +19,6 @@
         "subscription": "Subscription",
         "settings": "Settings",
         "reports": "Reports"
-
     },
     "whatsapp": {
         "title": "WhatsApp Connection",
@@ -348,7 +347,6 @@
         "select_session": "Select WhatsApp Session",
         "schedule_at": "Schedule For",
         "send_immediately": "Send Immediately",
-
         "status": {
             "draft": "Draft",
             "scheduled": "Scheduled",
@@ -403,7 +401,6 @@
         "media_attached": "attached",
         "create_campaign": "Create Campaign",
         "search_contacts": "Search contacts...",
-
         "type": {
             "text": "Text Only",
             "image": "Text + Image",
@@ -411,7 +408,6 @@
             "audio": "Audio",
             "document": "Document"
         },
-
         "errors": {
             "no_connected_session": "No Connected WhatsApp Session",
             "no_connected_session_desc": "Please connect a WhatsApp session before creating a campaign."
@@ -423,7 +419,6 @@
             "view_results": "View Results",
             "export_results": "Export Results"
         },
-
         "stats": {
             "total_recipients": "Total Recipients",
             "messages_sent": "Messages Sent",
@@ -432,7 +427,6 @@
             "success_rate": "Success Rate",
             "progress": "Progress"
         },
-
         "messages": {
             "created_successfully": "Campaign created successfully",
             "updated_successfully": "Campaign updated successfully",
@@ -442,7 +436,6 @@
             "sending_started": "Campaign sending started! Messages are being queued.",
             "completed": "Campaign completed successfully"
         },
-
         "errors": {
             "quota_exceeded": "This campaign requires {{required}} messages but you only have {{remaining}} remaining.",
             "no_session": "Please select a connected WhatsApp session",
@@ -1165,7 +1158,6 @@
         }
     },
     "settings": {
-
         "subscription": "Subscription",
         "subscription_settings": "Subscription Settings",
         "profile_overview": "Profile Overview",

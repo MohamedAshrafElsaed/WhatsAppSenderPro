@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use App\Models\User;
 use Carbon\Carbon;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class JWTService
 {
@@ -18,23 +18,6 @@ class JWTService
         $this->secret = config('jwt.secret');
         $this->algo = config('jwt.algo');
         $this->ttl = config('jwt.ttl');
-    }
-
-    /**
-     * Generate JWT token for a user
-     */
-    public function generateToken(User $user): string
-    {
-        $now = Carbon::now();
-
-        $payload = [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'iat' => $now->timestamp,
-            'exp' => $now->addSeconds($this->ttl)->timestamp,
-        ];
-
-        return JWT::encode($payload, $this->secret, $this->algo);
     }
 
     /**
@@ -55,6 +38,23 @@ class JWTService
     public function refreshToken(User $user): string
     {
         return $this->generateToken($user);
+    }
+
+    /**
+     * Generate JWT token for a user
+     */
+    public function generateToken(User $user): string
+    {
+        $now = Carbon::now();
+
+        $payload = [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'iat' => $now->timestamp,
+            'exp' => $now->addSeconds($this->ttl)->timestamp,
+        ];
+
+        return JWT::encode($payload, $this->secret, $this->algo);
     }
 
     /**

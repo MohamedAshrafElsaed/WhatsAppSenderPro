@@ -1,4 +1,8 @@
-export type TemplateType = 'text' | 'text_image' | 'text_video' | 'text_document';
+export type TemplateType =
+    | 'text'
+    | 'text_image'
+    | 'text_video'
+    | 'text_document';
 
 export interface Template {
     id: number;

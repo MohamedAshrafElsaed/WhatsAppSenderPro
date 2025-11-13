@@ -48,9 +48,9 @@ const { t } = useTranslation();
                 <div class="flex items-center gap-3">
                     <LanguageToggle />
                     <Link :href="home()">
-                        <Button variant="outline">{{
-                            t('static.back_home')
-                        }}</Button>
+                        <Button variant="outline"
+                            >{{ t('static.back_home') }}
+                        </Button>
                     </Link>
                 </div>
             </div>
@@ -62,9 +62,9 @@ const { t } = useTranslation();
         >
             <div class="container mx-auto px-4">
                 <div class="mx-auto max-w-3xl text-center">
-                    <Badge class="mb-4 bg-[#25D366]">{{
-                        t('static.about.badge')
-                    }}</Badge>
+                    <Badge class="mb-4 bg-[#25D366]"
+                        >{{ t('static.about.badge') }}
+                    </Badge>
                     <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
                         {{ t('static.about.title') }}
                     </h1>
@@ -86,9 +86,9 @@ const { t } = useTranslation();
                             >
                                 <Target class="size-6 text-[#128C7E]" />
                             </div>
-                            <CardTitle class="text-2xl">{{
-                                t('static.about.mission_title')
-                            }}</CardTitle>
+                            <CardTitle class="text-2xl"
+                                >{{ t('static.about.mission_title') }}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p class="text-muted-foreground">
@@ -104,9 +104,9 @@ const { t } = useTranslation();
                             >
                                 <Heart class="size-6 text-[#128C7E]" />
                             </div>
-                            <CardTitle class="text-2xl">{{
-                                t('static.about.vision_title')
-                            }}</CardTitle>
+                            <CardTitle class="text-2xl"
+                                >{{ t('static.about.vision_title') }}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p class="text-muted-foreground">
@@ -138,9 +138,9 @@ const { t } = useTranslation();
                             >
                                 <Shield class="size-5 text-white" />
                             </div>
-                            <CardTitle>{{
-                                t('static.about.value1_title')
-                            }}</CardTitle>
+                            <CardTitle
+                                >{{ t('static.about.value1_title') }}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p class="text-sm text-muted-foreground">
@@ -156,9 +156,9 @@ const { t } = useTranslation();
                             >
                                 <Zap class="size-5 text-white" />
                             </div>
-                            <CardTitle>{{
-                                t('static.about.value2_title')
-                            }}</CardTitle>
+                            <CardTitle
+                                >{{ t('static.about.value2_title') }}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p class="text-sm text-muted-foreground">
@@ -174,9 +174,9 @@ const { t } = useTranslation();
                             >
                                 <Users class="size-5 text-white" />
                             </div>
-                            <CardTitle>{{
-                                t('static.about.value3_title')
-                            }}</CardTitle>
+                            <CardTitle
+                                >{{ t('static.about.value3_title') }}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p class="text-sm text-muted-foreground">
@@ -222,10 +222,18 @@ const { t } = useTranslation();
                         {{ t('landing.footer.copyright') }}
                     </p>
                     <div class="flex gap-6 text-sm">
-                        <Link href="/about" class="hover:text-[#25D366]">{{ t('static.about.link') }}</Link>
-                        <Link href="/contact" class="hover:text-[#25D366]">{{ t('static.contact.link') }}</Link>
-                        <Link href="/privacy" class="hover:text-[#25D366]">{{ t('static.privacy.link') }}</Link>
-                        <Link href="/terms" class="hover:text-[#25D366]">{{ t('static.terms.link') }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/about">{{
+                            t('static.about.link')
+                        }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/contact">{{
+                            t('static.contact.link')
+                        }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/privacy">{{
+                            t('static.privacy.link')
+                        }}</Link>
+                        <Link class="hover:text-[#25D366]" href="/terms">{{
+                            t('static.terms.link')
+                        }}</Link>
                     </div>
                 </div>
             </div>

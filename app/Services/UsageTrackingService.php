@@ -97,20 +97,6 @@ class UsageTrackingService
     }
 
     /**
-     * Get remaining quota for a specific limit type
-     */
-    public function getRemainingQuota(User $user, string $type): int|string
-    {
-        $subscription = $user->activeSubscription();
-
-        if (!$subscription) {
-            return 0;
-        }
-
-        return $user->getRemainingQuota($type);
-    }
-
-    /**
      * Get usage statistics for the current period
      */
     public function getCurrentUsageStats(User $user): array
@@ -151,6 +137,20 @@ class UsageTrackingService
                 'remaining' => $user->getRemainingQuota('message_templates'),
             ],
         ];
+    }
+
+    /**
+     * Get remaining quota for a specific limit type
+     */
+    public function getRemainingQuota(User $user, string $type): int|string
+    {
+        $subscription = $user->activeSubscription();
+
+        if (!$subscription) {
+            return 0;
+        }
+
+        return $user->getRemainingQuota($type);
     }
 
     /**

@@ -3,7 +3,6 @@
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\StaticPageController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 
 Route::get('/', [LandingController::class, 'index'])->name('home');

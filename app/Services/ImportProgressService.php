@@ -32,7 +32,8 @@ class ImportProgressService
         int $invalid,
         int $duplicates,
         int $currentRow
-    ): void {
+    ): void
+    {
         $progress = Cache::get("import_progress_{$importId}");
         if ($progress) {
             $progress['processed'] = $processed;

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Progress } from '@/components/ui/progress';
 import { computed } from 'vue';
 
@@ -32,11 +32,14 @@ const progressLabel = computed(() => {
 <template>
     <div class="space-y-2">
         <Progress
-            :model-value="percentage"
             :class="progressColor"
+            :model-value="percentage"
             class="h-2"
         />
-        <div v-if="showLabel" class="flex justify-between text-sm text-muted-foreground">
+        <div
+            v-if="showLabel"
+            class="flex justify-between text-sm text-muted-foreground"
+        >
             <span>{{ progressLabel }}</span>
             <span>{{ percentage }}%</span>
         </div>

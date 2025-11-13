@@ -3,8 +3,8 @@
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberUtil;
 
 class ValidPhoneNumber implements Rule
 {
@@ -57,14 +57,6 @@ class ValidPhoneNumber implements Rule
     }
 
     /**
-     * Get the validation error message
-     */
-    public function message(): string
-    {
-        return $this->errorMessage;
-    }
-
-    /**
      * Get country ISO code from country ID
      */
     private function getCountryCode(): string
@@ -75,5 +67,13 @@ class ValidPhoneNumber implements Rule
         }
 
         return 'EG'; // Default to Egypt
+    }
+
+    /**
+     * Get the validation error message
+     */
+    public function message(): string
+    {
+        return $this->errorMessage;
     }
 }
