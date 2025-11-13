@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCampaignRequest;
 use App\Models\Campaign;
 use App\Models\Contact;
 use App\Models\Template;
@@ -10,7 +11,10 @@ use App\Services\UsageTrackingService;
 use App\Services\WhatsAppApiService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -234,76 +238,126 @@ class CampaignController extends Controller
     }
 
     /**
-     * Store new campaign
+     * Store new campaign with comprehensive validation and error handling
+     *
      * @throws AuthorizationException
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreCampaignRequest $request): \Illuminate\Http\RedirectResponse
     {
         $user = $request->user();
 
         // Check authorization
         $this->authorize('create', Campaign::class);
 
-        // Validate request
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'template_id' => 'nullable|exists:templates,id',
-            'message_type' => 'required|in:text,image,video,audio,document',
-            'message_content' => 'required|string|max:4096',
-            'message_caption' => 'nullable|string|max:1024',
-            'scheduled_at' => 'nullable|date|after:now',
-            'recipient_ids' => 'required|array|min:1',
-            'recipient_ids.*' => 'exists:contacts,id',
-            'session_id' => 'required|string', // WhatsApp session ID
-            'media' => [
-                'nullable',
-                'file',
-                'max:16384',
-                Rule::when(
-                    $request->input('message_type') === 'image',
-                    ['image', 'mimes:jpg,jpeg,png,gif', 'max:5120']
-                ),
-                Rule::when(
-                    $request->input('message_type') === 'video',
-                    ['mimes:mp4', 'max:16384']
-                ),
-                Rule::when(
-                    $request->input('message_type') === 'audio',
-                    ['mimes:mp3,ogg,wav', 'max:16384']
-                ),
-                Rule::when(
-                    $request->input('message_type') === 'document',
-                    ['mimes:pdf,doc,docx,xls,xlsx', 'max:10240']
-                ),
-            ],
-        ]);
+        // Get validated data from form request (all validation already done)
+        $validated = $request->validated();
 
-        // Check quota before creating
-        $recipientCount = count($validated['recipient_ids']);
-        $remaining = $this->usageTracking->getRemainingQuota($user, 'messages_per_month');
-
-        if ($remaining !== 'unlimited' && $recipientCount > $remaining) {
-            return back()->withErrors([
-                'quota' => trans('campaigns.errors.quota_exceeded', [
-                    'required' => $recipientCount,
-                    'remaining' => $remaining,
-                ]),
-            ])->withInput();
-        }
+        // Use database transaction for atomic operations
+        DB::beginTransaction();
 
         try {
+            // Prepare campaign data
             $validated['user_id'] = $user->id;
-            $validated['status'] = $validated['scheduled_at'] ? 'scheduled' : 'draft';
+            $validated['status'] = $validated['scheduled_at'] ?? null ? 'scheduled' : 'draft';
 
+            // Log campaign creation attempt
+            Log::info('Creating campaign', [
+                'user_id' => $user->id,
+                'campaign_name' => $validated['name'],
+                'recipient_count' => count($validated['recipient_ids']),
+                'message_type' => $validated['message_type'],
+                'has_template' => isset($validated['template_id']),
+                'is_scheduled' => isset($validated['scheduled_at']),
+            ]);
+
+            // Validate WhatsApp session exists and is connected
+            try {
+                $sessionsResponse = $this->whatsappApi->getSessions($user);
+                $sessionExists = collect($sessionsResponse['data']['sessions'] ?? [])
+                    ->firstWhere('id', $validated['session_id']);
+
+                if (!$sessionExists || $sessionExists['status'] !== 'connected') {
+                    throw ValidationException::withMessages([
+                        'session_id' => 'The selected WhatsApp session is not connected or does not exist.',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to validate WhatsApp session', [
+                    'user_id' => $user->id,
+                    'session_id' => $validated['session_id'],
+                    'error' => $e->getMessage(),
+                ]);
+
+                throw ValidationException::withMessages([
+                    'session_id' => 'Unable to verify WhatsApp session connectivity. Please try again.',
+                ]);
+            }
+
+            // Create campaign through service (handles media upload, recipients, etc.)
             $campaign = $this->campaignService->createCampaign($user, $validated);
+
+            // Commit transaction
+            DB::commit();
+
+            // Log successful creation
+            Log::info('Campaign created successfully', [
+                'user_id' => $user->id,
+                'campaign_id' => $campaign->id,
+                'campaign_name' => $campaign->name,
+                'recipient_count' => count($validated['recipient_ids']),
+            ]);
+
+            // Activity log (if you have activity logging system)
+            activity()
+                ->causedBy($user)
+                ->performedOn($campaign)
+                ->withProperties([
+                    'campaign_name' => $campaign->name,
+                    'recipient_count' => count($validated['recipient_ids']),
+                    'message_type' => $campaign->message_type,
+                    'is_scheduled' => !empty($campaign->scheduled_at),
+                ])
+                ->log('created_campaign');
 
             return redirect()->route('dashboard.campaigns.show', $campaign)
                 ->with('success', trans('campaigns.messages.created_successfully'));
 
-        } catch (\Exception $e) {
-            return back()->withErrors([
+        } catch (ValidationException $e) {
+            // Rollback transaction
+            DB::rollBack();
+
+            // Re-throw validation exceptions to show to user
+            throw $e;
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Rollback transaction
+            DB::rollBack();
+
+            // Log database errors
+            Log::error('Database error creating campaign', [
+                'user_id' => $user->id,
                 'error' => $e->getMessage(),
-            ])->withInput();
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()
+                ->withErrors(['error' => 'A database error occurred. Please try again or contact support.'])
+                ->withInput();
+
+        } catch (\Exception $e) {
+            // Rollback transaction
+            DB::rollBack();
+
+            // Log general errors
+            Log::error('Error creating campaign', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()
+                ->withErrors(['error' => 'An unexpected error occurred: ' . $e->getMessage()])
+                ->withInput();
         }
     }
 
