@@ -10,7 +10,6 @@ import { index as dashboard } from '@/routes/dashboard';
 import type { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import {
-    BarChart3,
     CheckCircle,
     Download,
     MessageSquare,
@@ -102,11 +101,13 @@ const formatNumber = (num: number): string => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head :title="t('reports.title', 'Reports & Analytics')" />
 
-        <div :class="isRTL() ? 'text-right' : 'text-left'" class="space-y-6">
+        <div
+            :class="isRTL() ? 'text-right' : 'text-left'"
+            class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6"
+        >
             <!-- Header -->
             <div
-                :class="isRTL() ? 'flex-row-reverse' : ''"
-                class="flex items-center justify-between"
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
             >
                 <Heading
                     :description="
@@ -116,15 +117,7 @@ const formatNumber = (num: number): string => {
                         )
                     "
                     :title="t('reports.title', 'Reports & Analytics')"
-                >
-                    <template #icon>
-                        <div
-                            class="flex items-center justify-center rounded-lg bg-[#25D366] p-2"
-                        >
-                            <BarChart3 class="h-5 w-5 text-white" />
-                        </div>
-                    </template>
-                </Heading>
+                />
             </div>
 
             <!-- Date Range Filter -->
@@ -273,11 +266,12 @@ const formatNumber = (num: number): string => {
                             )
                         }}</CardTitle>
                         <Button
+                            class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
                             size="sm"
                             variant="outline"
                             @click="exportReport('campaigns')"
                         >
-                            <Download class="mr-2 h-4 w-4" />
+                            <Download :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                             {{ t('common.export', 'Export') }}
                         </Button>
                     </div>
@@ -377,11 +371,12 @@ const formatNumber = (num: number): string => {
                             )
                         }}</CardTitle>
                         <Button
+                            class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
                             size="sm"
                             variant="outline"
                             @click="exportReport('messages')"
                         >
-                            <Download class="mr-2 h-4 w-4" />
+                            <Download :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                             {{ t('common.export', 'Export') }}
                         </Button>
                     </div>
@@ -441,11 +436,12 @@ const formatNumber = (num: number): string => {
                             t('reports.contact_growth', 'Contact Growth')
                         }}</CardTitle>
                         <Button
+                            class="border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
                             size="sm"
                             variant="outline"
                             @click="exportReport('contacts')"
                         >
-                            <Download class="mr-2 h-4 w-4" />
+                            <Download :class="isRTL() ? 'ml-2' : 'mr-2'" class="h-4 w-4" />
                             {{ t('common.export', 'Export') }}
                         </Button>
                     </div>
