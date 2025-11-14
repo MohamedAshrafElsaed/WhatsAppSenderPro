@@ -17,9 +17,9 @@ import { useTranslation } from '@/composables/useTranslation';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { index as dashboard } from '@/routes/dashboard';
 import {
-    export as exportResults,
+    exportMethod as exportResults,
     index,
-    show,
+    show
 } from '@/routes/dashboard/campaigns';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
