@@ -68,7 +68,7 @@ const handleValueChange = (value: string) => {
         <SelectTrigger :tabindex="tabindex" class="w-full">
             <SelectValue :placeholder="placeholder" />
         </SelectTrigger>
-        <SelectContent class="w-full">
+        <SelectContent class="w-[var(--reka-select-trigger-width)]">
             <!-- Search Input -->
             <div class="sticky top-0 z-10 bg-background p-2 pb-1">
                 <div class="relative">

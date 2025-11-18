@@ -99,6 +99,9 @@ return [
     | that it registers with the application. If necessary, you may change
     | these middleware but typically this provided default is preferred.
     |
+    | IMPORTANT: 'guest' middleware is automatically applied to login and
+    | register routes by Fortify when Features::registration() is enabled.
+    |
     */
 
     'middleware' => ['web'],
