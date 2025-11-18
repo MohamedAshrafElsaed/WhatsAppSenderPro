@@ -126,7 +126,7 @@ const showQRCode = async (session: Session) => {
     qrLoading.value = true;
 
     try {
-        const response = await fetch(`/whatsapp/sessions/${session.id}/qr`);
+        const response = await fetch(`/dashboard/whatsapp/sessions/${session.id}/qr`);
         const data = await response.json();
 
         if (data.success) {
@@ -143,7 +143,7 @@ const showQRCode = async (session: Session) => {
 
 const connectWebSocket = async (sessionId: string) => {
     try {
-        const response = await fetch(`/whatsapp/sessions/${sessionId}/ws-url`);
+        const response = await fetch(`/dashboard/whatsapp/sessions/${sessionId}/ws-url`);
         const data = await response.json();
 
         if (data.success) {

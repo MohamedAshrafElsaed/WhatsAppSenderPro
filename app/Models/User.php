@@ -271,15 +271,6 @@ class User extends Authenticatable
         return $subscription->getRemainingLimit($limit, $currentUsage);
     }
 
-    /**
-     * Generate JWT token for WhatsApp API authentication
-     */
-    public function generateJWT(): string
-    {
-        $jwtService = new JWTService();
-        return $jwtService->generateToken($this);
-    }
-
     public function contacts(): HasMany
     {
         return $this->hasMany(Contact::class);
@@ -298,5 +289,116 @@ class User extends Authenticatable
     public function campaigns(): HasMany
     {
         return $this->hasMany(Campaign::class);
+    }
+
+    /**
+     * Invalidate cached JWT token
+     * Call this when user logs out or token needs to be refreshed
+     *
+     * @return void
+     */
+    public function invalidateWhatsAppApiToken(): void
+    {
+        $cacheKey = 'whatsapp_api_token_' . $this->id;
+        session()->forget($cacheKey);
+    }
+
+
+    /**
+     * Generate JWT token for WhatsApp API authentication
+     *
+     * @return string
+     */
+    public function generateJWT(): string
+    {
+        $jwtService = app(JWTService::class);
+        return $jwtService->generateToken($this);
+    }
+
+    /**
+     * Get JWT token for WhatsApp API (alias for better readability)
+     *
+     * @return string
+     */
+    public function getWhatsAppApiToken(): string
+    {
+        return $this->generateCachedJWT();
+    }
+
+    /**
+     * Generate cached JWT token for WhatsApp API
+     * Uses caching to improve performance
+     *
+     * @return string
+     */
+    public function generateCachedJWT(): string
+    {
+        $jwtService = app(JWTService::class);
+        return $jwtService->generateCachedToken($this);
+    }
+
+    /**
+     * Refresh JWT token (invalidates cache and generates new token)
+     *
+     * @return string
+     */
+    public function refreshJWT(): string
+    {
+        $jwtService = app(JWTService::class);
+        return $jwtService->refreshToken($this);
+    }
+
+    /**
+     * Invalidate cached JWT token
+     * Call this when user logs out or needs token refresh
+     *
+     * @return void
+     */
+    public function invalidateJWT(): void
+    {
+        $jwtService = app(JWTService::class);
+        $jwtService->invalidateToken($this->id);
+    }
+
+    /**
+     * Verify if a JWT token is valid for this user
+     *
+     * @param string $token
+     * @return bool
+     */
+    public function verifyJWT(string $token): bool
+    {
+        $jwtService = app(JWTService::class);
+        $decoded = $jwtService->verifyToken($token);
+
+        if (!$decoded) {
+            return false;
+        }
+
+        return isset($decoded->user_id) && $decoded->user_id === $this->id;
+    }
+
+    /**
+     * Get JWT token expiration time
+     *
+     * @param string $token
+     * @return \Carbon\Carbon|null
+     */
+    public function getJWTExpiration(string $token): ?\Carbon\Carbon
+    {
+        $jwtService = app(JWTService::class);
+        return $jwtService->getTokenExpiration($token);
+    }
+
+    /**
+     * Check if JWT token can be refreshed
+     *
+     * @param string $token
+     * @return bool
+     */
+    public function canRefreshJWT(string $token): bool
+    {
+        $jwtService = app(JWTService::class);
+        return $jwtService->canRefreshToken($token);
     }
 }

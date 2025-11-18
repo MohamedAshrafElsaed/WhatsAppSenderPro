@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\SubscriptionService;
 use App\Services\WhatsAppApiService;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Log;
 
 class DashboardController extends Controller
 {
@@ -54,9 +57,9 @@ class DashboardController extends Controller
                 $user->update(['onboarding_data' => $onboardingData]);
                 $onboardingStatus['whatsapp_connected'] = true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // If WhatsApp API is not available, continue without it
-            \Log::warning('WhatsApp API not available for dashboard', ['error' => $e->getMessage()]);
+            Log::warning('WhatsApp API not available for dashboard', ['error' => $e->getMessage()]);
         }
 
         // Calculate onboarding progress

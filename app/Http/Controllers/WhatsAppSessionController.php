@@ -99,6 +99,7 @@ class WhatsAppSessionController extends Controller
             $response = $this->whatsappApi->getSessionQR($user, $sessionId);
             return response()->json($response);
         } catch (\Exception $e) {
+            dd($e);
             return response()->json([
                 'success' => false,
                 'message' => __('whatsapp.qr_failed'),
